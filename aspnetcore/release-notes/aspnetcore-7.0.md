@@ -195,7 +195,7 @@ The [`[AsParameters]` attribute](xref:Microsoft.AspNetCore.Http.AsParametersAttr
 
 The problem details service implements the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> interface, which supports creating [Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc7807.html).
 
-For more information, see [Problem details service](xref:web-api/handle-errors##pds7)
+For more information, see [Problem details service](xref:web-api/handle-errors#pds7).
 
 ### Route groups
 
@@ -209,7 +209,7 @@ gRPC JSON transcoding is an extension for ASP.NET Core that creates RESTful JSON
 
 * Apps to call gRPC services with familiar HTTP concepts.
 * ASP.NET Core gRPC apps to support both gRPC and RESTful JSON APIs without replicating functionality.
-* Experimental support for generating OpenAPI from transcoded RESTful APIs by integrating with with [Swashbuckle](xref:tutorials/get-started-with-swashbuckle).
+* Experimental support for generating OpenAPI from transcoded RESTful APIs by integrating with [Swashbuckle](xref:tutorials/get-started-with-swashbuckle).
 
 For more information, see [gRPC JSON transcoding in ASP.NET Core gRPC apps](xref:grpc/json-transcoding?view=aspnetcore-7.0) and <xref:grpc/json-transcoding-openapi>.
 
@@ -290,6 +290,16 @@ For more information, see <xref:blazor/components/index?view=aspnetcore-7.0#blaz
 
 ### Bind modifiers (`@bind:after`, `@bind:get`, `@bind:set`)
 
+> [!IMPORTANT]
+> The `@bind:after`/`@bind:get`/`@bind:set` features are receiving further updates at this time. To take advantage of the latest updates, confirm that you've installed the [latest SDK](https://dotnet.microsoft.com/download/dotnet/7.0).
+>
+> Using an event callback parameter (`[Parameter] public EventCallback<string> ValueChanged { get; set; }`) isn't supported. Instead, pass an <xref:System.Action>-returning or <xref:System.Threading.Tasks.Task>-returning method to `@bind:set`/`@bind:after`.
+>
+> For more information, see the following resources:
+>
+> * [Blazor `@bind:after` not working on .NET 7 RTM release (dotnet/aspnetcore #44957)](https://github.com/dotnet/aspnetcore/issues/44957)
+> * [`BindGetSetAfter701` sample app (javiercn/BindGetSetAfter701 GitHub repository)](https://github.com/javiercn/BindGetSetAfter701)
+
 In .NET 7, you can run asynchronous logic after a binding event has completed using the new `@bind:after` modifier. In the following example, the `PerformSearch` asynchronous method runs automatically after any changes to the search text are detected:
 
 ```razor
@@ -312,24 +322,65 @@ In .NET 7, it's also easier to set up binding for component parameters. Componen
 
 The `@bind:get` and `@bind:set` modifiers are always used together.
 
-Example:
+Examples:
 
 ```razor
-<input @bind:get="Value" @bind:set="ValueChanged" />
+@* Elements *@
+
+<input type="text" @bind="text" @bind:after="() => { }" />
+
+<input type="text" @bind:get="text" @bind:set="(value) => { }" />
+
+<input type="text" @bind="text" @bind:after="AfterAsync" />
+
+<input type="text" @bind:get="text" @bind:set="SetAsync" />
+
+<input type="text" @bind="text" @bind:after="() => { }" />
+
+<input type="text" @bind:get="text" @bind:set="(value) => { }" />
+
+<input type="text" @bind="text" @bind:after="AfterAsync" />
+
+<input type="text" @bind:get="text" @bind:set="SetAsync" />
+
+@* Components *@
+
+<InputText @bind-Value="text" @bind-Value:after="() => { }" />
+
+<InputText @bind-Value:get="text" @bind-Value:set="(value) => { }" />
+
+<InputText @bind-Value="text" @bind-Value:after="AfterAsync" />
+
+<InputText @bind-Value:get="text" @bind-Value:set="SetAsync" />
+
+<InputText @bind-Value="text" @bind-Value:after="() => { }" />
+
+<InputText @bind-Value:get="text" @bind-Value:set="(value) => { }" />
+
+<InputText @bind-Value="text" @bind-Value:after="AfterAsync" />
+
+<InputText @bind-Value:get="text" @bind-Value:set="SetAsync" />
 
 @code {
-    [Parameter]
-    public TValue? Value { get; set; }
+    private string text = "";
 
-    [Parameter]
-    public EventCallback<TValue> ValueChanged { get; set; }
+    private void After(){}
+    private void Set() {}
+    private Task AfterAsync() { return Task.CompletedTask; }
+    private Task SetAsync(string value) { return Task.CompletedTask; }
 }
 ```
+
+For more information on the `InputText` component, see <xref:blazor/forms-and-input-components>.
+
+<!--
 
 For more information, see the following content in the *Data binding* article:
 
 * [Introduction](xref:blazor/components/data-binding?view=aspnetcore-7.0)
 * [Bind across more than two components](xref:blazor/components/data-binding?view=aspnetcore-7.0#bind-across-more-than-two-components)
+
+-->
 
 ### Hot Reload improvements
 
@@ -406,7 +457,7 @@ Several additional changes were made to the Blazor project templates. It isn't f
 
 The new `QuickGrid` component provides a convenient data grid component for most common requirements and as a reference architecture and performance baseline for anyone building Blazor data grid components.
 
-For more information, see <xref:blazor/components/index?view=aspnetcore-7.0#quickgrid-component>.
+For more information, see <xref:blazor/components/quickgrid>.
 
 Live demo: [QuickGrid for Blazor sample app](https://aspnet.github.io/quickgridsamples/)
 

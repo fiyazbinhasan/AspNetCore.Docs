@@ -1,6 +1,6 @@
 ---
 title: Safe storage of app secrets in development in ASP.NET Core
-author: rick-anderson
+author: tdykstra
 description: Learn how to store and retrieve sensitive information during the development of an ASP.NET Core app.
 ms.author: riande
 monikerRange: '>= aspnetcore-3.0'
@@ -229,7 +229,7 @@ Run the following command from the directory in which the project file exists:
 dotnet user-secrets remove "Movies:ConnectionString"
 ```
 
-The app's `secrets.json` file was modified to remove the key-value pair associated with the `MoviesConnectionString` key:
+The app's `secrets.json` file was modified to remove the key-value pair associated with the `Movies:ConnectionString` key:
 
 ```json
 {
@@ -274,6 +274,10 @@ No secrets configured for this application.
 To manage user secrets in Visual Studio, right click the project in solution explorer and select **Manage User Secrets**:
 
 ![Visual Studio showing Manage User Secrets](app-secrets/_static/usvs.png)
+
+## Migrating User Secrets from ASP.NET Framework to ASP.NET Core
+
+See [this GitHub issue](https://github.com/dotnet/AspNetCore.Docs/issues/27611).
 
 ## Additional resources
 
@@ -547,6 +551,10 @@ No secrets configured for this application.
 To manage user secrets in Visual Studio, right click the project in solution explorer and select **Manage User Secrets**:
 
 ![Visual Studio showing Manage User Secrets](app-secrets/_static/usvs.png)
+
+## Migrating User Secrets from ASP.NET Framework to ASP.NET Core
+
+See [this GitHub issue](https://github.com/dotnet/AspNetCore.Docs/issues/27611).
 
 ## Additional resources
 

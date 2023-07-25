@@ -15,10 +15,6 @@ By [Rick Anderson](https://twitter.com/RickAndMSFT)
 
 The `dotnet user-jwts` command line tool can create and manage app specific local [JSON Web Tokens](https://jwt.io/introduction) (JWTs).
 
-## Name
-
-`dotnet user-jwts` - Cleans the output of a project.
-
 ## Synopsis
 
 ```dotnetcli
@@ -61,7 +57,7 @@ The MSBuild project or solution to apply a command on. If a project or solution 
 | ------------- | ------------- |
 | clear  |  Delete all issued JWTs for a project. |
 | create | Issue a new JSON Web Token.   |
-| delete | Delete a given JWT. |
+| remove | Delete a given JWT. |
 | key | Display or reset the signing key used to issue JWTs. |
 | list | Lists the JWTs issued for the project. |
 | print | Display the details of a given JWT. |
@@ -110,13 +106,13 @@ The `user-jwts` tool hides implementation details, such as where and how the val
 
 File system path:
 
-`%APPDATA%\Microsoft\UserSecrets\<secrets_GUID>\secrets.json`
+`%APPDATA%\Microsoft\UserSecrets\<secrets_GUID>\user-jwts.json`
 
 # [Linux / macOS](#tab/linux+macos)
 
 File system path:
 
-`~/.microsoft/usersecrets/<secrets_GUID>/secrets.json`
+`~/.microsoft/usersecrets/<secrets_GUID>/user-jwts.json`
 
 ---
 

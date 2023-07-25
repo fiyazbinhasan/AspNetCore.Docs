@@ -1,20 +1,34 @@
-Route handlers are methods that execute when the route matches. Route handlers can be a function of any shape, including synchronous or asynchronous. Route handlers can be a lambda expression, a local function, an instance method or a static method.
+Route handlers are methods that execute when the route matches. Route handlers can be a lambda expression, a local function, an instance method or a static method. Route handlers can be synchronous or asynchronous. 
 
-#### Lambda expression
+### Lambda expression
 
 [!code-csharp[](~/fundamentals/minimal-apis/7.0-samples/WebMinAPIs/Program.cs?name=snippet_le)]
 
-#### Local function
+### Local function
 
 [!code-csharp[](~/fundamentals/minimal-apis/7.0-samples/WebMinAPIs/Program.cs?name=snippet_lf)]
 
-#### Instance method
+### Instance method
 
 [!code-csharp[](~/fundamentals/minimal-apis/7.0-samples/WebMinAPIs/Program.cs?name=snippet_im)]
 
-#### Static method
+### Static method
 
 [!code-csharp[](~/fundamentals/minimal-apis/7.0-samples/WebMinAPIs/Program.cs?name=snippet_sm)]
+
+### Endpoint defined outside of `Program.cs`
+
+Minimal APIs don't have to be located in `Program.cs`.
+
+`Program.cs`
+
+[!code-csharp[](~/fundamentals/minimal-apis/8.0-samples/MinAPISeparateFile/Program.cs)]
+
+`TodoEndpoints.cs`
+
+[!code-csharp[](~/fundamentals/minimal-apis/8.0-samples/MinAPISeparateFile/TodoEndpoints.cs)]
+
+See also [Route groups](#route-groups) later in this article.
 
 ### Named endpoints and link generation
 

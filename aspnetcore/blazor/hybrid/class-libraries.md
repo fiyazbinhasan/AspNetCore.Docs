@@ -5,10 +5,12 @@ description: Learn how to share Razor components, C# code, and static assets acr
 monikerRange: '>= aspnetcore-6.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 08/02/2022
+ms.date: 11/08/2022
 uid: blazor/hybrid/class-libraries
 ---
 # Share assets across web and native clients using a Razor class library (RCL)
+
+[!INCLUDE[](~/includes/not-latest-version.md)]
 
 Use a Razor class library (RCL) to share Razor components, C# code, and static assets across web and native client projects.
 
@@ -17,7 +19,7 @@ This article builds on the general concepts found in the following articles:
 * <xref:blazor/components/class-libraries>
 * <xref:razor-pages/ui-class>
 
-The examples in this article share assets between a Blazor Server app and a .NET MAUI Blazor app in the same solution:
+The examples in this article share assets between a Blazor Server app and a .NET MAUI Blazor Hybrid app in the same solution:
 
 * Although a Blazor Server app is used, the guidance applies equally to Blazor WebAssembly apps sharing assets with a Blazor Hybrid app.
 * Projects are in the same [solution](/visualstudio/ide/solutions-and-projects-in-visual-studio#solutions), but an RCL can supply shared assets to projects outside of a solution.
@@ -66,7 +68,7 @@ The .NET Podcasts app showcases the following technologies:
 
 Components from an RCL can be simultaneously shared by web and native client apps built using Blazor. The guidance in <xref:blazor/components/class-libraries> explains how to share Razor components using a Razor class library (RCL). The same guidance applies to reusing Razor components from an RCL in a Blazor Hybrid app.
 
-Component namespaces are derived from the RCL's package ID or assembly name and the component's folder path within the RCL. For more information, see <xref:blazor/components/index#namespaces>. [`@using`](xref:mvc/views/razor#using) directives can be placed in `_Imports.razor` files for components and code, as the following example deomonstrates for an RCL named `SharedLibrary` with a `Shared` folder of shared Razor components and a `Data` folder of shared data classes:
+Component namespaces are derived from the RCL's package ID or assembly name and the component's folder path within the RCL. For more information, see <xref:blazor/components/index#class-name-and-namespace>. [`@using`](xref:mvc/views/razor#using) directives can be placed in `_Imports.razor` files for components and code, as the following example demonstrates for an RCL named `SharedLibrary` with a `Shared` folder of shared Razor components and a `Data` folder of shared data classes:
 
 ```razor
 @using SharedLibrary
@@ -76,13 +78,13 @@ Component namespaces are derived from the RCL's package ID or assembly name and 
 
 Place shared static assets in the RCL's `wwwroot` folder and update static asset paths in the app to use the following path format:
 
-> :::no-loc text="_content/{PACKAGE ID/ASSEMBLY}/{PATH}/{FILENAME}":::
+> :::no-loc text="_content/{PACKAGE ID/ASSEMBLY NAME}/{PATH}/{FILE NAME}":::
 
 Placeholders:
 
-* `{PACKAGE ID/ASSEMBLY}`: The package ID or assembly name of the RCL.
+* `{PACKAGE ID/ASSEMBLY NAME}`: The package ID or assembly name of the RCL.
 * `{PATH}`: Optional path within the RCL's `wwwroot` folder.
-* `{FILENAME}`: The filename of the static asset.
+* `{FILE NAME}`: The file name of the static asset.
 
 The preceding path format is also used in the app for static assets supplied by a NuGet package added to the RCL.
 
@@ -119,15 +121,14 @@ The example uses the following specifications and conventions:
 `Data/WeatherForecast.cs` in the RCL:
 
 ```csharp
-namespace SharedLibrary.Data
+namespace SharedLibrary.Data;
+
+public class WeatherForecast
 {
-    public class WeatherForecast
-    {
-        public DateTime Date { get; set; }
-        public int TemperatureC { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-        public string? Summary { get; set; }
-    }
+    public DateTime Date { get; set; }
+    public int TemperatureC { get; set; }
+    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    public string? Summary { get; set; }
 }
 ```
 
@@ -136,12 +137,11 @@ namespace SharedLibrary.Data
 ```csharp
 using SharedLibrary.Data;
 
-namespace SharedLibrary.Interfaces
+namespace SharedLibrary.Interfaces;
+
+public interface IWeatherForecastService
 {
-    public interface IWeatherForecastService
-    {
-        Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate);
-    }
+    Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate);
 }
 ```
 
@@ -159,20 +159,19 @@ using System.Net.Http.Json;
 using SharedLibrary.Data;
 using SharedLibrary.Interfaces;
 
-namespace {APP NAMESPACE}.Services
+namespace {APP NAMESPACE}.Services;
+
+public class WeatherForecastService : IWeatherForecastService
 {
-    public class WeatherForecastService : IWeatherForecastService
+    private readonly HttpClient http;
+
+    public WeatherForecastService(HttpClient http)
     {
-        private readonly HttpClient http;
-
-        public WeatherForecastService(HttpClient http)
-        {
-            this.http = http;
-        }
-
-        public async Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate) =>
-            await http.GetFromJsonAsync<WeatherForecast[]?>("WeatherForecast");
+        this.http = http;
     }
+
+    public async Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate) =>
+        await http.GetFromJsonAsync<WeatherForecast[]?>("WeatherForecast");
 }
 ```
 
@@ -184,24 +183,23 @@ In the preceding example, the `{APP NAMESPACE}` placeholder is the app's namespa
 using SharedLibrary.Data;
 using SharedLibrary.Interfaces;
 
-namespace {APP NAMESPACE}.Services
-{
-    public class WeatherForecastService : IWeatherForecastService
-    {
-        private static readonly string[] Summaries = new[]
-        {
-            "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot"
-        };
+namespace {APP NAMESPACE}.Services;
 
-        public async Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate) =>
-            await Task.FromResult(Enumerable.Range(1, 5)
-                .Select(index => new WeatherForecast
-                {
-                    Date = startDate.AddDays(index),
-                    TemperatureC = Random.Shared.Next(-20, 55),
-                    Summary = Summaries[Random.Shared.Next(Summaries.Length)]
-                }).ToArray());
-    }
+public class WeatherForecastService : IWeatherForecastService
+{
+    private static readonly string[] Summaries = new[]
+    {
+        "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot"
+    };
+
+    public async Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate) =>
+        await Task.FromResult(Enumerable.Range(1, 5)
+            .Select(index => new WeatherForecast
+            {
+                Date = startDate.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = Summaries[Random.Shared.Next(Summaries.Length)]
+            }).ToArray());
 }
 ```
 
@@ -268,18 +266,17 @@ HELD PER https://github.com/dotnet/AspNetCore.Docs/pull/26331#discussion_r927174
 
 The following example:
 
-* Assumes that a `CustomService` class must be implemented for each hosting model, including the platforms of a .NET MAUI Blazor app, because the code for the service differs for each platform (Android, macOS, Windows, iOS) and a Blazor Server/Blazor WebAssembly app.
+* Assumes that a `CustomService` class must be implemented for each hosting model, including the platforms of a .NET MAUI Blazor Hybrid app, because the code for the service differs for each platform (Android, macOS, Windows, iOS) and a Blazor Server/Blazor WebAssembly app.
 * Places an interface for the service in the Razor class library (RCL). The RCL is named `SharedLibrary`. The interface defines a method that returns a message.
 
 `Interfaces/ICustomService.cs` in the RCL:
 
 ```csharp
-namespace SharedLibrary.Interfaces
+namespace SharedLibrary.Interfaces;
+
+public interface ICustomService
 {
-    public interface ICustomService
-    {
-        string GetMessage();
-    }
+    string GetMessage();
 }
 ```
 
@@ -290,14 +287,13 @@ In the following examples, the RCL implements the `ICustomService` interface for
 ```csharp
 using SharedLibrary.Interfaces;
 
-namespace SharedLibrary.Platforms.Android
+namespace SharedLibrary.Platforms.Android;
+
+public class CustomService : ICustomService
 {
-    public class CustomService : ICustomService
+    public string GetMessage()
     {
-        public string GetMessage()
-        {
-            return "Android implementation of ICustomService.";
-        }
+        return "Android implementation of ICustomService.";
     }
 }
 ```
@@ -307,14 +303,13 @@ namespace SharedLibrary.Platforms.Android
 ```csharp
 using SharedLibrary.Interfaces;
 
-namespace SharedLibrary.Platforms.MacCatalyst
+namespace SharedLibrary.Platforms.MacCatalyst;
+
+public class CustomService : ICustomService
 {
-    public class CustomService : ICustomService
+    public string GetMessage()
     {
-        public string GetMessage()
-        {
-            return "Mac Catalyst implementation of ICustomService.";
-        }
+        return "Mac Catalyst implementation of ICustomService.";
     }
 }
 ```
@@ -324,14 +319,13 @@ namespace SharedLibrary.Platforms.MacCatalyst
 ```csharp
 using SharedLibrary.Interfaces;
 
-namespace SharedLibrary.Platforms.Windows
+namespace SharedLibrary.Platforms.Windows;
+
+public class CustomService : ICustomService
 {
-    public class CustomService : ICustomService
+    public string GetMessage()
     {
-        public string GetMessage()
-        {
-            return "Windows implementation of ICustomService.";
-        }
+        return "Windows implementation of ICustomService.";
     }
 }
 ```
@@ -341,14 +335,13 @@ namespace SharedLibrary.Platforms.Windows
 ```csharp
 using SharedLibrary.Interfaces;
 
-namespace SharedLibrary.Platforms.iOS
+namespace SharedLibrary.Platforms.iOS;
+
+public class CustomService : ICustomService
 {
-    public class CustomService : ICustomService
+    public string GetMessage()
     {
-        public string GetMessage()
-        {
-            return "iOS implementation of ICustomService.";
-        }
+        return "iOS implementation of ICustomService.";
     }
 }
 ```
@@ -360,14 +353,13 @@ In the following example, the RCL implements the `ICustomService` interface for 
 ```csharp
 using SharedLibrary.Interfaces;
 
-namespace SharedLibrary.Web
+namespace SharedLibrary.Web;
+
+public class CustomService : ICustomService
 {
-    public class CustomService : ICustomService
+    public string GetMessage()
     {
-        public string GetMessage()
-        {
-            return "Web implementation of ICustomService.";
-        }
+        return "Web implementation of ICustomService.";
     }
 }
 ```
@@ -375,7 +367,7 @@ namespace SharedLibrary.Web
 The following example is for a .NET MAUI app in the solution that:
 
 * Has a project reference for the `SharedLibrary` project.
-* Registers the appropriate `CustomService` implmentation for each platform.
+* Registers the appropriate `CustomService` implementation for each platform.
 
 In `MauiProgram` (`MauiProgram.cs`):
 
@@ -400,12 +392,12 @@ using SharedLibrary.Interfaces;
 ```
 
 > [!NOTE]
-> Windows Forms Blazor projects register services in `Form1`'s contstructor (`Form1.cs`). WPF Blazor projects register services in `MainWindow`'s constructor (`MainWindow.xaml`).
+> Windows Forms Blazor projects register services in `Form1`'s constructor (`Form1.cs`). WPF Blazor projects register services in `MainWindow`'s constructor (`MainWindow.xaml`).
 
 The following example for a Blazor Server or Blazor WebAssembly project:
 
 * Has a project reference for the `SharedLibrary` project.
-* Registers the appropriate `CustomService` implmentation for web-based clients.
+* Registers the appropriate `CustomService` implementation for web-based clients.
 
 In `Program.cs`:
 

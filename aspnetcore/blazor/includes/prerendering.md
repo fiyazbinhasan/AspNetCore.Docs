@@ -4,7 +4,8 @@ While an app is prerendering, certain actions, such as calling into JavaScript (
 
 For the following example, the `setElementText1` function is placed inside the `<head>` element. The function is called with <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeVoidAsync%2A?displayProperty=nameWithType> and doesn't return a value.
 
-[!INCLUDE[](~/blazor/includes/js-location.md)]
+> [!NOTE]
+> For general guidance on JS location and our recommendations for production apps, see <xref:blazor/js-interop/index#javascript-location>.
 
 ```html
 <script>
@@ -13,7 +14,7 @@ For the following example, the `setElementText1` function is placed inside the `
 ```
 
 > [!WARNING]
-> **The preceding example modifies the Document Object Model (DOM) directly for demonstration purposes only.** Directly modifying the DOM with JS isn't recommended in most scenarios because JS can interfere with Blazor's change tracking. For more information, see <xref:blazor/js-interop/index#interaction-with-the-document-object-model-dom>.
+> **The preceding example modifies the DOM directly for demonstration purposes only.** Directly modifying the DOM with JS isn't recommended in most scenarios because JS can interfere with Blazor's change tracking. For more information, see <xref:blazor/js-interop/index#interaction-with-the-document-object-model-dom>.
 
 The [`OnAfterRender{Async}` lifecycle event](xref:blazor/components/lifecycle#after-component-render-onafterrenderasync) isn't called during the prerendering process on the server. Override the `OnAfterRender{Async}` method to delay JS interop calls until after the component is rendered and interactive on the client after prerendering.
 
@@ -34,7 +35,8 @@ The following component demonstrates how to use JS interop as part of a componen
 
 For the following example, the `setElementText2` function is placed inside the `<head>` element. The function is called with <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A?displayProperty=nameWithType> and returns a value.
 
-[!INCLUDE[](~/blazor/includes/js-location.md)]
+> [!NOTE]
+> For general guidance on JS location and our recommendations for production apps, see <xref:blazor/js-interop/index#javascript-location>.
 
 ```html
 <script>
@@ -46,7 +48,7 @@ For the following example, the `setElementText2` function is placed inside the `
 ```
 
 > [!WARNING]
-> **The preceding example modifies the Document Object Model (DOM) directly for demonstration purposes only.** Directly modifying the DOM with JS isn't recommended in most scenarios because JS can interfere with Blazor's change tracking. For more information, see <xref:blazor/js-interop/index#interaction-with-the-document-object-model-dom>.
+> **The preceding example modifies the DOM directly for demonstration purposes only.** Directly modifying the DOM with JS isn't recommended in most scenarios because JS can interfere with Blazor's change tracking. For more information, see <xref:blazor/js-interop/index#interaction-with-the-document-object-model-dom>.
 
 Where <xref:Microsoft.JSInterop.JSRuntime.InvokeAsync%2A?displayProperty=nameWithType> is called, the <xref:Microsoft.AspNetCore.Components.ElementReference> is only used in <xref:Microsoft.AspNetCore.Components.ComponentBase.OnAfterRenderAsync%2A> and not in any earlier lifecycle method because there's no JS element until after the component is rendered.
 

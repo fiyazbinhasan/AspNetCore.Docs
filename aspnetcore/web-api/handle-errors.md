@@ -1,6 +1,6 @@
 ---
 title: Handle errors in ASP.NET Core web APIs
-author: rick-anderson
+author: tdykstra
 description: Learn about error handling with ASP.NET Core web APIs.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
@@ -180,7 +180,7 @@ The default problem details response body has the following `type`, `title`, and
 
 ### Problem details service
 
-ASP.NET Core supports creating [Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc7807.html) using the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService>. For more information, see the [Problem details](/aspnet/core/fundamentals/error-handling#pds7).
+ASP.NET Core supports creating [Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc7807.html) using the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService>. For more information, see the [Problem details service](/aspnet/core/fundamentals/error-handling#pds7).
 
 The following code configures the app to generate a problem details response for all HTTP client and server error responses that ***don't have a body content yet***:
 
@@ -198,7 +198,7 @@ A problem details response is generated with the previous code when any of the f
 
 The automatic creation of a `ProblemDetails` for error status codes is disabled when the <xref:Microsoft.AspNetCore.Mvc.ApiBehaviorOptions.SuppressMapClientErrors%2A> property is set to `true`:
 
-:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/middleware/problem-details-service/Program.cs" id="snippet_disable" highlight="4,9":::
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/middleware/problem-details-service/Program.cs" id="snippet_disable" highlight="4-7":::
 
 Using the preceding code, when an API controller returns `BadRequest`, an [HTTP 400](https://developer.mozilla.org/docs/Web/HTTP/Status/400) response status is returned with no response body. `SuppressMapClientErrors` prevents a `ProblemDetails` response from being created, even when calling `WriteAsync` for an API Controller endpoint. `WriteAsync` is explained later in this article.
 

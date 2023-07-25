@@ -5,7 +5,7 @@ description: Learn how to configure and use output caching middleware in ASP.NET
 monikerRange: '>= aspnetcore-7.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 10/26/2022
+ms.date: 12/06/2022
 uid: performance/caching/output
 ---
 # Output caching middleware in ASP.NET Core
@@ -39,15 +39,15 @@ For apps with controllers, apply the `[OutputCache]` attribute to the action met
 
 ## Configure multiple endpoints or pages
 
-Create *policies* when calling `AddOutputCaching` to specify caching configuration that applies to multiple endpoints. A policy can be selected for specific endpoints, while a base policy provides default caching configuration for a collection of endpoints.
+Create *policies* when calling `AddOutputCache` to specify caching configuration that applies to multiple endpoints. A policy can be selected for specific endpoints, while a base policy provides default caching configuration for a collection of endpoints.
 
 The following highlighted code configures caching for all of the app's endpoints, with expiration time of 10 seconds. If an expiration time isn't specified,  it defaults to one minute.
 
-:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies1" highlight="3":::
+:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies1" highlight="3-4":::
 
 The following highlighted code creates two policies, each specifying a different expiration time. Selected endpoints can use the 20 second expiration, and others can use the 30 second expiration.
 
-:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies1" highlight="4-5":::
+:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies1" highlight="5-8":::
 
 You can select a policy for an endpoint when calling the `CacheOutput` method or using the `[OutputCache]` attribute:
 
@@ -68,12 +68,38 @@ The following code applies all of the default caching rules to all of an app's e
 
 :::code language="csharp" source="output/samples/7.x/Program.cs" id="policies3":::
 
-The following code removes these defaults while applying caching to all of an app's endpoints:
+### Override the default policy
 
-:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies4":::
+The following code shows how to override the default rules. The highlighted lines in the following custom policy code enable caching for HTTP POST methods and HTTP 301 responses:
 
+:::code language="csharp" source="output/samples/7.x/MyCustomPolicy.cs" highlight="50,68":::
 
-You can override these defaults.
+To use this custom policy, create a named policy:
+
+:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies3b":::
+
+And select the named policy for an endpoint:
+
+:::code language="csharp" source="output/samples/7.x/Program.cs" id="post":::
+
+### Alternative default policy override 
+
+Alternatively, use Dependency Injection (DI) to initialize an instance, with the following changes to the custom policy class:
+
+* A public constructor instead of a private constructor.
+* Eliminate the `Instance` property in the custom policy class.
+
+For example:
+
+:::code language="csharp" source="output/samples/7.x/MyCustomPolicy2.cs" id="fordi":::
+
+The remainder of the class is the same as shown previously. Add the custom policy as shown in the following example:
+
+:::code language="csharp" source="output/samples/7.x/Program.cs" id="policies3c":::
+
+The preceding code uses DI to create the instance of the custom policy class. Any public arguments in the constructor are resolved.
+
+When using a custom policy as a base policy, don't call `OutputCache()` (with no arguments) on any endpoint that the base policy should apply to. Calling `OutputCache()` adds the default policy to the endpoint.
 
 ## Specify the cache key
 
@@ -92,6 +118,8 @@ Here are some of the options for controlling the cache key:
 * <xref:Microsoft.AspNetCore.OutputCaching.OutputCachePolicyBuilder.VaryByValue%2A>- Specify a value to add to the cache key. The following example uses a value that indicates whether the current server time in seconds is odd or even. A new response is generated only when the number of seconds goes from odd to even or even to odd.
 
   :::code language="csharp" source="output/samples/7.x/Program.cs" id="varybyvalue":::
+
+Use <xref:Microsoft.AspNetCore.OutputCaching.OutputCacheOptions.UseCaseSensitivePaths?displayProperty=nameWithType> to specify that the path part of the key is case sensitive. The default is case insensitive.
 
 For more options, see the <xref:Microsoft.AspNetCore.OutputCaching.OutputCachePolicyBuilder> class.
 
@@ -145,11 +173,23 @@ The following example selects the no-locking policy for an endpoint:
 
 :::code language="csharp" source="output/samples/7.x/Program.cs" id="selectnolock":::
 
+## Limits
+
+The following properties of <xref:Microsoft.AspNetCore.OutputCaching.OutputCacheOptions> let you configure limits that apply to all endpoints:
+
+* <xref:Microsoft.AspNetCore.OutputCaching.OutputCacheOptions.SizeLimit> - Maximum size of cache storage. When this limit is reached, no new responses will be cached until older entries are evicted. Default value is 100 MB.
+* <xref:Microsoft.AspNetCore.OutputCaching.OutputCacheOptions.MaximumBodySize> - If the response body exceeds this limit, it will not be cached. Default value is 64 MB.
+* <xref:Microsoft.AspNetCore.OutputCaching.OutputCacheOptions.DefaultExpirationTimeSpan> - The expiration time duration that applies when not specified by a policy. Default value is 60 seconds.
+
+## Cache storage
+
+<xref:Microsoft.AspNetCore.OutputCaching.IOutputCacheStore> is used for storage. By default it's used with <xref:System.Runtime.Caching.MemoryCache>. We don't recommend <xref:Microsoft.Extensions.Caching.Distributed.IDistributedCache> for use with output caching. `IDistributedCache` doesn't have atomic features, which are required for tagging. We recommend that you create custom <xref:Microsoft.AspNetCore.OutputCaching.IOutputCacheStore> implementations by using direct dependencies on the underlying storage mechanism, such as Redis.
+
 ## See also
 
 * <xref:performance/caching/overview>
-* <xref:fundamentals/startup>
 * <xref:fundamentals/middleware/index>
-* <xref:fundamentals/change-tokens>
+* <xref:Microsoft.AspNetCore.OutputCaching.OutputCacheOptions>
+* <xref:Microsoft.AspNetCore.OutputCaching.OutputCachePolicyBuilder>
 
 :::moniker-end
