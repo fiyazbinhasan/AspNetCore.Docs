@@ -5,7 +5,7 @@ description: Use Identity with a Single Page App hosted inside an ASP.NET Core a
 monikerRange: '>= aspnetcore-3.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 6/30/2022
+ms.date: 09/12/2023
 uid: security/authentication/identity/spa
 ---
 # Authentication and authorization for SPAs
@@ -19,7 +19,7 @@ The ASP.NET Core templates offer authentication in Single Page Apps (SPAs) using
 > [!IMPORTANT]
 > [Duende Software](https://duendesoftware.com/) might require you to pay a license fee for production use of Duende Identity Server. For more information, see <xref:migration/50-to-60#project-templates-use-duende-identity-server>.
 
-An authentication parameter was added to the **Angular** and **React** project templates that is similar to the authentication parameter in the **Web Application (Model-View-Controller)** (MVC) and **Web Application** (Razor Pages) project templates. The allowed parameter values are **None** and **Individual**. The **React.js and Redux** project template doesn't support the authentication parameter at this time.
+An authentication parameter was added to the **Angular** and **React** project templates that is similar to the authentication parameter in the **Web Application (Model-View-Controller)** (MVC) and **Web Application** (Razor Pages) project templates. The allowed parameter values are **None** and **Individual**.
 
 ## Create an app with API authorization support
 
@@ -426,4 +426,4 @@ AddApiAuthorization<ApplicationUser, ApplicationDbContext>(options =>
 
 :::moniker-end
 
-[!INCLUDE[](~/security/authentication/identity-api-authorization/includes/identity-api-authorization.md)]
+[!INCLUDE[](~/security/authentication/identity-api-authorization/includes/identity-api-authorization3-7.md)]
