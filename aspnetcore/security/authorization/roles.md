@@ -27,6 +27,8 @@ builder.Services.AddDefaultIdentity<IdentityUser>( ... )
     ...
 ```
 
+The preceding code requires the [Microsoft.AspNetCore.Identity.UI](https://www.nuget.org/packages/Microsoft.AspNetCore.Identity.UI) package and a `using` directive for `Microsoft.AspNetCore.Identity`.
+
 ## Adding role checks
 
 Role based authorization checks:
@@ -58,7 +60,7 @@ In the preceding `ControlAllPanelController` controller:
 * Members of the `Administrator` role or the `PowerUser` role can access the controller and the `SetTime` action.
 * Only members of the `Administrator` role can access the `ShutDown` action.
 
-A controller can be locked down but allow anonymous, unauthenticated access to individual actions:
+A controller can be secured but allow anonymous, unauthenticated access to individual actions:
 
 [!code-csharp[](~/security/authorization/roles/samples/6_0/WebAll/Controllers/Control3PanelController.cs?name=snippet&highlight=1,7)]
 

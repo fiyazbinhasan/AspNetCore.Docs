@@ -5,7 +5,7 @@ description: Learn how to build Blazor apps with the tutorials listed in this ar
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/tutorials/index
 ---
 # ASP.NET Core Blazor tutorials
@@ -21,6 +21,8 @@ For an overview of Blazor, see <xref:blazor/index>.
 * [Build your first Blazor app](https://dotnet.microsoft.com/learn/aspnet/blazor-tutorial/intro)
 
 * <xref:blazor/tutorials/build-a-blazor-app> (Blazor Web App)
+
+* <xref:blazor/tutorials/movie-database-app/index> (Blazor Web App)
 
 * <xref:blazor/tutorials/signalr-blazor> (Blazor Web App)
 

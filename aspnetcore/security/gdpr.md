@@ -1,8 +1,8 @@
 ---
 title: General Data Protection Regulation (GDPR) support in ASP.NET Core
-author: rick-anderson
+author: tdykstra
 description: Learn how to access the GDPR extension points in an ASP.NET Core web app.
-ms.author: riande
+ms.author: tdykstra
 ms.custom: mvc
 ms.date: 07/11/2019
 uid: security/gdpr

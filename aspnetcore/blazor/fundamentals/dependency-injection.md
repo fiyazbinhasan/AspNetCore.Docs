@@ -5,7 +5,7 @@ description: Learn how Blazor apps can inject services into components.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 05/03/2024
 uid: blazor/fundamentals/dependency-injection
 ---
 # ASP.NET Core Blazor dependency injection
@@ -23,8 +23,6 @@ This article explains how Blazor apps can inject services into components.
 
 > [!NOTE]
 > We recommend reading <xref:fundamentals/dependency-injection> before reading this topic.
-
-[!INCLUDE[](~/blazor/includes/location-client-and-server-net31-or-later.md)]
 
 ## Default services
 
@@ -95,7 +93,8 @@ After creating a new app, examine part of the `Program` file:
 ```csharp
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorComponents().AddServerComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 ```
 
 :::moniker-end
@@ -179,11 +178,28 @@ Client.Program.ConfigureCommonServices(builder.Services);
 
 For an example of this approach, see <xref:blazor/security/webassembly/additional-scenarios#prerendering-with-authentication>.
 
+:::moniker range=">= aspnetcore-8.0"
+
+## Client-side services that fail during prerendering
+
+*This section only applies to WebAssembly components in Blazor Web Apps.*
+
+Blazor Web Apps normally prerender client-side WebAssembly components. If an app is run with a required service only registered in the `.Client` project, executing the app results in a runtime error similar to the following when a component attempts to use the required service during prerendering:
+
+> :::no-loc text="InvalidOperationException: Cannot provide a value for {PROPERTY} on type '{ASSEMBLY}}.Client.Pages.{COMPONENT NAME}'. There is no registered service of type '{SERVICE}'.":::
+
+Use ***either*** of the following approaches to resolve this problem:
+
+* Register the service in the main project to make it available during component prerendering.
+* If prerendering isn't required for the component, disable prerendering by following the guidance in <xref:blazor/components/render-modes#prerendering>. If you adopt this approach, you don't need to register the service in the main project.
+
+For more information, see [Client-side services fail to resolve during prerendering](xref:blazor/components/render-modes#client-side-services-fail-to-resolve-during-prerendering).
+
+:::moniker-end
+
 ## Service lifetime
 
 Services can be configured with the lifetimes shown in the following table.
-
-<!-- UPDATE 8.0 Hosting models article cross-link -->
 
 | Lifetime | Description |
 | -------- | ----------- |
@@ -195,7 +211,43 @@ The DI system is based on the DI system in ASP.NET Core. For more information, s
 
 ## Request a service in a component
 
-After services are added to the service collection, inject the services into the components using the [`@inject`](xref:mvc/views/razor#inject) Razor directive, which has two parameters:
+:::moniker range=">= aspnetcore-9.0"
+
+For injecting services into components, Blazor supports [constructor injection](#constructor-injection) and [property injection](#property-injection).
+
+### Constructor injection
+
+After services are added to the service collection, inject one or more services into components with constructor injection. The following example injects the `NavigationManager` service.
+
+`ConstructorInjection.razor`:
+
+```razor
+@page "/constructor-injection"
+
+<button @onclick="HandleClick">
+    Take me to the Counter component
+</button>
+```
+
+`ConstructorInjection.razor.cs`:
+
+```csharp
+using Microsoft.AspNetCore.Components;
+
+public partial class ConstructorInjection(NavigationManager navigation)
+{
+    private void HandleClick()
+    {
+        navigation.NavigateTo("/counter");
+    }
+}
+```
+
+### Property injection
+
+:::moniker-end
+
+After services are added to the service collection, inject one or more services into components with the [`@inject`](xref:mvc/views/razor#inject) Razor directive, which has two parameters:
 
 * Type: The type of the service to inject.
 * Property: The name of the property receiving the injected app service. The property doesn't require manual creation. The compiler creates the property.
@@ -204,13 +256,20 @@ For more information, see <xref:mvc/views/dependency-injection>.
 
 Use multiple [`@inject`](xref:mvc/views/razor#inject) statements to inject different services.
 
-The following example shows how to use [`@inject`](xref:mvc/views/razor#inject). The service implementing `Services.IDataAccess` is injected into the component's property `DataRepository`. Note how the code is only using the `IDataAccess` abstraction:
+The following example demonstrates shows how to use the [`@inject`](xref:mvc/views/razor#inject) directive. The service implementing `Services.NavigationManager` is injected into the component's property `Navigation`. Note how the code is only using the `NavigationManager` abstraction.
 
-<!-- UPDATE 8.0 Sample cross-link and highlight will change -->
+`PropertyInjection.razor`:
 
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_Server/Pages/dependency-injection/CustomerList.razor" highlight="2,19":::
+```razor
+@page "/property-injection"
+@inject NavigationManager Navigation
 
-Internally, the generated property (`DataRepository`) uses the [`[Inject]` attribute](xref:Microsoft.AspNetCore.Components.InjectAttribute). Typically, this attribute isn't used directly. If a base class is required for components and injected properties are also required for the base class, manually add the [`[Inject]` attribute](xref:Microsoft.AspNetCore.Components.InjectAttribute):
+<button @onclick="@(() => Navigation.NavigateTo("/counter"))">
+    Take me to the Counter component
+</button>
+```
+
+Internally, the generated property (`Navigation`) uses the [`[Inject]` attribute](xref:Microsoft.AspNetCore.Components.InjectAttribute). Typically, this attribute isn't used directly. If a base class is required for components and injected properties are also required for the base class, manually add the [`[Inject]` attribute](xref:Microsoft.AspNetCore.Components.InjectAttribute):
 
 ```csharp
 using Microsoft.AspNetCore.Components;
@@ -218,7 +277,7 @@ using Microsoft.AspNetCore.Components;
 public class ComponentBase : IComponent
 {
     [Inject]
-    protected IDataAccess DataRepository { get; set; } = default!;
+    protected NavigationManager Navigation { get; set; } = default!;
 
     ...
 }
@@ -227,13 +286,11 @@ public class ComponentBase : IComponent
 > [!NOTE]
 > Since injected services are expected to be available, the default literal with the null-forgiving operator (`default!`) is assigned in .NET 6 or later. For more information, see [Nullable reference types (NRTs) and .NET compiler null-state static analysis](xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis).
 
-In components derived from the base class, the [`@inject`](xref:mvc/views/razor#inject) directive isn't required. The <xref:Microsoft.AspNetCore.Components.InjectAttribute> of the base class is sufficient:
+In components derived from a base class, the [`@inject`](xref:mvc/views/razor#inject) directive isn't required. The <xref:Microsoft.AspNetCore.Components.InjectAttribute> of the base class is sufficient. The component only requires the [`@inherits`](xref:mvc/views/razor#inherits) directive. In the following example, any injected services of `CustomComponentBase` are available to the `Demo` component:
 
 ```razor
 @page "/demo"
-@inherits ComponentBase
-
-<h1>Demo Component</h1>
+@inherits CustomComponentBase
 ```
 
 ## Use DI in services
@@ -249,6 +306,19 @@ public class DataAccess : IDataAccess
     {
         ...
     }
+
+    ...
+}
+```
+
+Constructor injection is supported with [primary constructors](/dotnet/csharp/whats-new/tutorials/primary-constructors) in C# 12 (.NET 8) or later:
+
+```csharp
+using System.Net.Http;
+
+public class DataAccess(HttpClient http) : IDataAccess
+{
+    ...
 }
 ```
 
@@ -258,20 +328,30 @@ Prerequisites for constructor injection:
 * The applicable constructor must be `public`.
 * One applicable constructor must exist. In case of an ambiguity, DI throws an exception.
 
+:::moniker range=">= aspnetcore-8.0"
+
+## Inject keyed services into components
+
+Blazor supports injecting keyed services using the `[Inject]` attribute. Keys allow for scoping of registration and consumption of services when using dependency injection. Use the <xref:Microsoft.AspNetCore.Components.InjectAttribute.Key?displayProperty=nameWithType> property to specify the key for the service to inject:
+
+```csharp
+[Inject(Key = "my-service")]
+public IMyService MyService { get; set; }
+```
+
+:::moniker-end
+
 ## Utility base component classes to manage a DI scope
 
-In ASP.NET Core apps, scoped services are typically scoped to the current request. After the request completes, any scoped or transient services are disposed by the DI system. Server-side, the request scope lasts for the duration of the client connection, which can result in transient and scoped services living much longer than expected. Client-side, services registered with a scoped lifetime are treated as singletons, so they live longer than scoped services in typical ASP.NET Core apps.
+<!-- UPDATE 10.0 - PU design is under consideration for .NET 10. -->
 
-> [!NOTE]
-> To detect disposable transient services in an app, see the following sections:
->
-> [Detect client-side transient disposables](#detect-client-side-transient-disposables)
-> [Detect server-side transient disposables](#detect-server-side-transient-disposables)
+In non-Blazor ASP.NET Core apps, scoped and transient services are typically scoped to the current request. After the request completes, scoped and transient services are disposed by the DI system.
 
-An approach that limits a service lifetime is use of the <xref:Microsoft.AspNetCore.Components.OwningComponentBase> type. <xref:Microsoft.AspNetCore.Components.OwningComponentBase> is an abstract type derived from <xref:Microsoft.AspNetCore.Components.ComponentBase> that creates a DI scope corresponding to the lifetime of the component. Using this scope, it's possible to use DI services with a scoped lifetime and have them live as long as the component. When the component is destroyed, services from the component's scoped service provider are disposed as well. This can be useful for services that:
+In interactive server-side Blazor apps, the DI scope lasts for the duration of the circuit (the SignalR connection between the client and server), which can result in scoped and disposable transient services living much longer than the lifetime of a single component. Therefore, don't directly inject a scoped service into a component if you intend the service lifetime to match the lifetime of the component. Transient services injected into a component that don't implement <xref:System.IDisposable> are garbage collected when the component is disposed. However, injected transient services *that implement <xref:System.IDisposable>* are maintained by the DI container for the lifetime of the circuit, which prevents service garbage collection when the component is disposed and results in a memory leak. An alternative approach for scoped services based on the <xref:Microsoft.AspNetCore.Components.OwningComponentBase> type is described later in this section, and disposable transient services shouldn't be used at all. For more information, see [Design for solving transient disposables on Blazor Server (`dotnet/aspnetcore` #26676)](https://github.com/dotnet/aspnetcore/issues/26676).
 
-* Should be reused within a component, as the transient lifetime is inappropriate.
-* Shouldn't be shared across components, as the singleton lifetime is inappropriate.
+Even in client-side Blazor apps that don't operate over a circuit, services registered with a scoped lifetime are treated as singletons, so they live longer than scoped services in typical ASP.NET Core apps. Client-side disposable transient services also live longer than the components where they're injected because the DI container, which holds references to disposable services, persists for the lifetime of the app, preventing garbage collection on the services. Although long-lived disposable transient services are of greater concern on the server, they should be avoided as client service registrations as well. Use of the <xref:Microsoft.AspNetCore.Components.OwningComponentBase> type is also recommended for client-side scoped services to control service lifetime, and disposable transient services shouldn't be used at all.
+
+An approach that limits a service lifetime is use of the <xref:Microsoft.AspNetCore.Components.OwningComponentBase> type. <xref:Microsoft.AspNetCore.Components.OwningComponentBase> is an abstract type derived from <xref:Microsoft.AspNetCore.Components.ComponentBase> that creates a DI scope corresponding to the *lifetime of the component*. Using this scope, a component can inject services with a scoped lifetime and have them live as long as the component. When the component is destroyed, services from the component's scoped service provider are disposed as well. This can be useful for services reused within a component but not shared across components.
 
 Two versions of <xref:Microsoft.AspNetCore.Components.OwningComponentBase> type are available and described in the next two sections:
 
@@ -317,9 +397,9 @@ In the following `TimeTravel` component:
 * The time travel service is directly injected with `@inject` as `TimeTravel1`.
 * The service is also resolved separately with <xref:Microsoft.AspNetCore.Components.OwningComponentBase.ScopedServices> and <xref:Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService%2A> as `TimeTravel2`.
 
-<!-- UPDATE 8.0 Confirm that this example won't require interactivity to execute -->
-
 `TimeTravel.razor`:
+
+:::moniker range=">= aspnetcore-8.0"
 
 ```razor
 @page "/time-travel"
@@ -343,6 +423,34 @@ In the following `TimeTravel` component:
 }
 ```
 
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+```razor
+@page "/time-travel"
+@inject ITimeTravel TimeTravel1
+@inherits OwningComponentBase
+
+<h1><code>OwningComponentBase</code> Example</h1>
+
+<ul>
+    <li>TimeTravel1.DT: @TimeTravel1?.DT</li>
+    <li>TimeTravel2.DT: @TimeTravel2?.DT</li>
+</ul>
+
+@code {
+    private ITimeTravel TimeTravel2 { get; set; } = default!;
+
+    protected override void OnInitialized()
+    {
+        TimeTravel2 = ScopedServices.GetRequiredService<ITimeTravel>();
+    }
+}
+```
+
+:::moniker-end
+
 Initially navigating to the `TimeTravel` component, the time travel service is instantiated twice when the component loads, and `TimeTravel1` and `TimeTravel2` have the same initial value:
   
 > :::no-loc text="TimeTravel1.DT: 8/31/2022 2:54:45 PM":::  
@@ -364,12 +472,9 @@ In spite of the scoped service registration in the `Program` file and the longev
 
 <xref:Microsoft.AspNetCore.Components.OwningComponentBase%601> derives from <xref:Microsoft.AspNetCore.Components.OwningComponentBase> and adds a <xref:Microsoft.AspNetCore.Components.OwningComponentBase%601.Service%2A> property that returns an instance of `T` from the scoped DI provider. This type is a convenient way to access scoped services without using an instance of <xref:System.IServiceProvider> when there's one primary service the app requires from the DI container using the component's scope. The <xref:Microsoft.AspNetCore.Components.OwningComponentBase.ScopedServices> property is available, so the app can get services of other types, if necessary.
 
-:::moniker range=">= aspnetcore-8.0"
-
 ```razor
 @page "/users"
 @attribute [Authorize]
-@attribute [RenderModeServer]
 @inherits OwningComponentBase<AppDbContext>
 
 <h1>Users (@Service.Users.Count())</h1>
@@ -381,25 +486,76 @@ In spite of the scoped service registration in the `Program` file and the longev
     }
 </ul>
 ```
+
+:::moniker range=">= aspnetcore-6.0"
+
+### Detect client-side transient disposables
+
+Custom code can be added to a client-side Blazor app to detect disposable transient services in an app that should use <xref:Microsoft.AspNetCore.Components.OwningComponentBase>. This approach is useful if you're concerned that code added to the app in the future consumes one or more transient disposable services, including services added by libraries. Demonstration code is available in the [Blazor samples GitHub repository](https://github.com/dotnet/blazor-samples/tree/main) ([how to download](xref:blazor/fundamentals/index#sample-apps)).
+
+Inspect the following in .NET 6 or later versions of the `BlazorSample_WebAssembly` sample:
+
+* `DetectIncorrectUsagesOfTransientDisposables.cs`
+* `Services/TransientDisposableService.cs`
+* In `Program.cs`:
+  * The app's `Services` namespace is provided at the top of the file (`using BlazorSample.Services;`).
+  * `DetectIncorrectUsageOfTransients` is called immediately after the `builder` is assigned from <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.WebAssemblyHostBuilder.CreateDefault%2A?displayProperty=nameWithType>.
+  * The `TransientDisposableService` is registered (`builder.Services.AddTransient<TransientDisposableService>();`).
+  * `EnableTransientDisposableDetection` is called on the built host in the processing pipeline of the app (`host.EnableTransientDisposableDetection();`).
+* The app registers the `TransientDisposableService` service without throwing an exception. However, attempting to resolve the service in `TransientService.razor` throws an <xref:System.InvalidOperationException> when the framework attempts to construct an instance of `TransientDisposableService`.
+
+### Detect server-side transient disposables
+
+Custom code can be added to a server-side Blazor app to detect server-side disposable transient services in an app that should use <xref:Microsoft.AspNetCore.Components.OwningComponentBase>. This approach is useful if you're concerned that code added to the app in the future consumes one or more transient disposable services, including services added by libraries. Demonstration code is available in the [Blazor samples GitHub repository](https://github.com/dotnet/blazor-samples/tree/main) ([how to download](xref:blazor/fundamentals/index#sample-apps)).
 
 :::moniker-end
 
-:::moniker range="< aspnetcore-8.0"
+:::moniker range=">= aspnetcore-8.0"
 
-```razor
-@page "/users"
-@attribute [Authorize]
-@inherits OwningComponentBase<AppDbContext>
+Inspect the following in .NET 8 or later versions of the `BlazorSample_BlazorWebApp` sample:
 
-<h1>Users (@Service.Users.Count())</h1>
+:::moniker-end
 
-<ul>
-    @foreach (var user in Service.Users)
-    {
-        <li>@user.UserName</li>
-    }
-</ul>
-```
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
+
+Inspect the following in .NET 6 or .NET 7 versions of the `BlazorSample_Server` sample:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0"
+
+* `DetectIncorrectUsagesOfTransientDisposables.cs`
+* `Services/TransitiveTransientDisposableDependency.cs`:
+* In `Program.cs`:
+  * The app's `Services` namespace is provided at the top of the file (`using BlazorSample.Services;`).
+  * `DetectIncorrectUsageOfTransients` is called on the host builder (`builder.DetectIncorrectUsageOfTransients();`).
+  * The `TransientDependency` service is registered (`builder.Services.AddTransient<TransientDependency>();`).
+  * The `TransitiveTransientDisposableDependency` is registered for `ITransitiveTransientDisposableDependency` (`builder.Services.AddTransient<ITransitiveTransientDisposableDependency, TransitiveTransientDisposableDependency>();`).
+* The app registers the `TransientDependency` service without throwing an exception. However, attempting to resolve the service in `TransientService.razor` throws an <xref:System.InvalidOperationException> when the framework attempts to construct an instance of `TransientDependency`.
+
+### Transient service registrations for `IHttpClientFactory`/`HttpClient` handlers
+
+Transient service registrations for <xref:System.Net.Http.IHttpClientFactory>/<xref:System.Net.Http.HttpClient> handlers are recommended. If the app contains <xref:System.Net.Http.IHttpClientFactory>/<xref:System.Net.Http.HttpClient> handlers and uses the <xref:Microsoft.Extensions.DependencyInjection.IRemoteAuthenticationBuilder%602> to add support for authentication, the following transient disposables for client-side authentication are also discovered, which is expected and can be ignored:
+
+* <xref:Microsoft.AspNetCore.Components.WebAssembly.Authentication.BaseAddressAuthorizationMessageHandler>
+* <xref:Microsoft.AspNetCore.Components.WebAssembly.Authentication.AuthorizationMessageHandler>
+
+Other instances of <xref:System.Net.Http.IHttpClientFactory>/<xref:System.Net.Http.HttpClient> are also discovered. These instances can also be ignored.
+
+The Blazor sample apps in the [Blazor samples GitHub repository](https://github.com/dotnet/blazor-samples/tree/main) ([how to download](xref:blazor/fundamentals/index#sample-apps)) demonstrate the code to detect transient disposables. However, the code is deactivated because the sample apps include <xref:System.Net.Http.IHttpClientFactory>/<xref:System.Net.Http.HttpClient> handlers.
+
+To activate the demonstration code and witness its operation:
+
+* Uncomment the transient disposable lines in `Program.cs`.
+
+* Remove the conditional check in `NavLink.razor` that prevents the `TransientService` component from displaying in the app's navigation sidebar:
+
+  ```diff
+  - else if (name != "TransientService")
+  + else
+  ```
+
+* Run the sample app and navigate to the `TransientService` component at `/transient-service`.
 
 :::moniker-end
 
@@ -407,277 +563,13 @@ In spite of the scoped service registration in the `Program` file and the longev
 
 For more information, see <xref:blazor/blazor-ef-core>.
 
-## Detect client-side transient disposables
-
-The following Blazor WebAssembly example shows how to detect client-side disposable transient services in an app that should use <xref:Microsoft.AspNetCore.Components.OwningComponentBase>. For more information, see the [Utility base component classes to manage a DI scope](#utility-base-component-classes-to-manage-a-di-scope) section.
-
-`DetectIncorrectUsagesOfTransientDisposables.cs` for client-side development:
-
-<!-- UPDATE 8.0 Do we need to see if the code works in the client of a BWA? -->
-
-:::moniker range=">= aspnetcore-7.0"
-
-:::code language="csharp" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-:::code language="csharp" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
-
-:::code language="csharp" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-5.0"
-
-:::code language="csharp" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-`TransientDisposable.cs`:
-
-```csharp
-public class TransientDisposable : IDisposable
-{
-    public void Dispose() => throw new NotImplementedException();
-}
-```
-
-The `TransientDisposable` in the following example is detected.
-
-In the `Program` file of a Blazor WebAssembly app:
-
-:::moniker range=">= aspnetcore-6.0"
-
-```csharp
-using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using BlazorWebAssemblyTransientDisposable;
-
-var builder = WebAssemblyHostBuilder.CreateDefault(args);
-builder.DetectIncorrectUsageOfTransients();
-builder.RootComponents.Add<App>("#app");
-builder.RootComponents.Add<HeadOutlet>("head::after");
-
-builder.Services.AddTransient<TransientDisposable>();
-builder.Services.AddScoped(sp => 
-    new HttpClient
-    { 
-        BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
-    });
-
-var host = builder.Build();
-host.EnableTransientDisposableDetection();
-await host.RunAsync();
-```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-```csharp
-public class Program
-{
-    public static async Task Main(string[] args)
-    {
-        var builder = WebAssemblyHostBuilder.CreateDefault(args);
-        builder.DetectIncorrectUsageOfTransients();
-        builder.RootComponents.Add<App>("#app");
-
-        builder.Services.AddTransient<TransientDisposable>();
-        builder.Services.AddScoped(sp =>
-            new HttpClient
-            {
-                BaseAddress = new(builder.HostEnvironment.BaseAddress)
-            });
-
-        var host = builder.Build();
-        host.EnableTransientDisposableDetection();
-        await host.RunAsync();
-    }
-}
-
-public class TransientDisposable : IDisposable
-{
-    public void Dispose() => throw new NotImplementedException();
-}
-```
-
-:::moniker-end
-
-The app can register transient disposables without throwing an exception. However, attempting to resolve a transient disposable results in an <xref:System.InvalidOperationException>, as the following example shows.
-
-`TransientExample.razor`:
-
-```razor
-@page "/transient-example"
-@inject TransientDisposable TransientDisposable
-
-<h1>Transient Disposable Detection</h1>
-```
-
-Navigate to the `TransientExample` component at `/transient-example` and an <xref:System.InvalidOperationException> is thrown when the framework attempts to construct an instance of `TransientDisposable`:
-
-> System.InvalidOperationException: Trying to resolve transient disposable service TransientDisposable in the wrong scope. Use an 'OwningComponentBase\<T>' component base class for the service 'T' you are trying to resolve.
-
-> [!NOTE]
-> Transient service registrations for <xref:System.Net.Http.IHttpClientFactory> handlers are recommended. The `TransientExample` component in this section indicates the following transient disposables client-side that use authentication, which is expected:
->
-> * <xref:Microsoft.AspNetCore.Components.WebAssembly.Authentication.BaseAddressAuthorizationMessageHandler>
-> * <xref:Microsoft.AspNetCore.Components.WebAssembly.Authentication.AuthorizationMessageHandler>
-
-## Detect server-side transient disposables
-
-The following example shows how to detect server-side disposable transient services in an app that should use <xref:Microsoft.AspNetCore.Components.OwningComponentBase>. For more information, see the [Utility base component classes to manage a DI scope](#utility-base-component-classes-to-manage-a-di-scope) section.
-
-`DetectIncorrectUsagesOfTransientDisposables.cs`:
-
-<!-- UPDATE 8.0 Confirm that it works in a BWA -->
-
-:::moniker range=">= aspnetcore-7.0"
-
-:::code language="csharp" source="~/../blazor-samples/7.0/BlazorSample_Server/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-:::code language="csharp" source="~/../blazor-samples/6.0/BlazorSample_Server/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
-
-:::code language="csharp" source="~/../blazor-samples/5.0/BlazorSample_Server/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-5.0"
-
-:::code language="csharp" source="~/../blazor-samples/3.1/BlazorSample_Server/dependency-injection/DetectIncorrectUsagesOfTransientDisposables.cs":::
-
-:::moniker-end
-
-`TransitiveTransientDisposableDependency.cs`:
-
-```csharp
-public class TransitiveTransientDisposableDependency 
-    : ITransitiveTransientDisposableDependency, IDisposable
-{
-    public void Dispose() { }
-}
-
-public interface ITransitiveTransientDisposableDependency
-{
-}
-
-public class TransientDependency
-{
-    private readonly ITransitiveTransientDisposableDependency 
-        transitiveTransientDisposableDependency;
-
-    public TransientDependency(ITransitiveTransientDisposableDependency 
-        transitiveTransientDisposableDependency)
-    {
-        this.transitiveTransientDisposableDependency = 
-            transitiveTransientDisposableDependency;
-    }
-}
-```
-
-The `TransientDependency` in the following example is detected.
-
-:::moniker range=">= aspnetcore-6.0"
-
-In the `Program` file:
-
-```csharp
-builder.DetectIncorrectUsageOfTransients();
-builder.Services.AddTransient<TransientDependency>();
-builder.Services.AddTransient<ITransitiveTransientDisposableDependency, 
-    TransitiveTransientDisposableDependency>();
-```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-In `Startup.cs`:
-
-```csharp
-public void ConfigureServices(IServiceCollection services)
-{
-    services.AddRazorPages();
-    services.AddServerSideBlazor();
-    services.AddSingleton<WeatherForecastService>();
-    services.AddTransient<TransientDependency>();
-    services.AddTransient<ITransitiveTransientDisposableDependency, 
-        TransitiveTransientDisposableDependency>();
-}
-
-public class TransitiveTransientDisposableDependency 
-    : ITransitiveTransientDisposableDependency, IDisposable
-{
-    public void Dispose() { }
-}
-
-public interface ITransitiveTransientDisposableDependency
-{
-}
-
-public class TransientDependency
-{
-    private readonly ITransitiveTransientDisposableDependency 
-        _transitiveTransientDisposableDependency;
-
-    public TransientDependency(ITransitiveTransientDisposableDependency 
-        transitiveTransientDisposableDependency)
-    {
-        _transitiveTransientDisposableDependency = 
-            transitiveTransientDisposableDependency;
-    }
-}
-```
-
-:::moniker-end
-
-The app can register transient disposables without throwing an exception. However, attempting to resolve a transient disposable results in an <xref:System.InvalidOperationException>, as the following example shows.
-
-:::moniker range=">= aspnetcore-8.0"
-
-`Components/Pages/TransientExample.razor`:
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-8.0"
-
-`TransientExample.razor`:
-
-:::moniker-end
-
-```razor
-@page "/transient-example"
-@inject TransientDependency TransientDependency
-
-<h1>Transient Disposable Detection</h1>
-```
-
-Navigate to the `TransientExample` component at `/transient-example` and an <xref:System.InvalidOperationException> is thrown when the framework attempts to construct an instance of `TransientDependency`:
-
-> System.InvalidOperationException: Trying to resolve transient disposable service TransientDependency in the wrong scope. Use an 'OwningComponentBase\<T>' component base class for the service 'T' you are trying to resolve.
-  
 ## Access server-side Blazor services from a different DI scope
 
 :::moniker range=">= aspnetcore-8.0"
 
 [Circuit activity handlers](xref:blazor/fundamentals/signalr#monitor-server-side-circuit-activity) provide an approach for accessing scoped Blazor services from other non-Blazor dependency injection (DI) scopes, such as scopes created using <xref:System.Net.Http.IHttpClientFactory>. 
 
-Prior to the release of ASP.NET Core 8.0, accessing circuit-scoped services from other dependency injection scopes required using a custom base component type. With circuit activity handlers, a custom base component type isn't required, as the following example demonstrates:
+Prior to the release of ASP.NET Core in .NET 8, accessing circuit-scoped services from other dependency injection scopes required using a custom base component type. With circuit activity handlers, a custom base component type isn't required, as the following example demonstrates:
 
 ```csharp
 public class CircuitServicesAccessor
@@ -691,28 +583,18 @@ public class CircuitServicesAccessor
     }
 }
 
-public class ServicesAccessorCircuitHandler : CircuitHandler
+public class ServicesAccessorCircuitHandler(
+    IServiceProvider services, CircuitServicesAccessor servicesAccessor) 
+    : CircuitHandler
 {
-    readonly IServiceProvider services;
-    readonly CircuitServicesAccessor circuitServicesAccessor;
-
-    public ServicesAccessorCircuitHandler(IServiceProvider services, 
-        CircuitServicesAccessor servicesAccessor)
-    {
-        this.services = services;
-        this.circuitServicesAccessor = servicesAccessor;
-    }
-
     public override Func<CircuitInboundActivityContext, Task> CreateInboundActivityHandler(
-        Func<CircuitInboundActivityContext, Task> next)
-    {
-        return async context =>
-        {
-            circuitServicesAccessor.Services = services;
-            await next(context);
-            circuitServicesAccessor.Services = null;
-        };
-    }
+        Func<CircuitInboundActivityContext, Task> next) => 
+            async context =>
+            {
+                servicesAccessor.Services = services;
+                await next(context);
+                servicesAccessor.Services = null;
+            };
 }
 
 public static class CircuitServicesServiceCollectionExtensions
@@ -740,7 +622,7 @@ There may be times when a Razor component invokes asynchronous methods that exec
 
 For example, <xref:System.Net.Http.HttpClient> instances created using <xref:System.Net.Http.IHttpClientFactory> have their own DI service scope. As a result, <xref:System.Net.Http.HttpMessageHandler> instances configured on the <xref:System.Net.Http.HttpClient> aren't able to directly inject Blazor services.
 
-Create a class `BlazorServiceAccessor` that defines an [`AsyncLocal`](xref:System.Threading.AsyncLocal`1), which stores the Blazor <xref:System.IServiceProvider> for the current asynchronous context. A `BlazorServiceAcccessor` instance can be acquired from within a different DI service scope to access Blazor services.
+Create a class `BlazorServiceAccessor` that defines an [`AsyncLocal`](xref:System.Threading.AsyncLocal`1), which stores the Blazor <xref:System.IServiceProvider> for the current asynchronous context. A `BlazorServiceAccessor` instance can be acquired from within a different DI service scope to access Blazor services.
 
 `BlazorServiceAccessor.cs`:
 
@@ -887,6 +769,20 @@ services.AddScoped<BlazorServiceAccessor>();
 
 ## Additional resources
 
+:::moniker range=">= aspnetcore-8.0"
+
+* [Service injection via a top-level imports file (`_Imports.razor`) in Blazor Web Apps](xref:blazor/components/render-modes#service-injection-via-a-top-level-imports-file-_importsrazor)
 * <xref:fundamentals/dependency-injection>
 * [`IDisposable` guidance for Transient and shared instances](xref:fundamentals/dependency-injection#idisposable-guidance-for-transient-and-shared-instances)
 * <xref:mvc/views/dependency-injection>
+* [Primary constructors (C# Guide)](/dotnet/csharp/programming-guide/classes-and-structs/instance-constructors#primary-constructors)
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+* <xref:fundamentals/dependency-injection>
+* [`IDisposable` guidance for Transient and shared instances](xref:fundamentals/dependency-injection#idisposable-guidance-for-transient-and-shared-instances)
+* <xref:mvc/views/dependency-injection>
+
+:::moniker-end

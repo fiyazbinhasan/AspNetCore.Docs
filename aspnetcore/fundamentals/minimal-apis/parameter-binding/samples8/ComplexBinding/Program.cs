@@ -8,6 +8,8 @@ builder.Services.AddAntiforgery();
 
 var app = builder.Build();
 
+app.UseAntiforgery();
+
 app.MapGet("/", (HttpContext context, IAntiforgery antiforgery) =>
 {
     var token = antiforgery.GetAndStoreTokens(context);
@@ -18,8 +20,9 @@ app.MapGet("/", (HttpContext context, IAntiforgery antiforgery) =>
                                 type="hidden" value="{token.RequestToken}" />
                <input type="text" name="name" />
                <input type="date" name="dueDate" />
-               <input type="checkbox" name="isCompleted" />
+               <input type="checkbox" name="isCompleted" value="true" />
                <input type="submit" />
+               <input name="isCompleted" type="hidden" value="false" /> 
            </form>
         </body></html>
     """;
@@ -36,7 +39,7 @@ app.MapPost("/todo", async Task<Results<Ok<Todo>, BadRequest<string>>>
     }
     catch (AntiforgeryValidationException e)
     {
-        return TypedResults.BadRequest("Invalid anti-forgery token");
+        return TypedResults.BadRequest("Invalid antiforgery token");
     }
 });
 

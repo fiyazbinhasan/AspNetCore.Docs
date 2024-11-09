@@ -5,7 +5,7 @@ description: Learn how to persist user data (state) in Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/state-management
 zone_pivot_groups: blazor-app-models
 ---
@@ -15,10 +15,10 @@ zone_pivot_groups: blazor-app-models
 
 This article describes common approaches for maintaining a user's data (state) while they use an app and across browser sessions.
 
-[!INCLUDE[](~/blazor/includes/location-client-and-server-net31-or-later.md)]
-
 > [!NOTE]
-> The code examples in this article adopt [nullable reference types (NRTs) and .NET compiler null-state static analysis](xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis), which are supported in ASP.NET Core 6.0 or later. When targeting ASP.NET Core 5.0 or earlier, remove the null type designation (`?`) from types in the article's examples.
+> The code examples in this article adopt [nullable reference types (NRTs) and .NET compiler null-state static analysis](xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis), which are supported in ASP.NET Core in .NET 6 or later. When targeting ASP.NET Core 5.0 or earlier, remove the null type designation (`?`) from types in the article's examples.
+
+## Maintain user state
 
 :::zone pivot="server"
 
@@ -109,11 +109,11 @@ Generally, `sessionStorage` is safer to use. `sessionStorage` avoids the risk th
 Caveats for using browser storage:
 
 * Similar to the use of a server-side database, loading and saving data are asynchronous.
-* Unlike a server-side database, storage isn't available during prerendering because the requested page doesn't exist in the browser during the prerendering stage.
+* The requested page doesn't exist in the browser during prerendering, so local storage isn't available during prerendering.
 * Storage of a few kilobytes of data is reasonable to persist for server-side Blazor apps. Beyond a few kilobytes, you must consider the performance implications because the data is loaded and saved across the network.
 * Users may view or tamper with the data. [ASP.NET Core Data Protection](xref:security/data-protection/introduction) can mitigate the risk. For example, [ASP.NET Core Protected Browser Storage](#aspnet-core-protected-browser-storage) uses ASP.NET Core Data Protection.
 
-Third-party NuGet packages provide APIs for working with `localStorage` and `sessionStorage`. It's worth considering choosing a package that transparently uses [ASP.NET Core Data Protection](xref:security/data-protection/introduction). Data Protection encrypts stored data and reduces the potential risk of tampering with stored data. If JSON-serialized data is stored in plain text, users can see the data using browser developer tools and also modify the stored data. Securing data isn't always a problem because the data might be trivial in nature. For example, reading or modifying the stored color of a UI element isn't a significant security risk to the user or the organization. Avoid allowing users to inspect or tamper with *sensitive data*.
+Third-party NuGet packages provide APIs for working with `localStorage` and `sessionStorage`. It's worth considering choosing a package that transparently uses [ASP.NET Core Data Protection](xref:security/data-protection/introduction). Data Protection encrypts stored data and reduces the potential risk of tampering with stored data. If JSON-serialized data is stored in plain text, users can see the data using browser developer tools and also modify the stored data. Securing trivial data isn't a problem. For example, reading or modifying the stored color of a UI element isn't a significant security risk to the user or the organization. Avoid allowing users to inspect or tamper with *sensitive data*.
 
 ## ASP.NET Core Protected Browser Storage
 
@@ -269,17 +269,24 @@ One way to resolve the error is to disable prerendering. This is usually the bes
 
 :::moniker range=">= aspnetcore-8.0"
 
-To disable prerendering, indicate the render mode with the `prerender` parameter set to `false` at the highest-level component in the app's component hierarchy that isn't a root component (root components can't be interactive). Typically, this is where the `Routes` component is used in the `App` component (`Components/App.razor`) for apps based on the Blazor Web App project template:
+To disable prerendering, indicate the render mode with the `prerender` parameter set to `false` at the highest-level component in the app's component hierarchy that isn't a root component.
+
+> [!NOTE]
+> Making a root component interactive, such as the `App` component, isn't supported. Therefore, prerendering can't be disabled directly by the `App` component.
+
+For apps based on the Blazor Web App project template, prerendering is typically disabled where the `Routes` component is used in the `App` component (`Components/App.razor`):
 
 ```razor
-<Routes @rendermode="@(new ServerRenderMode(prerender: false))" />
+<Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
 ```
 
 Also, disable prerendering for the `HeadOutlet` component:
 
 ```razor
-<HeadOutlet @rendermode="@(new ServerRenderMode(prerender: false))" />
+<HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
 ```
+
+For more information, see <xref:blazor/components/render-modes#prerendering>.
 
 :::moniker-end
 
@@ -406,7 +413,7 @@ In the following example of a `CounterStateProvider` component, counter data is 
 
 @if (isLoaded)
 {
-    <CascadingValue Value="@this">
+    <CascadingValue Value="this">
         @ChildContent
     </CascadingValue>
 }
@@ -447,7 +454,7 @@ else
 
 @if (isLoaded)
 {
-    <CascadingValue Value="@this">
+    <CascadingValue Value="this">
         @ChildContent
     </CascadingValue>
 }
@@ -484,7 +491,25 @@ else
 
 The `CounterStateProvider` component handles the loading phase by not rendering its child content until state loading is complete.
 
+:::moniker range=">= aspnetcore-8.0"
+
+To make the state accessible to all components in an app, wrap the `CounterStateProvider` component around the <xref:Microsoft.AspNetCore.Components.Routing.Router> (`<Router>...</Router>`) in the `Routes` component with global interactive server-side rendering (interactive SSR).
+
+In the `App` component (`Components/App.razor`):
+
+```razor
+<Routes @rendermode="InteractiveServer" />
+```
+
+In the `Routes` component (`Components/Routes.razor`):
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
 To use the `CounterStateProvider` component, wrap an instance of the component around any other component that requires access to the counter state. To make the state accessible to all components in an app, wrap the `CounterStateProvider` component around the <xref:Microsoft.AspNetCore.Components.Routing.Router> in the `App` component (`App.razor`):
+
+:::moniker-end
 
 ```razor
 <CounterStateProvider>
@@ -585,7 +610,7 @@ For permanent data persistence that spans multiple users and devices, the app ca
 
 After data is saved, the user's state is retained and available in any new browser session.
 
-Because Blazor WebAssembly apps run entirely in the user's browser, they require additional measures to access secure external systems, such as storage services and databases. Blazor WebAssembly apps are secured in the same manner as single-page applications (SPAs). Typically, an app authenticates a user via [OAuth](https://oauth.net)/[OpenID Connect (OIDC)](https://openid.net/connect/) and then interacts with storage services and databases through web API calls to a server-side app. The server-side app mediates the transfer of data between the Blazor WebAssembly app and the storage service or database. The Blazor WebAssembly app maintains an ephemeral connection to the server-side app, while the server-side app has a persistent connection to storage.
+Because Blazor WebAssembly apps run entirely in the user's browser, they require additional measures to access secure external systems, such as storage services and databases. Blazor WebAssembly apps are secured in the same manner as single-page applications (SPAs). Typically, an app authenticates a user via [OAuth](https://oauth.net)/[OpenID Connect (OIDC)](https://openid.net/developers/how-connect-works/) and then interacts with storage services and databases through web API calls to a server-side app. The server-side app mediates the transfer of data between the Blazor WebAssembly app and the storage service or database. The Blazor WebAssembly app maintains an ephemeral connection to the server-side app, while the server-side app has a persistent connection to storage.
 
 For more information, see the following resources:
 
@@ -670,7 +695,7 @@ Client-side apps (`Program` file):
 builder.Services.AddSingleton<StateContainer>();
 ```
 
-Server-side apps (`Program` file, ASP.NET Core 6.0 or later):
+Server-side apps (`Program` file, ASP.NET Core in .NET 6 or later):
 
 ```csharp
 builder.Services.AddScoped<StateContainer>();
@@ -763,8 +788,6 @@ When implementing custom state storage, a useful approach is to adopt [cascading
 
 * To consume state across many components.
 * If there's just one top-level state object to persist.
-
-For additional discussion and example approaches, see [Blazor: In-memory state container as cascading parameter (dotnet/AspNetCore.Docs #27296)](https://github.com/dotnet/AspNetCore.Docs/issues/27296).
 
 ## Troubleshoot
 

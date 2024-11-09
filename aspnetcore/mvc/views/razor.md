@@ -1,8 +1,8 @@
 ---
 title: Razor syntax reference for ASP.NET Core
-author: rick-anderson
+author: tdykstra
 description: Learn about Razor markup syntax for embedding server-based code into webpages.
-ms.author: riande
+ms.author: tdykstra
 ms.date: 02/12/2020
 uid: mvc/views/razor
 ---
@@ -412,7 +412,7 @@ In C#, a `using` statement is used to ensure an object is disposed. In Razor, th
 @using (Html.BeginForm())
 {
     <div>
-        Email: <input type="email" id="Email" value="">
+        <label>Email: <input type="email" id="Email" value=""></label>
         <button>Register</button>
     </div>
 }
@@ -467,7 +467,7 @@ Razor comments are removed by the server before the webpage is rendered. Razor u
 
 ## Directives
 
-Razor directives are represented by implicit expressions with reserved keywords following the `@` symbol. A directive typically changes the way a view is parsed or enables different functionality.
+Razor directives are represented by implicit expressions with reserved keywords following the `@` symbol. A directive typically changes the way a view is compiled or functions.
 
 Understanding how Razor generates code for a view makes it easier to understand how directives work.
 
@@ -734,38 +734,38 @@ When set to `false` (default), whitespace in the rendered markup from Razor comp
 
 *This scenario only applies to Razor components (`.razor`).*
 
-<!-- UPDATE 8.0 RC2: Remove preview remark and update code -->
-
 Sets the render mode of a Razor component:
 
-* `Server`: Applies interactive server rendering using Blazor Server.
-* `WebAssembly`: Applies interactive client rendering using Blazor WebAssembly.
-* `Auto`: Initially applies interactive client rendering using Blazor Server, and then applies interactive client rendering using WebAssembly on subsequent visits after the Blazor bundle is downloaded.
+* `InteractiveServer`: Applies interactive server rendering using Blazor Server.
+* `InteractiveWebAssembly`: Applies interactive WebAssembly rendering using Blazor WebAssembly.
+* `InteractiveAuto`: Initially applies interactive WebAssembly rendering using Blazor Server, and then applies interactive WebAssembly rendering using WebAssembly on subsequent visits after the Blazor bundle is downloaded.
 
-The following example sets the Server render mode to a `Dialog` component:
+For a component instance:
 
 ```razor
-<Dialog @rendermode="@RenderMode.Server" />
+<... @rendermode="InteractiveServer" />
 ```
 
-To disable prerendering, pass the `prerender` flag with a value of `false`:
+In the component definition:
 
 ```razor
-<Dialog @rendermode="@(new ServerRenderMode(prerender: false))" />
+@rendermode InteractiveServer
 ```
 
 > [!NOTE]
-> During .NET 8 *Release Candidate 1*, use the following values:
+> Blazor templates include a static `using` directive for <xref:Microsoft.AspNetCore.Components.Web.RenderMode> in the app's `_Imports` file (`Components/_Imports.razor`) for shorter `@rendermode` syntax:
 >
-> Render mode | Value
-> ----------- | -----
-> Server      | `@RenderMode.Server` or `@(new ServerRenderMode(prerender: false))`
-> WebAssembly | `@RenderMode.WebAssembly` or `@(new WebAssemblyRenderMode(prerender: false))`
-> Auto        | `@RenderMode.Auto` or `@(new AutoRenderMode(prerender: false))`
+> ```razor
+> @using static Microsoft.AspNetCore.Components.Web.RenderMode
+> ```
 >
-> The preceding syntax will be simplified in an upcoming preview release.
+> Without the preceding directive, components must specify the static <xref:Microsoft.AspNetCore.Components.Web.RenderMode> class in `@rendermode` syntax explicitly:
+>
+> ```razor
+> <Dialog @rendermode="RenderMode.InteractiveServer" />
+> ```
 
-For more information, see <xref:blazor/components/render-modes>.
+For more information, including guidance on disabling prerendering with the directive/directive attribute, see <xref:blazor/components/render-modes>.
 
 :::moniker-end
 
@@ -810,7 +810,7 @@ In [Razor components](xref:blazor/components/index), `@using` also controls whic
 
 ## Directive attributes
 
-Razor directive attributes are represented by implicit expressions with reserved keywords following the `@` symbol. A directive attribute typically changes the way an element is parsed or enables different functionality.
+Razor directive attributes are represented by implicit expressions with reserved keywords following the `@` symbol. A directive attribute typically changes the way an element is compiled or functions.
 
 ### `@attributes`
 
@@ -829,6 +829,21 @@ Data binding in components is accomplished with the `@bind` attribute. For more 
 *This scenario only applies to Razor components (`.razor`).*
 
 Use the `@bind:culture` attribute with the [`@bind`](#bind) attribute to provide a <xref:System.Globalization.CultureInfo?displayProperty=fullName> for parsing and formatting a value. For more information, see <xref:blazor/globalization-localization#globalization>.
+
+:::moniker range=">= aspnetcore-8.0"
+
+### `@formname`
+
+*This scenario only applies to Razor components (`.razor`).*
+
+`@formname` assigns a form name to a Razor component's plain HTML form or a form based on <xref:Microsoft.AspNetCore.Components.Forms.EditForm> ([`Editform` documentation](xref:blazor/forms/binding#editformeditcontext-model)). The value of `@formname` should be unique, which prevents form collisions in the following situations:
+
+* A form is placed in a component with multiple forms.
+* A form is sourced from an external class library, commonly a NuGet package, for a component with multiple forms, and the app author doesn't control the source code of the library to set a different external form name than a name used by another form in the component.
+
+For more information and examples, see <xref:blazor/forms/index>.
+
+:::moniker-end
 
 ### `@on{EVENT}`
 
@@ -861,6 +876,8 @@ The `@key` directive attribute causes the components diffing algorithm to guaran
 Component references (`@ref`) provide a way to reference a component instance so that you can issue commands to that instance. For more information, see <xref:blazor/components/index#capture-references-to-components>.
 
 ## Templated Razor delegates
+
+*This scenario only applies to MVC views and Razor Pages (`.cshtml`).*
 
 Razor templates allow you to define a UI snippet with the following format:
 

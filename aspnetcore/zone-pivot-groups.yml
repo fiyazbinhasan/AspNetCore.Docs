@@ -72,3 +72,29 @@ groups:
       title: Server
     - id: webassembly
       title: Blazor WebAssembly
+- id: blazor-groups-and-roles
+  title: Approach
+  prompt: Choose the Microsoft Graph SDK version
+  pivots:
+    - id: graph-sdk-4
+      title: Graph SDK v4
+    - id: graph-sdk-5
+      title: Graph SDK v5
+- id: blazor-web-app-oidc-specification
+  title: Specification
+  prompt: Choose the app specification
+  pivots:
+    - id: without-bff-pattern
+      title: OIDC without BFF pattern
+    - id: with-bff-pattern
+      title: OIDC with BFF pattern
+- id: tooling
+  title: Tooling
+  prompt: Select your tooling
+  pivots:
+    - id: vs
+      title: Visual Studio
+    - id: vsc
+      title: Visual Studio Code
+    - id: cli
+      title: .NET CLI

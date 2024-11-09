@@ -5,7 +5,7 @@ description: Build a .NET MAUI Blazor Hybrid app step-by-step.
 monikerRange: '>= aspnetcore-6.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/18/2022
+ms.date: 02/09/2024
 uid: blazor/hybrid/tutorials/maui
 ---
 # Build a .NET MAUI Blazor Hybrid app
@@ -46,7 +46,7 @@ Select the **.NET MAUI Blazor Hybrid App** template and then select the **Next**
 :::image type="content" source="maui/_static/win/new-project-2.png" alt-text="Choose a template.":::
 
 > [!NOTE]
-> In .NET 7.0 or earlier, the template is named **.NET MAUI Blazor App**.
+> In .NET 7 or earlier, the template is named **.NET MAUI Blazor App**.
 
 In the **Configure your new project** dialog:
 

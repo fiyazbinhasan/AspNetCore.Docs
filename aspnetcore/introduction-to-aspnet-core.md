@@ -2,14 +2,16 @@
 title: Overview of ASP.NET Core
 author: tdykstra
 description: Get an overview of ASP.NET Core, a cross-platform, high-performance, open-source framework for building modern, cloud-enabled, Internet-connected apps.
-ms.author: riande
+ms.author: tdykstra
 ms.custom: mvc
-ms.date: 03/02/2022
+ms.date: 10/03/2023
 uid: index
 ---
 # Overview of ASP.NET Core
 
 By [Daniel Roth](https://github.com/danroth27), [Rick Anderson](https://twitter.com/RickAndMSFT), and [Shaun Luttin](https://mvp.microsoft.com/en-us/PublicProfile/5001182)
+
+[!INCLUDE[](~/includes/not-latest-version.md)]
 
 :::moniker range=">= aspnetcore-3.0"
 
@@ -20,7 +22,7 @@ With ASP.NET Core, you can:
 * Build web apps and services, [Internet of Things (IoT)](https://www.microsoft.com/internet-of-things/) apps, and mobile backends.
 * Use your favorite development tools on Windows, macOS, and Linux.
 * Deploy to the cloud or on-premises.
-* Run on [.NET Core](/dotnet/core/introduction).
+* Run on [.NET](/dotnet/core/introduction).
 
 ## Why choose ASP.NET Core?
 
@@ -48,9 +50,9 @@ ASP.NET Core includes [Blazor](xref:blazor/index) for building richly interactiv
 
 ## ASP.NET Core target frameworks
 
-ASP.NET Core 3.x or later can only target .NET Core. Generally, ASP.NET Core is composed of [.NET Standard](/dotnet/standard/net-standard) libraries. Libraries written with .NET Standard 2.0 run on any [.NET platform that implements .NET Standard 2.0](/dotnet/standard/net-standard#net-implementation-support).
+ASP.NET Core 3.x or later can only target .NET.
 
-There are several advantages to targeting .NET Core, and these advantages increase with each release. Some advantages of .NET Core over .NET Framework include:
+There are several advantages to targeting .NET, and these advantages increase with each release. Some advantages of .NET over .NET Framework include:
 
 * Cross-platform. Runs on Windows, macOS, and Linux.
 * Improved performance

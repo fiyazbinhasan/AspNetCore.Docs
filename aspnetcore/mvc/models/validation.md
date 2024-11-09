@@ -1,9 +1,9 @@
 ---
 title: Model validation in ASP.NET Core MVC
-author: rick-anderson
+author: tdykstra
 description: Learn about model validation in ASP.NET Core MVC and Razor Pages.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
+ms.author: tdykstra
 ms.custom: mvc
 ms.date: 05/7/2023
 uid: mvc/models/validation
@@ -424,7 +424,7 @@ Other options to disable client-side validation:
 * Comment out the reference to `_ValidationScriptsPartial` in all the `.cshtml` files.
 * Remove the contents of the *Pages\Shared\_ValidationScriptsPartial.cshtml* file.
 
-The preceding approach won't prevent client-side validation of ASP.NET Core Identity Razor Class Library. For more information, see <xref:security/authentication/scaffold-identity>.
+The preceding approach won't prevent client-side validation of ASP.NET Core Identity Razor class library. For more information, see <xref:security/authentication/scaffold-identity>.
 
 
 ## Problem details

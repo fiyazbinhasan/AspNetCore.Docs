@@ -13,15 +13,15 @@ items:
     uid: getting-started
   - name: What's new
     items:
-      - name: What's new in docs
-        href: whats-new/index.yml
-      - name: What's new in 8.0
+      - name: What's new in 9
+        uid: aspnetcore-9
+      - name: What's new in 8
         uid: aspnetcore-8
-      - name: What's new in 7.0
+      - name: What's new in 7
         uid: aspnetcore-7
-      - name: What's new in 6.0
+      - name: What's new in 6
         uid: aspnetcore-6.0
-      - name: What's new in 5.0
+      - name: What's new in 5
         uid: aspnetcore-5.0
       - name: What's new in 3.1
         uid: aspnetcore-3.1
@@ -35,6 +35,8 @@ items:
         uid: aspnetcore-2.0
       - name: What's new in 1.1
         uid: aspnetcore-1.1
+      - name: What's new in docs
+        href: whats-new/index.yml
   - name: Tutorials
     displayName: tutorial
     items:
@@ -231,7 +233,7 @@ items:
             uid: fundamentals/aot/rdg
           - name: RDG diagnostics
             displayName: aot, RDG diagnostics
-            uid: fundamentals/aot/request-delegate-generator/rgd_ids
+            uid: fundamentals/aot/request-delegate-generator/rdg-ids
             items:
               - name: RDG002
                 uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg002
@@ -256,7 +258,7 @@ items:
               - name: RDG013
                 uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg013
       - name: Middleware
-        items: 
+        items:
           - name: Middleware overview
             uid: fundamentals/middleware/index
           - name: Rate limiting middleware
@@ -297,16 +299,18 @@ items:
         items:
           - name: Logging
             uid: fundamentals/logging/index
-          - name: HTTP Logging
+          - name: HTTP logging
             uid: fundamentals/http-logging/index
-          - name: W3C Logger
+          - name: W3C logger
             uid: fundamentals/w3c-logger/index
           - name: Health checks
             displayName: logging, monitoring
             uid: host-and-deploy/health-checks
-          - name: Metrics
+          - name: Metrics overview
             displayName: logging, monitoring
             uid: log-mon/metrics/metrics
+          - name: Built-in metrics >>
+            href: /dotnet/core/diagnostics/built-in-metrics-aspnetcore
       - name: HttpContext
         uid: fundamentals/use-httpcontext
       - name: Routing
@@ -398,6 +402,8 @@ items:
             uid: blazor/supported-platforms
           - name: Tooling
             uid: blazor/tooling
+          - name: WebAssembly tooling and AOT
+            uid: blazor/tooling/webassembly
           - name: Hosting models
             uid: blazor/hosting-models
           - name: Tutorials
@@ -408,6 +414,26 @@ items:
                 href: https://dotnet.microsoft.com/learn/aspnet/blazor-tutorial/intro
               - name: Build a Blazor todo list app
                 uid: blazor/tutorials/build-a-blazor-app
+              - name: Build a Blazor movie database app
+                items:
+                  - name: Overview
+                    uid: blazor/tutorials/movie-database-app/index
+                  - name: Create a Blazor Web App
+                    uid: blazor/tutorials/movie-database-app/part-1
+                  - name: Add and scaffold a model
+                    uid: blazor/tutorials/movie-database-app/part-2
+                  - name: Learn about Razor components
+                    uid: blazor/tutorials/movie-database-app/part-3
+                  - name: Work with a database
+                    uid: blazor/tutorials/movie-database-app/part-4
+                  - name: Add validation
+                    uid: blazor/tutorials/movie-database-app/part-5
+                  - name: Add search
+                    uid: blazor/tutorials/movie-database-app/part-6
+                  - name: Add a new field
+                    uid: blazor/tutorials/movie-database-app/part-7
+                  - name: Add interactivity
+                    uid: blazor/tutorials/movie-database-app/part-8
               - name: SignalR with Blazor
                 uid: blazor/tutorials/signalr-blazor
               - name: Learn modules
@@ -422,6 +448,8 @@ items:
                     uid: blazor/hybrid/tutorials/index
                   - name: .NET MAUI
                     uid: blazor/hybrid/tutorials/maui
+                  - name: .NET MAUI with Blazor Web App
+                    uid: blazor/hybrid/tutorials/maui-blazor-web-app
                   - name: Windows Forms
                     uid: blazor/hybrid/tutorials/windows-forms
                   - name: WPF
@@ -446,6 +474,8 @@ items:
                     uid: blazor/hybrid/security/security-considerations
               - name: Publish
                 uid: blazor/hybrid/publish/index
+              - name: Troubleshoot
+                uid: blazor/hybrid/troubleshoot
           - name: Project structure
             uid: blazor/project-structure
           - name: Fundamentals
@@ -496,10 +526,10 @@ items:
                 uid: blazor/components/control-head-content
               - name: Cascading values and parameters
                 uid: blazor/components/cascading-values-and-parameters
-              - name: Data binding
-                uid: blazor/components/data-binding
               - name: Event handling
                 uid: blazor/components/event-handling
+              - name: Data binding
+                uid: blazor/components/data-binding
               - name: Lifecycle
                 uid: blazor/components/lifecycle
               - name: Virtualization
@@ -520,6 +550,8 @@ items:
                 uid: blazor/components/integration
               - name: Class libraries
                 uid: blazor/components/class-libraries
+              - name: Class libraries with static SSR
+                uid: blazor/components/class-libraries-with-static-ssr
               - name: JavaScript apps and SPA frameworks
                 uid: blazor/components/js-spa-frameworks
               - name: Components outside of ASP.NET Core
@@ -528,8 +560,18 @@ items:
                 uid: blazor/components/built-in-components
           - name: Globalization and localization
             uid: blazor/globalization-localization
-          - name: Forms and input components
-            uid: blazor/forms-and-input-components
+          - name: Forms
+            items:
+              - name: Overview
+                uid: blazor/forms/index
+              - name: Input components
+                uid: blazor/forms/input-components
+              - name: Binding
+                uid: blazor/forms/binding
+              - name: Validation
+                uid: blazor/forms/validation
+              - name: Troubleshoot
+                uid: blazor/forms/troubleshoot
           - name: File uploads
             uid: blazor/file-uploads
           - name: File downloads
@@ -538,32 +580,46 @@ items:
             items:
               - name: Overview
                 uid: blazor/js-interop/index
+              - name: JavaScript location
+                uid: blazor/js-interop/javascript-location
               - name: Call JS from .NET
                 uid: blazor/js-interop/call-javascript-from-dotnet
               - name: Call .NET from JS
                 uid: blazor/js-interop/call-dotnet-from-javascript
               - name: JSImport/JSExport interop
                 uid: blazor/js-interop/import-export-interop
+              - name: Static server rendering
+                uid: blazor/js-interop/ssr
           - name: Call a web API
             uid: blazor/call-web-api
-          - name: Images
-            uid: blazor/images
+          - name: Images and documents
+            uid: blazor/images-and-documents
           - name: Security and Identity
             items:
               - name: Overview
                 uid: blazor/security/index
-              - name: Blazor Server
+              - name: Authentication state
+                uid: blazor/security/authentication-state
+              - name: Server
                 items:
                   - name: Overview
                     uid: blazor/security/server/index
-                  - name: Threat mitigation
-                    uid: blazor/security/server/threat-mitigation
+                  - name: Static server-side rendering threats
+                    uid: blazor/security/server/static-server-side-rendering
+                  - name: Interactive server-side rendering threats
+                    uid: blazor/security/server/interactive-server-side-rendering
+                  - name: Account confirmation and password recovery
+                    uid: blazor/security/server/account-confirmation-and-password-recovery
+                  - name: QR code generation
+                    uid: blazor/security/server/qrcodes-for-authenticator-apps
                   - name: Additional scenarios
                     uid: blazor/security/server/additional-scenarios
               - name: Blazor WebAssembly
                 items:
                   - name: Overview
                     uid: blazor/security/webassembly/index
+                  - name: Standalone with Identity
+                    uid: blazor/security/webassembly/standalone-with-identity
                   - name: Standalone with Authentication library
                     uid: blazor/security/webassembly/standalone-with-authentication-library
                   - name: Standalone with Microsoft Accounts
@@ -582,8 +638,14 @@ items:
                     uid: blazor/security/webassembly/additional-scenarios
                   - name: ME-ID groups and roles
                     uid: blazor/security/webassembly/meid-groups-roles
+                  - name: ME-ID groups and roles
+                    uid: blazor/security/webassembly/meid-groups-roles-net5to7
                   - name: Graph API
                     uid: blazor/security/webassembly/graph-api
+              - name: Blazor Web App with Entra
+                uid: blazor/security/blazor-web-app-entra
+              - name: Blazor Web App with OIDC
+                uid: blazor/security/blazor-web-app-oidc
               - name: Content Security Policy
                 uid: blazor/security/content-security-policy
           - name: State management
@@ -604,10 +666,16 @@ items:
             items:
               - name: Overview
                 uid: blazor/host-and-deploy/index
-              - name: Blazor Server
+              - name: Server
                 uid: blazor/host-and-deploy/server
               - name: Blazor WebAssembly
                 uid: blazor/host-and-deploy/webassembly
+              - name: WebAssembly caching
+                items:
+                  - name: Overview
+                    uid: blazor/host-and-deploy/webassembly-caching/index
+                  - name: HTTP caching issues
+                    uid: blazor/host-and-deploy/webassembly-caching/http-caching-issues
               - name: Configure the Linker
                 uid: blazor/host-and-deploy/configure-linker
               - name: Configure the Trimmer
@@ -648,8 +716,12 @@ items:
                 uid: client-side/libman/libman-cli
               - name: Visual Studio
                 uid: client-side/libman/libman-vs
-          - name: Run .NET from JavaScript
-            uid: client-side/dotnet-interop
+          - name: WebAssembly JS interop
+            items:
+              - name: Overview
+                uid: client-side/dotnet-interop/index
+              - name: JS interop (WebAssembly Browser App)
+                uid: client-side/dotnet-interop/wasm-browser-app
           - name: Grunt
             uid: client-side/using-grunt
           - name: Bundle and minify
@@ -735,7 +807,8 @@ items:
             uid: mvc/models/file-uploads
           - name: Web SDK
             uid: razor-pages/web-sdk
-          - name: aspnet-codegenerator (Scaffolding)
+          - name: Code generator tool (scaffolding)
+            displayName: aspnet-codegenerator
             uid: fundamentals/tools/dotnet-aspnet-codegenerator
   - name: APIs
     items:
@@ -751,16 +824,6 @@ items:
               uid: tutorials/first-web-api
             - name: Web API with MongoDB
               uid: tutorials/first-mongo-app
-        - name: Swagger / OpenAPI
-          items:
-            - name: Overview
-              uid: tutorials/web-api-help-pages-using-swagger
-            - name: Get started with Swashbuckle
-              uid: tutorials/get-started-with-swashbuckle
-            - name: Get started with NSwag
-              uid: tutorials/get-started-with-nswag
-            - name: OpenAPI tools
-              uid: web-api/Microsoft.dotnet-openapi
         - name: Action return types
           uid: web-api/action-return-types
         - name: Handle JSON Patch requests
@@ -797,8 +860,6 @@ items:
           uid: fundamentals/minimal-apis/parameter-binding
         - name: Create responses
           uid: fundamentals/minimal-apis/responses
-        - name: OpenAPI
-          uid: fundamentals/minimal-apis/openapi
         - name: Filters
           uid: fundamentals/minimal-apis/min-api-filters
         - name: Unit and integration tests
@@ -809,6 +870,28 @@ items:
           uid: fundamentals/minimal-apis/handle-errors
         - name: Authentication and authorization
           uid: fundamentals/minimal-apis/security
+      - name: OpenAPI
+        items:
+          - name: Overview
+            uid: fundamentals/openapi/overview
+          - name: Generate OpenAPI documents
+            uid: fundamentals/openapi/aspnetcore-openapi
+          - name: Include OpenAPI metadata
+            uid: fundamentals/openapi/include-metadata
+          - name: Customize OpenAPI documents
+            uid: fundamentals/openapi/customize-openapi
+          - name: Use OpenAPI documents
+            uid: fundamentals/openapi/using-openapi-documents
+          - name: OpenAPI tools
+            uid: fundamentals/openapi/openapi-tools
+          - name: Swagger / NSwag
+            items:
+              - name: Overview
+                uid: tutorials/web-api-help-pages-using-swagger
+              - name: Get started with Swashbuckle
+                uid: tutorials/get-started-with-swashbuckle
+              - name: Get started with NSwag
+                uid: tutorials/get-started-with-nswag
   - name: Real-time apps
     displayName: signalr
     items:
@@ -976,6 +1059,8 @@ items:
         uid: grpc/configuration
       - name: Authentication and authorization
         uid: grpc/authn-and-authz
+      - name: Error handling
+        uid: grpc/error-handling
       - name: gRPC interceptors
         uid: grpc/interceptors
       - name: Logging and diagnostics
@@ -1000,7 +1085,7 @@ items:
         uid: grpc/health-checks
       - name: Manage Protobuf references with dotnet-grpc
         uid: grpc/dotnet-grpc
-      - name: Test services with Postman and gRPCurl
+      - name: Test services with gRPCurl and gRPCui
         uid: grpc/test-tools
       - name: Migrate from C-core to gRPC for .NET
         uid: grpc/migration
@@ -1123,6 +1208,8 @@ items:
             uid: web-api/http-repl/telemetry
       - name: Test Minimal API
         uid: fundamentals/minimal-apis/test-min-api
+      - name: Blazor tests
+        uid: blazor/test
       - name: Razor Pages unit tests
         uid: test/razor-pages-tests
       - name: MVC controllers unit tests
@@ -1206,6 +1293,8 @@ items:
         uid: diagnostics/asp0024
       - name: ASP0025
         uid: diagnostics/asp0025
+      - name: ASP0026
+        uid: diagnostics/asp0026
       - name: BL0001
         uid: diagnostics/bl0001
       - name: BL0002
@@ -1354,9 +1443,6 @@ items:
       - name: Linux with Nginx
         displayName: deploy, publish
         uid: host-and-deploy/linux-nginx
-      - name: Linux with Apache
-        displayName: deploy, publish
-        uid: host-and-deploy/linux-apache
       - name: Docker
         displayName: deploy, publish
         items:
@@ -1402,69 +1488,58 @@ items:
         items:
           - name: Overview
             uid: security/authentication/index
-          - name: Introduction to Identity
-            uid: security/authentication/identity
-          - name: How to chose an identity management solution
+          - name: Choose an identity solution
             uid: security/how-to-choose-identity
-          - name: Mapping, customizing, and transforming claims
-            uid: security/authentication/claims
-          - name: Identity with SPA
-            uid: security/authentication/identity/spa
-          - name: Scaffold Identity
-            uid: security/authentication/scaffold-identity
-          - name: Add custom user data to Identity
-            uid: security/authentication/add-user-data
-          - name: Authentication samples
-            uid: security/authentication/samples
-          - name: Customize Identity
-            uid: security/authentication/customize_identity_model
-          - name: Community OSS authentication options
-            uid: security/authentication/community
-          - name: Configure Identity
-            uid: security/authentication/identity-configuration
-          - name: Configure Windows Authentication
-            uid: security/authentication/windowsauth
-          - name: Custom storage providers for Identity
-            uid: security/authentication/identity-custom-storage-providers
-          - name: Google, Facebook ...
+          - name: ASP.NET Core Identity
             items:
               - name: Overview
-                uid: security/authentication/social/index
-              - name: Google authentication
-                uid: security/authentication/google-logins
-              - name: Facebook authentication
-                uid: security/authentication/facebook-logins
-              - name: Microsoft authentication
-                uid: security/authentication/microsoft-logins
-              - name: Twitter authentication
-                uid: security/authentication/twitter-logins
-              - name: Other providers
-                uid: security/authentication/otherlogins
-              - name: Additional claims
-                uid: security/authentication/social/additional-claims
-          - name: Policy schemes
-            uid: security/authentication/policyschemes
-          - name: WS-Federation authentication
-            uid: security/authentication/ws-federation
-          - name: Account confirmation and password recovery
-            uid: security/authentication/accconfirm
-          - name: Enable QR code generation in Identity
-            uid: security/authentication/identity-enable-qrcodes
-          - name: Two-factor authentication with SMS
-            uid: security/authentication/2fa
-          - name: Use cookie authentication without Identity
-            uid: security/authentication/cookie
-          - name: Use social authentication without Identity
-            uid: security/authentication/social/social-without-identity
-          - name: Manage JWTs in development
-            displayName: jwt, JSON WEB Token
-            uid: security/authentication/jwt
-          - name: Azure Active Directory
+                uid: security/authentication/identity
+              - name: Identity with SPA
+                uid: security/authentication/identity/spa
+              - name: Scaffold Identity
+                uid: security/authentication/scaffold-identity
+              - name: Add custom user data to Identity
+                uid: security/authentication/add-user-data
+              - name: Customize Identity
+                uid: security/authentication/customize_identity_model
+              - name: Configure Identity
+                uid: security/authentication/identity-configuration
+              - name: Custom storage providers for Identity
+                uid: security/authentication/identity-custom-storage-providers
+              - name: Account confirmation and password recovery
+                uid: security/authentication/accconfirm
+              - name: Enable QR code generation in Identity
+                uid: security/authentication/identity-enable-qrcodes
+              - name: Two-factor authentication with SMS
+                uid: security/authentication/2fa
+              - name: External authentication providers
+                items:
+                  - name: Overview
+                    uid: security/authentication/social/index
+                  - name: Google authentication
+                    uid: security/authentication/google-logins
+                  - name: Facebook authentication
+                    uid: security/authentication/facebook-logins
+                  - name: Microsoft authentication
+                    uid: security/authentication/microsoft-logins
+                  - name: Twitter authentication
+                    uid: security/authentication/twitter-logins
+                  - name: Other providers
+                    uid: security/authentication/otherlogins
+                  - name: Additional claims
+                    uid: security/authentication/social/additional-claims
+              - name: Individual user accounts
+                uid: security/authentication/individual
+          - name: Azure
             items:
               - name: Overview
                 uid: security/authentication/azure-active-directory/index
-              - name: Integrate Azure AD into a web app
-                href: /azure/active-directory/develop/quickstart-v2-aspnet-core-webapp
+              - name: Secure ASP.NET Core apps with Microsoft identity web
+                href: https://github.com/AzureAD/microsoft-identity-web/wiki
+              - name: Secure ASP.NET Core apps with Microsoft identity platform
+                href: /azure/active-directory/develop/
+              - name: Secure ASP.NET Core apps with Azure App Service authentication (Easy Auth)
+                href: /azure/app-service/overview-authentication-authorization?toc=/aspnet/core/toc.json&bc=/aspnet/core/breadcrumb/toc.json
               - name: Scenarios
                 items:
                   - name: Web app that signs in users
@@ -1479,26 +1554,33 @@ items:
                     uid: security/authentication/azure-ad-b2c
               - name: Samples
                 items:
-                  - name: Sign-in users and call web APIs using Azure AD V2
-                    href: /samples/azure-samples/active-directory-aspnetcore-webapp-openidconnect-v2/enable-webapp-signin/
+                  - name: Enable your Web Apps to sign-in users and call APIs with the Microsoft identity platform for developers
+                    href: https://github.com/Azure-Samples/active-directory-aspnetcore-webapp-openidconnect-v2/
                   - name: Calling an ASP.NET Core 2.0 Web API from a WPF application using Azure AD V2
                     href: https://github.com/Azure-Samples/active-directory-dotnet-native-aspnetcore-v2/tree/master/1.%20Desktop%20app%20calls%20Web%20API
                   - name: Web API with Azure AD B2C
-                    href: /samples/azure-samples/active-directory-aspnetcore-webapp-openidconnect-v2/how-to-secure-a-web-api-built-with-aspnet-core-using-the-azure-ad-b2c/
-          - name: Identity management solutions for ASP.NET Core apps
-            uid: security/identity-management-solutions 
-          - name: Secure ASP.NET Core apps with Microsoft Identity Web
-            href: /azure/active-directory/develop/
-          - name: Secure ASP.NET Core apps with Duende Identity Server
-            href: https://docs.duendesoftware.com
-          - name: Secure ASP.NET Core apps with IdentityServer4
-            href: https://identityserver4.readthedocs.io/
-          - name: Secure ASP.NET Core apps with Azure App Service authentication (Easy Auth)
-            href: /azure/app-service/overview-authentication-authorization?toc=/aspnet/core/toc.json&bc=/aspnet/core/breadcrumb/toc.json
-          - name: Individual user accounts
-            uid: security/authentication/individual
+                    href: /azure/active-directory-b2c/enable-authentication-web-api
+          - name: Configure cookie authentication
+            uid: security/authentication/cookie
           - name: Configure certificate authentication
             uid: security/authentication/certauth
+          - name: Configure Windows authentication
+            uid: security/authentication/windowsauth
+          - name: Configure WS-Federation authentication
+            uid: security/authentication/ws-federation
+          - name: Configure social authentication
+            uid: security/authentication/social/social-without-identity
+          - name: Policy schemes
+            uid: security/authentication/policyschemes
+          - name: Manage JWTs in development
+            displayName: jwt, JSON WEB Token
+            uid: security/authentication/jwt
+          - name: Map, customize, and transform claims
+            uid: security/authentication/claims
+          - name: Community OSS authentication options
+            uid: security/authentication/community
+          - name: Identity management solutions
+            uid: security/identity-management-solutions
           - name: Multi-factor authentication
             uid: security/authentication/mfa
       - name: Authorization
@@ -1660,6 +1742,9 @@ items:
           - name: Distributed caching
             displayName: cache
             uid: performance/caching/distributed
+          - name: Hybrid cache
+            displayName: caching
+            uid: performance/caching/hybrid
           - name: Output caching
             displayName: cache
             uid: performance/caching/output
@@ -1752,9 +1837,6 @@ items:
       - name: High performance logging
         displayName: loggermessage
         href: /dotnet/core/extensions/high-performance-logging?toc=/aspnet/core/toc.json&bc=/aspnet/core/breadcrumb/toc.json
-      - name: Logging (not ASP.NET Core)
-        displayName: migrate, migration
-        uid: migration/logging-nonaspnetcore
       - name: Use a file watcher
         uid: tutorials/dotnet-watch
       - name: Factory-based middleware
@@ -1765,19 +1847,22 @@ items:
     items:
       - name: Version updates
         items:
-          - name: 7.0 to 8.0
+          - name: 8 to 9
+            displayName: migrate, migration
+            uid: migration/80-to-90
+          - name: 7 to 8
             displayName: migrate, migration
             uid: migration/70-to-80
-          - name: 6.0 to 7.0
+          - name: 6 to 7
             displayName: migrate, migration
             uid: migration/60-to-70
-          - name: 5.0 to 6.0
+          - name: 5 to 6
             displayName: migrate, migration
             uid: migration/50-to-60
-          - name: 3.1/5.0 Code to 6.0
+          - name: 3.1/5.0 Code to 6
             displayName: migrate, migration
             uid: migration/50-to-60-samples
-          - name: 3.1 to 6.0 LTS
+          - name: 3.1 to 6 LTS
             displayName: migrate, migration, LTS
             uid: migration/31-to-60
           - name: Older versions
@@ -1794,6 +1879,9 @@ items:
               - name: 2.1 to 2.2
                 displayName: migrate, migration
                 uid: migration/21-to-22
+              - name: Logging 2.1 to 2.2 or 3.0
+                displayName: migrate, migration
+                uid: migration/logging-nonaspnetcore
               - name: 2.0 to 2.1
                 displayName: migrate, migration
                 uid: migration/20_21
@@ -1826,13 +1914,17 @@ items:
               uid: migration/inc/wrapped
             - name: Session state migration
               uid: migration/inc/session
+            - name: Module migration
+              uid: migration/inc/http-modules
             - name: Remote app session state
               uid: migration/inc/remote-session
             - name: Remote Authentication
-              uid: migration/inc/remote-authentication             
+              uid: migration/inc/remote-authentication
+            - name: Unit testing
+              uid: migration/inc/unit-testing
             - name: A/B Testing endpoints
               uid: migration/inc/ab-testing
-            - name: Blazor support with YARP 
+            - name: Blazor support with YARP
               uid: migration/inc/blazor
           - name: MVC and Web API
             uid: migration/mvc

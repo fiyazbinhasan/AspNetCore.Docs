@@ -5,7 +5,7 @@ description: Learn how to incorporate manual logic for building Blazor render tr
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 08/26/2024
 uid: blazor/advanced-scenarios
 ---
 # ASP.NET Core Blazor advanced scenarios (render tree construction)
@@ -25,7 +25,7 @@ Consider the following `PetDetails` component, which can be manually rendered in
 
 `PetDetails.razor`:
 
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Shared/advanced-scenarios/PetDetails.razor":::
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/PetDetails.razor":::
 
 In the following `BuiltContent` component, the loop in the `CreateComponent` method generates three `PetDetails` components.
 
@@ -33,47 +33,21 @@ In <xref:Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder> methods wi
 
 `BuiltContent.razor`:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
 
-```razor
-@page "/built-content"
-@attribute [RenderModeServer]
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/BuiltContent.razor":::
 
-<h1>Build a component</h1>
+:::moniker-end
 
-<div>
-    @CustomRender
-</div>
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
 
-<button @onclick="RenderComponent">
-    Create three Pet Details components
-</button>
-
-@code {
-    private RenderFragment? CustomRender { get; set; }
-
-    private RenderFragment CreateComponent() => builder =>
-    {
-        for (var i = 0; i < 3; i++) 
-        {
-            builder.OpenComponent(0, typeof(PetDetails));
-            builder.AddAttribute(1, "PetDetailsQuote", "Someone's best friend!");
-            builder.CloseComponent();
-        }
-    };
-
-    private void RenderComponent()
-    {
-        CustomRender = CreateComponent();
-    }
-}
-```
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/BuiltContent.razor":::
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-8.0"
 
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/advanced-scenarios/BuiltContent.razor" highlight="6,16-24,28":::
+:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/advanced-scenarios/BuiltContent.razor":::
 
 :::moniker-end
 
@@ -110,16 +84,16 @@ builder.AddContent(1, "Second");
 
 When the code executes for the first time and `someFlag` is `true`, the builder receives the sequence in the following table.
 
-| Sequence | Type      | Data   |
-| :------: | --------- | :----: |
-| 0        | Text node | First  |
-| 1        | Text node | Second |
+Sequence | Type      | Data
+:------: | --------- | ------
+0        | Text node | First
+1        | Text node | Second
 
 Imagine that `someFlag` becomes `false` and the markup is rendered again. This time, the builder receives the sequence in the following table.
 
-| Sequence | Type       | Data   |
-| :------: | ---------- | :----: |
-| 1        | Text node  | Second |
+Sequence | Type      | Data
+:------: | --------- | ------
+1        | Text node | Second
 
 When the runtime performs a diff, it sees that the item at sequence `0` was removed, so it generates the following trivial *edit script* with a single step:
 
@@ -142,16 +116,16 @@ builder.AddContent(seq++, "Second");
 
 The first output is reflected in the following table.
 
-| Sequence | Type      | Data   |
-| :------: | --------- | :----: |
-| 0        | Text node | First  |
-| 1        | Text node | Second |
+Sequence | Type      | Data
+:------: | --------- | ------
+0        | Text node | First
+1        | Text node | Second
 
 This outcome is identical to the prior case, so no negative issues exist. `someFlag` is `false` on the second rendering, and the output is seen in the following table.
 
-| Sequence | Type      | Data   |
-| :------: | --------- | ------ |
-| 0        | Text node | Second |
+Sequence | Type      | Data
+:------: | --------- | ------
+0        | Text node | Second
 
 This time, the diff algorithm sees that *two* changes have occurred. The algorithm generates the following edit script:
 
@@ -165,7 +139,8 @@ This is a trivial example. In more realistic cases with complex and deeply neste
 ### Guidance and conclusions
 
 * App performance suffers if sequence numbers are generated dynamically.
-* The framework can't create its own sequence numbers automatically at runtime because the necessary information doesn't exist unless it's captured at compile time.
+* The necessary information doesn't exist to permit the framework to generate sequence numbers automatically at runtime unless the information is captured at compile time.
 * Don't write long blocks of manually-implemented <xref:Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder> logic. Prefer `.razor` files and allow the compiler to deal with the sequence numbers. If you're unable to avoid manual <xref:Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder> logic, split long blocks of code into smaller pieces wrapped in <xref:Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder.OpenRegion%2A>/<xref:Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder.CloseRegion%2A> calls. Each region has its own separate space of sequence numbers, so you can restart from zero (or any other arbitrary number) inside each region.
 * If sequence numbers are hardcoded, the diff algorithm only requires that sequence numbers increase in value. The initial value and gaps are irrelevant. One legitimate option is to use the code line number as the sequence number, or start from zero and increase by ones or hundreds (or any preferred interval).
+* For loops, the sequence numbers should increase in your source code, not in terms of runtime behavior. The fact that, at runtime, the numbers repeat is how the diffing system realises you're in a loop.
 * Blazor uses sequence numbers, while other tree-diffing UI frameworks don't use them. Diffing is far faster when sequence numbers are used, and Blazor has the advantage of a compile step that deals with sequence numbers automatically for developers authoring `.razor` files.

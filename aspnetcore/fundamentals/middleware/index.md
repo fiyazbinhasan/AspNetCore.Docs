@@ -1,9 +1,9 @@
 ---
 title: ASP.NET Core Middleware
-author: rick-anderson
+author: tdykstra
 description: Learn about ASP.NET Core middleware and the request pipeline.
 monikerRange: '>= aspnetcore-3.0'
-ms.author: riande
+ms.author: tdykstra
 ms.custom: mvc
 ms.date: 05/03/2023
 uid: fundamentals/middleware/index
@@ -52,10 +52,10 @@ Chain multiple request delegates together with <xref:Microsoft.AspNetCore.Builde
 When a delegate doesn't pass a request to the next delegate, it's called *short-circuiting the request pipeline*. Short-circuiting is often desirable because it avoids unnecessary work. For example, [Static File Middleware](xref:fundamentals/static-files) can act as a *terminal middleware* by processing a request for a static file and short-circuiting the rest of the pipeline. Middleware added to the pipeline before the middleware that terminates further processing still processes code after their `next.Invoke` statements. However, see the following warning about attempting to write to a response that has already been sent.
 
 > [!WARNING]
-> Don't call `next.Invoke` after the response has been sent to the client. Changes to <xref:Microsoft.AspNetCore.Http.HttpResponse> after the response has started throw an exception. For example, [setting headers and a status code throw an exception](xref:fundamentals/best-practices#do-not-modify-the-status-code-or-headers-after-the-response-body-has-started). Writing to the response body after calling `next`:
+> Don't call `next.Invoke` during or after the response has been sent to the client. After an <xref:Microsoft.AspNetCore.Http.HttpResponse> has started, changes result in an exception. For example, [setting headers and a status code throw an exception](xref:fundamentals/best-practices#do-not-modify-the-status-code-or-headers-after-the-response-body-has-started) after the response starts. Writing to the response body after calling `next`:
 >
-> * May cause a protocol violation. For example, writing more than the stated `Content-Length`.
-> * May corrupt the body format. For example, writing an HTML footer to a CSS file.
+> * May cause a protocol violation, such as writing more than the stated `Content-Length`.
+> * May corrupt the body format, such as writing an HTML footer to a CSS file.
 >
 > <xref:Microsoft.AspNetCore.Http.HttpResponse.HasStarted%2A> is a useful hint to indicate if headers have been sent or the body has been written to.
 
@@ -288,7 +288,7 @@ ASP.NET Core ships with the following middleware components. The *Order* column 
 | [Request Decompression](xref:fundamentals/middleware/request-decompression) | Provides support for decompressing requests. | Before components that read the request body. |
 | [Response Compression](xref:performance/response-compression) | Provides support for compressing responses. | Before components that require compression. |
 | [Request Localization](xref:fundamentals/localization) | Provides localization support. | Before localization sensitive components. Must appear after Routing Middleware when using <xref:Microsoft.AspNetCore.Localization.Routing.RouteDataRequestCultureProvider>. |
-| [Request Timeouts](xref:performance/timeouts) | Provides support for configuring request timeouts, global and per endpoint. | `UseRouting` must come before `UseRequestTimeouts`. |
+| [Request Timeouts](xref:performance/timeouts) | Provides support for configuring request timeouts, global and per endpoint. | `UseRequestTimeouts` must come after `UseExceptionHandler`, `UseDeveloperExceptionPage`, and `UseRouting`. |
 | [Endpoint Routing](xref:fundamentals/routing) | Defines and constrains request routes. | Terminal for matching routes. |
 | [SPA](xref:Microsoft.AspNetCore.Builder.SpaApplicationBuilderExtensions.UseSpa%2A) | Handles all requests from this point in the middleware chain by returning the default page for the Single Page Application (SPA) | Late in the chain, so that other middleware for serving static files, MVC actions, etc., takes precedence.|
 | [Session](xref:fundamentals/app-state) | Provides support for managing user sessions. | Before components that require Session. | 

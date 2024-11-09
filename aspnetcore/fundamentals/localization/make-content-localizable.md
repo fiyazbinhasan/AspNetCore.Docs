@@ -9,9 +9,11 @@ uid: fundamentals/localization/make-content-localizable
 ---
 # Make an ASP.NET Core app's content localizable
 
+[!INCLUDE[](~/includes/not-latest-version.md)]
+
 :::moniker range="> aspnetcore-5.0"
 
-By [Hisham Bin Ateya](https://twitter.com/hishambinateya), [Damien Bowden](https://twitter.com/damien_bod), [Bart Calixto](https://twitter.com/bartmax) and [Nadeem Afana](https://afana.me/)
+By [Hisham Bin Ateya](https://twitter.com/hishambinateya), [Damien Bowden](https://github.com/damienbod), [Bart Calixto](https://twitter.com/bartmax) and [Nadeem Afana](https://afana.me/)
 
 One task for localizing an app is to wrap localizable content with code that facilitates replacing that content for different cultures.
 
@@ -131,6 +133,8 @@ Localizing an app also involves the following tasks:
 
 ## Additional resources
 
+* [Url culture provider using middleware as filters in ASP.NET Core](https://andrewlock.net/url-culture-provider-using-middleware-as-mvc-filter-in-asp-net-core-1-1-0/)
+* [Applying the RouteDataRequest CultureProvider globally with middleware as filters](https://andrewlock.net/applying-the-routedatarequest-cultureprovider-globally-with-middleware-as-filters/)
 * <xref:fundamentals/localization>
 * <xref:fundamentals/localization/provide-resources>
 * <xref:fundamentals/localization/select-language-culture>

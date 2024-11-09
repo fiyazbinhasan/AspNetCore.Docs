@@ -13,7 +13,7 @@ uid: fundamentals/localization/select-language-culture
 
 :::moniker range=">= aspnetcore-8.0"
 
-[Hisham Bin Ateya](https://twitter.com/hishambinateya), [Damien Bowden](https://twitter.com/damien_bod), [Bart Calixto](https://twitter.com/bartmax), [Nadeem Afana](https://afana.me/), and [Rick Anderson](https://twitter.com/RickAndMSFT)
+[Hisham Bin Ateya](https://twitter.com/hishambinateya), [Damien Bowden](https://github.com/damienbod), [Bart Calixto](https://twitter.com/bartmax), [Nadeem Afana](https://afana.me/), and [Rick Anderson](https://twitter.com/RickAndMSFT)
 
 One task for localizing an app is to implement a strategy for selecting the appropriate culture for each response the app returns.
 
@@ -95,6 +95,15 @@ app.UseRequestLocalization(new RequestLocalizationOptions
     ApplyCurrentCultureToResponseHeaders = true
 });
 ```
+
+## Apply the RouteDataRequest CultureProvider
+
+The <xref:Microsoft.AspNetCore.Localization.Routing.RouteDataRequestCultureProvider> sets the culture based on the value of the `culture` route value. See [Url culture provider using middleware as filters](https://andrewlock.net/url-culture-provider-using-middleware-as-mvc-filter-in-asp-net-core-1-1-0/) for information on:
+
+* Using the middleware as filters feature of ASP.NET Core.
+* How to use `RouteDataRequestCultureProvider` to set the culture of an app from the url.
+
+See [Applying the RouteDataRequest CultureProvider globally with middleware as filters](https://andrewlock.net/applying-the-routedatarequest-cultureprovider-globally-with-middleware-as-filters/) for information on how to apply the `RouteDataRequestCultureProvider` globally.
 
 ## Use a custom provider
 
@@ -182,6 +191,8 @@ Localizing an app also involves the following tasks:
 
 ## Additional resources
 
+* [Url culture provider using middleware as filters in ASP.NET Core](https://andrewlock.net/url-culture-provider-using-middleware-as-mvc-filter-in-asp-net-core-1-1-0/)
+* [Applying the RouteDataRequest CultureProvider globally with middleware as filters](https://andrewlock.net/applying-the-routedatarequest-cultureprovider-globally-with-middleware-as-filters/)
 * <xref:fundamentals/localization>
 * <xref:fundamentals/localization/make-content-localizable>
 * <xref:fundamentals/localization/provide-resources>

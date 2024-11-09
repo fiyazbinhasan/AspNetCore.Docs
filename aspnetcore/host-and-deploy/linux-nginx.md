@@ -4,7 +4,7 @@ author: rick-anderson
 description: Learn how to set up Nginx as a reverse proxy on Ubuntu, RHEL and SUSE to forward HTTP traffic to an ASP.NET Core web app running on Kestrel.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
-ms.custom: mvc, engagement-fy23
+ms.custom: mvc, engagement-fy23, linux-related-content
 ms.date: 5/8/2023
 uid: host-and-deploy/linux-nginx
 ---
@@ -103,7 +103,7 @@ Kestrel is great for serving dynamic content from ASP.NET Core. However, the web
 
 For the purposes of this guide, a single instance of Nginx is used. It runs on the same server, alongside the HTTP server. Based on requirements, a different setup may be chosen.
 
-Because requests are forwarded by reverse proxy, use the [Forwarded Headers Middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package. The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
+Because requests are forwarded by reverse proxy, use the [Forwarded Headers Middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package, which is automatically included in ASP.NET Core apps via the [shared framework's `Microsoft.AspNetCore.App` metapackage](xref:fundamentals/metapackage-app). The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
 
 [!INCLUDE[](~/includes/ForwardedHeaders.md)]
 
@@ -160,28 +160,35 @@ Open `/etc/nginx/sites-available/default` in a text editor, and replace the cont
 
 # [Red Hat Enterprise Linux](#tab/linux-rhel)
 
-To configure Nginx as a reverse proxy to forward HTTP requests to an ASP.NET Core app, modify `/etc/nginx.conf`. Replace the `server{}` code block with the following snippet:
+To configure Nginx as a reverse proxy to forward HTTP requests to an ASP.NET Core app, modify `/etc/nginx.conf`. Update the `http{}` code block with the following snippet:
 
 # [SUSE Linux Enterprise Server](#tab/linux-sles)
 
-To configure Nginx as a reverse proxy to forward HTTP requests to an ASP.NET Core app, modify `/etc/nginx.conf`. Replace the `server{}` code block with the following snippet:
+To configure Nginx as a reverse proxy to forward HTTP requests to an ASP.NET Core app, modify `/etc/nginx.conf`. Update the `http{}` code block with the following snippet:
 
 ---
 
 ```text
-server {
+http {
+  map $http_connection $connection_upgrade {
+    "~*Upgrade" $http_connection;
+    default keep-alive;
+  }
+
+  server {
     listen        80;
     server_name   example.com *.example.com;
     location / {
-        proxy_pass         http://127.0.0.1:5000;
+        proxy_pass         http://127.0.0.1:5000/;
         proxy_http_version 1.1;
         proxy_set_header   Upgrade $http_upgrade;
-        proxy_set_header   Connection keep-alive;
+        proxy_set_header   Connection $connection_upgrade;
         proxy_set_header   Host $host;
         proxy_cache_bypass $http_upgrade;
         proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header   X-Forwarded-Proto $scheme;
     }
+  }
 }
 ```
 
@@ -197,7 +204,7 @@ server {
 }
 ```
 
-With the preceding configuration file and default server, Nginx accepts public traffic on port 80 with host header `example.com` or `*.example.com`. Requests not matching these hosts won't get forwarded to Kestrel. Nginx forwards the matching requests to Kestrel at `http://127.0.0.1:5000`. For more information, see [How nginx processes a request](https://nginx.org/docs/http/request_processing.html). To change Kestrel's IP/port, see [Kestrel: Endpoint configuration](xref:fundamentals/servers/kestrel/endpoints).
+With the preceding configuration file and default server, Nginx accepts public traffic on port 80 with host header `example.com` or `*.example.com`. Requests not matching these hosts won't get forwarded to Kestrel. Nginx forwards the matching requests to Kestrel at `http://127.0.0.1:5000/`. For more information, see [How nginx processes a request](https://nginx.org/docs/http/request_processing.html). To change Kestrel's IP/port, see [Kestrel: Endpoint configuration](xref:fundamentals/servers/kestrel/endpoints).
 
 > [!WARNING]
 > Failure to specify a proper [server_name directive](https://nginx.org/docs/http/server_names.html) exposes your app to security vulnerabilities. Subdomain wildcard binding (for example, `*.example.com`) doesn't pose this security risk if you control the entire parent domain (as opposed to `*.com`, which is vulnerable). For more information, see [RFC 9110: HTTP Semantics (Section 7.2: Host and :authority)](https://www.rfc-editor.org/rfc/rfc9110#field.host).
@@ -257,7 +264,7 @@ KillSignal=SIGINT
 SyslogIdentifier=dotnet-example
 User=www-data
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=DOTNET_NOLOGO=true
 
 [Install]
 WantedBy=multi-user.target

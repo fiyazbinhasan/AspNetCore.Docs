@@ -3,12 +3,14 @@ title: Host ASP.NET Core in a Windows Service
 author: tdykstra
 description: Learn how to host an ASP.NET Core app in a Windows Service.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
+ms.author: tdykstra
 ms.custom: mvc
 ms.date: 12/19/2022
 uid: host-and-deploy/windows-service
 ---
 # Host ASP.NET Core in a Windows Service
+
+[!INCLUDE[](~/includes/not-latest-version.md)]
 
 :::moniker range=">= aspnetcore-7.0"
 
@@ -94,7 +96,7 @@ Self-contained deployment (SCD) doesn't rely on the presence of a shared framewo
 A Windows [Runtime Identifier (RID)](/dotnet/core/rid-catalog) is included in the `<PropertyGroup>` that contains the target framework:
 
 ```xml
-<RuntimeIdentifier>win7-x64</RuntimeIdentifier>
+<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 ```
 
 To publish for multiple RIDs:
@@ -317,7 +319,7 @@ After an app crashes and dump collection is complete, the app is allowed to term
 
 #### App is unresponsive, fails during startup, or runs normally
 
-When an app *hangs* (stops responding but doesn't crash), fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
+When an app stops responding but doesn't crash, fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
 
 #### Analyze the dump
 
@@ -641,7 +643,7 @@ After an app crashes and dump collection is complete, the app is allowed to term
 
 #### App is unresponsive, fails during startup, or runs normally
 
-When an app *hangs* (stops responding but doesn't crash), fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
+When an app stops responding but doesn't crash, fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
 
 #### Analyze the dump
 
@@ -964,7 +966,7 @@ After an app crashes and dump collection is complete, the app is allowed to term
 
 #### App is unresponsive, fails during startup, or runs normally
 
-When an app *hangs* (stops responding but doesn't crash), fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
+When an app stops responding but doesn't crash, fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
 
 #### Analyze the dump
 
@@ -1287,7 +1289,7 @@ After an app crashes and dump collection is complete, the app is allowed to term
 
 #### App is unresponsive, fails during startup, or runs normally
 
-When an app *hangs* (stops responding but doesn't crash), fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
+When an app stops responding but doesn't crash, fails during startup, or runs normally, see [User-Mode Dump Files: Choosing the Best Tool](/windows-hardware/drivers/debugger/user-mode-dump-files#choosing-the-best-tool) to select an appropriate tool to produce the dump.
 
 #### Analyze the dump
 

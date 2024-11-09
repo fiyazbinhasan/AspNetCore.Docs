@@ -5,19 +5,16 @@ description: Learn how to secure a hosted ASP.NET Core Blazor WebAssembly app wi
 monikerRange: '>= aspnetcore-3.1 < aspnetcore-8.0'
 ms.author: riande
 ms.custom: "devx-track-csharp, mvc"
-ms.date: 04/25/2023
+ms.date: 06/07/2024
 uid: blazor/security/webassembly/hosted-with-microsoft-entra-id
 ---
 # Secure a hosted ASP.NET Core Blazor WebAssembly app with Microsoft Entra ID
 
 This article explains how to create a [hosted Blazor WebAssembly solution](xref:blazor/hosting-models#blazor-webassembly) that uses [Microsoft Entra ID (ME-ID)](https://azure.microsoft.com/services/active-directory/) for authentication. This article focuses on a single tenant app with a single tenant Azure app registration.
 
-This article doesn't cover a *multi-tenant ME-ID registration*. For more information, see [Making your application multi-tenant](/azure/active-directory/develop/howto-convert-app-to-be-multi-tenant).
+This article doesn't cover a *multi-tenant ME-ID registration*. For more information, see [Making your application multi-tenant](/entra/identity-platform/howto-convert-app-to-be-multi-tenant).
 
-<!--UPDATE 8.0 Is the tenant name going to change to 
-    match the rest of the MS Entra ID branding? -->
-
-This article focuses on the use of an **Azure Active Directory** tenant, as described in [Quickstart: Set up a tenant](/azure/active-directory/develop/quickstart-create-new-tenant). If the app is registered in an **Azure Active Directory B2C** tenant, as described in [Tutorial: Create an Azure Active Directory B2C tenant](/azure/active-directory-b2c/tutorial-create-tenant) but follows the guidance in this article, the App ID URI is managed differently by ME-ID. For more information, see the [Use of an Azure Active Directory B2C tenant](#use-of-an-azure-active-directory-b2c-tenant) section of this article.
+This article focuses on the use of a **Microsoft Entra** tenant, as described in [Quickstart: Set up a tenant](/entra/identity-platform/quickstart-create-new-tenant). If the app is registered in an **Azure Active Directory B2C** tenant, as described in [Tutorial: Create an Azure Active Directory B2C tenant](/azure/active-directory-b2c/tutorial-create-tenant) but follows the guidance in this article, the App ID URI is managed differently by ME-ID. For more information, see the [Use of an Azure Active Directory B2C tenant](#use-of-an-azure-active-directory-b2c-tenant) section of this article.
 
 For additional security scenario coverage after reading this article, see <xref:blazor/security/webassembly/additional-scenarios>.
 
@@ -35,26 +32,23 @@ The subsections of the walkthrough explain how to:
 
 ### Create a tenant in Azure
 
-Follow the guidance in [Quickstart: Set up a tenant](/azure/active-directory/develop/quickstart-create-new-tenant) to create a tenant in ME-ID.
+Follow the guidance in [Quickstart: Set up a tenant](/entra/identity-platform/quickstart-create-new-tenant) to create a tenant in ME-ID.
 
 ### Register a server API app in Azure
 
 Register an ME-ID app for the *Server API app*:
 
-<!--UPDATE 8.0 Is the tenant name going to change to 
-    match the rest of the MS Entra ID branding? -->
-
 1. Navigate to [**Microsoft Entra ID** in the Azure portal](https://entra.microsoft.com/#home). Select **Applications** > **App registrations** in the sidebar. Select the **New registration** button.
 1. Provide a **Name** for the app (for example, **Blazor Server ME-ID**).
 1. Choose a **Supported account types**. You may select **Accounts in this organizational directory only** (single tenant) for this experience.
 1. The *Server API app* doesn't require a **Redirect URI** in this scenario, so leave the **Select a platform** dropdown list unselected and don't enter a redirect URI.
-1. This article assumes the app is registered in an **Azure Active Directory** tenant. If the app is registered in an **Azure Active Directory B2C** tenant, the **Permissions** > **Grant admin consent to openid and offline_access permissions** checkbox is present and selected. Deselect the checkbox to disable the setting. When using an **Active Azure Directory** tenant, the checkbox isn't present.
+1. This article assumes the app is registered in a **Microsoft Entra** tenant. If the app is registered in an **Azure Active Directory B2C** tenant, the **Permissions** > **Grant admin consent to openid and offline_access permissions** checkbox is present and selected. Deselect the checkbox to disable the setting. When using an **Active Azure Directory** tenant, the checkbox isn't present.
 1. Select **Register**.
 
 Record the following information:
 
-* *Server API app* Application (client) ID (for example, `41451fa7-82d9-4673-8fa5-69eff5a761fd`)
-* Directory (tenant) ID (for example, `e86c78e2-8bb4-4c41-aefd-918e0565a45e`)
+* *Server API app* Application (client) ID (for example, `00001111-aaaa-2222-bbbb-3333cccc4444`)
+* Directory (tenant) ID (for example, `aaaabbbb-0000-cccc-1111-dddd2222eeee`)
 * ME-ID Primary/Publisher/Tenant domain (for example, `contoso.onmicrosoft.com`): The domain is available as the **Publisher domain** in the **Branding** blade of the Azure portal for the registered app.
 
 In **API permissions**, remove the **Microsoft Graph** > **User.Read** permission, as the server API app doesn't require additional API access for merely signing in users and calling server API endpoints.
@@ -72,7 +66,7 @@ In **Expose an API**:
 
 Record the following information:
 
-* App ID URI GUID (for example, record `41451fa7-82d9-4673-8fa5-69eff5a761fd` from the App ID URI of `api://41451fa7-82d9-4673-8fa5-69eff5a761fd`)
+* App ID URI GUID (for example, record `00001111-aaaa-2222-bbbb-3333cccc4444` from the App ID URI of `api://00001111-aaaa-2222-bbbb-3333cccc4444`)
 * Scope name (for example, `API.Access`)
 
 > [!IMPORTANT]
@@ -82,20 +76,17 @@ Record the following information:
 
 Register an ME-ID app for the *Client app*:
 
-<!--UPDATE 8.0 Is the tenant name going to change to 
-    match the rest of the MS Entra ID branding? -->
-
 1. Navigate to **Microsoft Entra ID** in the Azure portal. Select **App registrations** in the sidebar. Select the **New registration** button.
 1. Provide a **Name** for the app (for example, **Blazor Client ME-ID**).
 1. Choose a **Supported account types**. You may select **Accounts in this organizational directory only** (single tenant) for this experience.
 1. Set the **Redirect URI** dropdown list to **Single-page application (SPA)** and provide the following redirect URI: `https://localhost/authentication/login-callback`. If you know the production redirect URI for the Azure default host (for example, `azurewebsites.net`) or the custom domain host (for example, `contoso.com`), you can also add the production redirect URI at the same time that you're providing the `localhost` redirect URI. Be sure to include the port number for non-`:443` ports in any production redirect URIs that you add.
-1. This article assumes the app is registered in an **Azure Active Directory** tenant. If the app is registered in an **Azure Active Directory B2C** tenant, the **Permissions** > **Grant admin consent to openid and offline_access permissions** checkbox is present and selected. Deselect the checkbox to disable the setting. When using an **Active Azure Directory** tenant, the checkbox isn't present.
+1. This article assumes the app is registered in a **Microsoft Entra** tenant. If the app is registered in an **Azure Active Directory B2C** tenant, the **Permissions** > **Grant admin consent to openid and offline_access permissions** checkbox is present and selected. Deselect the checkbox to disable the setting. When using an **Active Azure Directory** tenant, the checkbox isn't present.
 1. Select **Register**.
 
 > [!NOTE]
-> Supplying the port number for a `localhost` ME-ID redirect URI isn't required. For more information, see [Redirect URI (reply URL) restrictions and limitations: Localhost exceptions (Azure documentation)](/azure/active-directory/develop/reply-url#localhost-exceptions).
+> Supplying the port number for a `localhost` ME-ID redirect URI isn't required. For more information, see [Redirect URI (reply URL) restrictions and limitations: Localhost exceptions (Entra documentation)](/entra/identity-platform/reply-url#localhost-exceptions).
 
-Record the **:::no-loc text="Client":::** app Application (client) ID (for example, `4369008b-21fa-427c-abaa-9b53bf58e538`).
+Record the **:::no-loc text="Client":::** app Application (client) ID (for example, `11112222-bbbb-3333-cccc-4444dddd5555`).
 
 In **Authentication** > **Platform configurations** > **Single-page application**:
 
@@ -108,7 +99,7 @@ In **API permissions**:
 
 1. Confirm that the app has **Microsoft Graph** > **User.Read** permission.
 1. Select **Add a permission** followed by **My APIs**.
-1. Select the *Server API app* from the **Name** column (for example, **Blazor Server ME-ID**).
+1. Select the *Server API app* from the **Name** column (for example, **Blazor Server ME-ID**). You must be an owner of the app registration (and the API app registration if it's a separate app) in order to see the API in the **My APIs** area of the Azure portal. For more information, see [Assign application owner (Microsoft Entra documentation)](/entra/identity-platform/quickstart-configure-app-expose-web-apis#assign-application-owner).
 1. Open the **API** list.
 1. Enable access to the API (for example, `API.Access`).
 1. Select **Add permissions**.
@@ -130,12 +121,12 @@ dotnet new blazorwasm -au SingleOrg --api-client-id "{SERVER API APP CLIENT ID}"
 | Placeholder | Azure portal name | Example |
 | --- | --- | --- |
 | `{PROJECT NAME}` | &mdash; | `BlazorSample` |
-| `{CLIENT APP CLIENT ID}` | Application (client) ID for the **:::no-loc text="Client":::** app | `4369008b-21fa-427c-abaa-9b53bf58e538` |
+| `{CLIENT APP CLIENT ID}` | Application (client) ID for the **:::no-loc text="Client":::** app | `11112222-bbbb-3333-cccc-4444dddd5555` |
 | `{DEFAULT SCOPE}` | Scope name | `API.Access` |
-| `{SERVER API APP CLIENT ID}` | Application (client) ID for the *Server API app* | `41451fa7-82d9-4673-8fa5-69eff5a761fd` |
-| `{SERVER API APP ID URI GUID}` | Application ID URI GUID | `41451fa7-82d9-4673-8fa5-69eff5a761fd` (GUID ONLY, by default matches the `{SERVER API APP CLIENT ID}`) |
+| `{SERVER API APP CLIENT ID}` | Application (client) ID for the *Server API app* | `00001111-aaaa-2222-bbbb-3333cccc4444` |
+| `{SERVER API APP ID URI GUID}` | Application ID URI GUID | `00001111-aaaa-2222-bbbb-3333cccc4444` (GUID ONLY, matches the `{SERVER API APP CLIENT ID}`) |
 | `{TENANT DOMAIN}` | Primary/Publisher/Tenant domain | `contoso.onmicrosoft.com` |
-| `{TENANT ID}` | Directory (tenant) ID | `e86c78e2-8bb4-4c41-aefd-918e0565a45e` |
+| `{TENANT ID}` | Directory (tenant) ID | `aaaabbbb-0000-cccc-1111-dddd2222eeee` |
 
 The output location specified with the `-o|--output` option creates a project folder if it doesn't exist and becomes part of the project's name. **Avoid using dashes (`-`) in the app name that break the formation of the OIDC app identifier (see the earlier WARNING).**
 
@@ -150,7 +141,7 @@ The output location specified with the `-o|--output` option creates a project fo
 
 *The guidance in this section covers optionally populating `User.Identity.Name` with the value from the `name` claim.*
 
-By default, the **:::no-loc text="Server":::** app API populates `User.Identity.Name` with the value from the `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name` claim type (for example, `2d64b3da-d9d5-42c6-9352-53d8df33d770@contoso.onmicrosoft.com`).
+The **:::no-loc text="Server":::** app API populates `User.Identity.Name` with the value from the `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name` claim type (for example, `bbbb0000-cccc-1111-dddd-2222eeee3333@contoso.onmicrosoft.com`).
 
 To configure the app to receive the value from the `name` claim type:
 
@@ -200,8 +191,8 @@ Example:
   "AzureAd": {
     "Instance": "https://login.microsoftonline.com/",
     "Domain": "contoso.onmicrosoft.com",
-    "TenantId": "e86c78e2-8bb4-4c41-aefd-918e0565a45e",
-    "ClientId": "41451fa7-82d9-4673-8fa5-69eff5a761fd",
+    "TenantId": "aaaabbbb-0000-cccc-1111-dddd2222eeee",
+    "ClientId": "00001111-aaaa-2222-bbbb-3333cccc4444",
     "CallbackPath": "/signin-oidc",
     "Scopes": "API.Access"
   }
@@ -215,17 +206,17 @@ Example:
 
 *This section pertains to the solution's **:::no-loc text="Server":::** app.*
 
-The support for authenticating and authorizing calls to ASP.NET Core web APIs with the Microsoft Identity Platform is provided by the [`Microsoft.Identity.Web`](https://www.nuget.org/packages/Microsoft.Identity.Web) package.
+The support for authenticating and authorizing calls to ASP.NET Core web APIs with the Microsoft identity platform is provided by the [`Microsoft.Identity.Web`](https://www.nuget.org/packages/Microsoft.Identity.Web) package.
 
 [!INCLUDE[](~/includes/package-reference.md)]
 
-The **:::no-loc text="Server":::** app of a hosted Blazor solution created from the Blazor WebAssembly template includes the [`Microsoft.Identity.Web.UI`](https://www.nuget.org/packages/Microsoft.Identity.Web) package by default. The package adds UI for user authentication in web apps and isn't used by the Blazor framework. If the **:::no-loc text="Server":::** app won't be used to authenticate users directly, it's safe to remove the package reference from the **:::no-loc text="Server":::** app's project file.
+The **:::no-loc text="Server":::** app of a hosted Blazor solution created from the Blazor WebAssembly template includes the [`Microsoft.Identity.Web.UI`](https://www.nuget.org/packages/Microsoft.Identity.Web) package. The package adds UI for user authentication in web apps and isn't used by the Blazor framework. If the **:::no-loc text="Server":::** app won't be used to authenticate users directly, it's safe to remove the package reference from the **:::no-loc text="Server":::** app's project file.
 
 ### Authentication service support
 
 *This section pertains to the solution's **:::no-loc text="Server":::** app.*
 
-The `AddAuthentication` method sets up authentication services within the app and configures the JWT Bearer handler as the default authentication method. The <xref:Microsoft.Identity.Web.MicrosoftIdentityWebApiAuthenticationBuilderExtensions.AddMicrosoftIdentityWebApi%2A> method configures services to protect the web API with Microsoft Identity Platform v2.0. This method expects an `AzureAd` section in the app's configuration with the necessary settings to initialize authentication options.
+The `AddAuthentication` method sets up authentication services within the app and configures the JWT Bearer handler as the default authentication method. The <xref:Microsoft.Identity.Web.MicrosoftIdentityWebApiAuthenticationBuilderExtensions.AddMicrosoftIdentityWebApi%2A> method configures services to protect the web API with Microsoft identity platform v2.0. This method expects an `AzureAd` section in the app's configuration with the necessary settings to initialize authentication options.
 
 ```csharp
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -290,7 +281,7 @@ Example:
 {
   "AzureAd": {
     "Authority": "https://login.microsoftonline.com/e86c78e2-...-918e0565a45e",
-    "ClientId": "4369008b-21fa-427c-abaa-9b53bf58e538",
+    "ClientId": "11112222-bbbb-3333-cccc-4444dddd5555",
     "ValidateAuthority": true
   }
 }
@@ -300,7 +291,7 @@ Example:
 
 *This section pertains to the solution's **:::no-loc text="Client":::** app.*
 
-When an app is created to use Work or School Accounts (`SingleOrg`), the app automatically receives a package reference for the [Microsoft Authentication Library](/azure/active-directory/develop/msal-overview) ([`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal)). The package provides a set of primitives that help the app authenticate users and obtain tokens to call protected APIs.
+When an app is created to use Work or School Accounts (`SingleOrg`), the app automatically receives a package reference for the [Microsoft Authentication Library](/entra/identity-platform/msal-overview) ([`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal)). The package provides a set of primitives that help the app authenticate users and obtain tokens to call protected APIs.
 
 If adding authentication to an app, manually add the [`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal) package to the app.
 
@@ -325,7 +316,7 @@ builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
     .CreateClient("{PROJECT NAME}.ServerAPI"));
 ```
 
-The placeholder `{PROJECT NAME}` is the project name at solution creation. For example, providing a project name of `BlazorSample` produces a named <xref:System.Net.Http.HttpClient> of `BlazorSample.ServerAPI`.
+The `{PROJECT NAME}` placeholder is the project name at solution creation. For example, providing a project name of `BlazorSample` produces a named <xref:System.Net.Http.HttpClient> of `BlazorSample.ServerAPI`.
 
 Support for authenticating users is registered in the service container with the <xref:Microsoft.Extensions.DependencyInjection.MsalWebAssemblyServiceCollectionExtensions.AddMsalAuthentication%2A> extension method provided by the [`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal) package. This method sets up the services required for the app to interact with the Identity Provider (IP).
 
@@ -347,7 +338,7 @@ The <xref:Microsoft.Extensions.DependencyInjection.MsalWebAssemblyServiceCollect
 
 The default access token scopes represent the list of access token scopes that are:
 
-* Included by default in the sign in request.
+* Included in the sign in request.
 * Used to provision an access token immediately after authentication.
 
 Additional scopes can be added as needed in the `Program` file:
@@ -366,11 +357,14 @@ Specify additional scopes with `AdditionalScopesToConsent`:
 options.ProviderOptions.AdditionalScopesToConsent.Add("{ADDITIONAL SCOPE URI}");
 ```
 
+> [!NOTE]
+> <xref:Microsoft.Authentication.WebAssembly.Msal.Models.MsalProviderOptions.AdditionalScopesToConsent%2A> isn't able to provision delegated user permissions for Microsoft Graph via the Microsoft Entra ID consent UI when a user first uses an app registered in Microsoft Azure. For more information, see <xref:blazor/security/webassembly/graph-api?pivots=graph-sdk-5#defaultaccesstokenscopes-versus-additionalscopestoconsent>.
+
 Example default access token scope:
 
 ```csharp
 options.ProviderOptions.DefaultAccessTokenScopes.Add(
-    "api://41451fa7-82d9-4673-8fa5-69eff5a761fd/API.Access");
+    "api://00001111-aaaa-2222-bbbb-3333cccc4444/API.Access");
 ```
 
 For more information, see the following sections of the *Additional scenarios* article:
@@ -400,7 +394,18 @@ For more information, see the following sections of the *Additional scenarios* a
 
 *This section pertains to the solution's **:::no-loc text="Client":::** app.*
 
-[!INCLUDE[](~/blazor/security/includes/app-component.md)]
+The `App` component (`App.razor`) is similar to the `App` component found in Blazor Server apps:
+
+* The <xref:Microsoft.AspNetCore.Components.Authorization.CascadingAuthenticationState> component manages exposing the <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationState> to the rest of the app.
+* The <xref:Microsoft.AspNetCore.Components.Authorization.AuthorizeRouteView> component makes sure that the current user is authorized to access a given page or otherwise renders the `RedirectToLogin` component.
+* The `RedirectToLogin` component manages redirecting unauthorized users to the login page.
+
+Due to changes in the framework across releases of ASP.NET Core, Razor markup for the `App` component (`App.razor`) isn't shown in this section. To inspect the markup of the component for a given release, use ***either*** of the following approaches:
+
+* Create an app provisioned for authentication from the default Blazor WebAssembly project template for the version of ASP.NET Core that you intend to use. Inspect the `App` component (`App.razor`) in the generated app.
+* Inspect the `App` component (`App.razor`) in [reference source](https://github.com/dotnet/aspnetcore). Select the version from the branch selector, and search for the component in the `ProjectTemplates` folder of the repository because the `App` component's location has changed over the years.
+
+  [!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
 
 ### RedirectToLogin component
 
@@ -443,7 +448,7 @@ Instead of the App ID URI matching the format `api://{SERVER API APP CLIENT ID O
   Example:
 
   ```json
-  "Audience": "https://contoso.onmicrosoft.com/41451fa7-82d9-4673-8fa5-69eff5a761fd"
+  "Audience": "https://contoso.onmicrosoft.com/00001111-aaaa-2222-bbbb-3333cccc4444"
   ```
 
 * In the `Program` file of the **`Client`** app, set the audience of the scope (App ID URI) to match the server API app's audience:
@@ -459,17 +464,17 @@ Instead of the App ID URI matching the format `api://{SERVER API APP CLIENT ID O
 
   ```csharp
   options.ProviderOptions.DefaultAccessTokenScopes
-      .Add("https://contoso.onmicrosoft.com/41451fa7-82d9-4673-8fa5-69eff5a761fd/API.Access");
+      .Add("https://contoso.onmicrosoft.com/00001111-aaaa-2222-bbbb-3333cccc4444/API.Access");
   ```
 
-  In the preceding scope, the App ID URI/audience is the `https://contoso.onmicrosoft.com/41451fa7-82d9-4673-8fa5-69eff5a761fd` portion of the value, which doesn't include a trailing slash (`/`) and doesn't include the scope name (`API.Access`).
+  In the preceding scope, the App ID URI/audience is the `https://contoso.onmicrosoft.com/00001111-aaaa-2222-bbbb-3333cccc4444` portion of the value, which doesn't include a trailing slash (`/`) and doesn't include the scope name (`API.Access`).
 
 ## Use of a custom App ID URI
 
 If the App ID URI is a custom value, you must manually update the default access token scope URI in the **:::no-loc text="Client":::** app and add the audience to the **:::no-loc text="Server":::** app's ME-ID configuration.
 
 > [!IMPORTANT]
-> The following configuration is ***not*** required when using the default App ID URI of `api://{SERVER API APP CLIENT ID}`.
+> The following configuration isn't required when using the default App ID URI of `api://{SERVER API APP CLIENT ID}`.
 
 Example App ID URI of `urn://custom-app-id-uri` and a scope name of `API.Access`:
 
@@ -488,17 +493,17 @@ Example App ID URI of `urn://custom-app-id-uri` and a scope name of `API.Access`
 
 ## Troubleshoot
 
-[!INCLUDE[](~/blazor/security/includes/troubleshoot.md)]
+[!INCLUDE[](~/blazor/security/includes/troubleshoot-wasm.md)]
 
 ## Additional resources
 
-* [Configure an app's publisher domain](/azure/active-directory/develop/howto-configure-publisher-domain)
-* [Microsoft Entra ID app manifest: identifierUris attribute](/azure/active-directory/develop/reference-app-manifest#identifieruris-attribute)
+* [Configure an app's publisher domain](/entra/identity-platform/howto-configure-publisher-domain)
+* [Microsoft Entra ID app manifest: identifierUris attribute](/entra/identity-platform/reference-app-manifest#identifieruris-attribute)
 * <xref:blazor/security/webassembly/additional-scenarios>
 * [Build a custom version of the Authentication.MSAL JavaScript library](xref:blazor/security/webassembly/additional-scenarios#build-a-custom-version-of-the-authenticationmsal-javascript-library)
 * [Unauthenticated or unauthorized web API requests in an app with a secure default client](xref:blazor/security/webassembly/additional-scenarios#unauthenticated-or-unauthorized-web-api-requests-in-an-app-with-a-secure-default-client)
-* <xref:blazor/security/webassembly/meid-groups-roles>
+* <xref:blazor/security/webassembly/meid-groups-roles-net5to7>
 * <xref:security/authentication/azure-active-directory/index>
-* [Microsoft identity platform documentation](/azure/active-directory/develop/)
-* [Quickstart: Register an application with the Microsoft identity platform](/azure/active-directory/develop/quickstart-register-app)
-* [Security best practices for application properties in Microsoft Entra ID](/azure/active-directory/develop/security-best-practices-for-app-registration)
+* [Microsoft identity platform documentation](/entra/identity-platform/)
+* [Quickstart: Register an application with the Microsoft identity platform](/entra/identity-platform/quickstart-register-app)
+* [Security best practices for application properties in Microsoft Entra ID](/entra/identity-platform/security-best-practices-for-app-registration)

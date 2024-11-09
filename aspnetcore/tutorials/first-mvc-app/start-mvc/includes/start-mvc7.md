@@ -41,7 +41,9 @@ See https://github.com/dotnet/AspNetCore.Docs/issues/21193
 
 * Start Visual Studio and select **Create a new project**.
 * In the **Create a new project** dialog, select **ASP.NET Core Web App (Model-View-Controller)** > **Next**.
-* In the **Configure your new project** dialog, enter `MvcMovie` for **Project name**. It's important to name the project *MvcMovie*. Capitalization needs to match each `namespace` when code is copied.
+* In the **Configure your new project** dialog:
+  * Enter `MvcMovie` for **Project name**. It's important to name the project *MvcMovie*. Capitalization needs to match each `namespace` when code is copied.
+  * The **Location** for the project can be set to anywhere.
 * Select **Next**.
 * In the **Additional information** dialog:
   * Select **.NET 7.0**.
@@ -62,7 +64,7 @@ Visual Studio uses the default project template for the created MVC project. The
 The tutorial assumes familiarity with VS Code. For more information, see [Getting started with VS Code](https://code.visualstudio.com/docs).
 
 * Select **New Terminal** from the **Terminal** menu to open the [integrated terminal](https://code.visualstudio.com/docs/editor/integrated-terminal).
-* Change to the directory (`cd`) that will contain the project.
+* Change to the directory (`cd`) that will contain the project. The project can be located anywhere.
 * Run the following commands:
 
    ```dotnetcli
@@ -85,6 +87,7 @@ The tutorial assumes familiarity with VS Code. For more information, see [Gettin
   * Verify that **Do not use top-level statements** is unchecked.
 * Select **Continue**.
 * Enter `MvcMovie` for **Project name**. It's important to name the project *MvcMovie*. Capitalization needs to match each `namespace` when code is copied.
+* The **Location** for the project can be set to anywhere.
 * Select **Create**.
 
 ---
@@ -93,15 +96,14 @@ The tutorial assumes familiarity with VS Code. For more information, see [Gettin
 
 # [Visual Studio](#tab/visual-studio)
 
-* Select Ctrl+F5 to run the app without the debugger.
-
+* Press <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without the debugger.
   [!INCLUDE[](~/includes/trustCertVS.md)]
 
 Visual Studio runs the app and opens the default browser.
 
 The address bar shows `localhost:<port#>` and not something like `example.com`. The standard hostname for your local computer is `localhost`. When Visual Studio creates a web project, a random port is used for the web server.
 
-Launching the app without debugging by selecting Ctrl+F5 allows you to:
+Launching the app without debugging by pressing <kbd>Ctrl</kbd>+<kbd>F5</kbd> allows you to:
 
 * Make code changes.
 * Save the file.
@@ -119,11 +121,13 @@ The following image shows the app:
 
 ![Home or Index page](~/tutorials/first-mvc-app/start-mvc/_static/home50-vs.png)
 
+* Close the browser window.  Visual Studio will stop the application.
+
 # [Visual Studio Code](#tab/visual-studio-code)
 
-* Select F5 to run the app.
+[!INCLUDE[](~/includes/trustCertVSC.md)]
 
-  [!INCLUDE[](~/includes/trustCertVSC.md)]
+* In Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows)/<kbd>^</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
 
   Visual Studio Code:
 
@@ -140,6 +144,10 @@ Launching the app without debugging by selecting Ctrl+F5 allows you to:
 * Quickly refresh the browser and see the code changes.
 
   ![Home or Index page](~/tutorials/first-mvc-app/start-mvc/_static/home50-port5001.png)
+
+* Close the browser window.
+
+* In Visual Studio Code, from the *Run* menu, select *Stop Debugging* or press <kbd>Shift</kbd>+<kbd>F5</kbd> to stop the app.
 
 # [Visual Studio for Mac](#tab/visual-studio-mac)
 
@@ -160,6 +168,8 @@ You can launch the app in debug or non-debug mode from the **Debug** menu.
 The following image shows the app:
 
 ![Home or Index page](~/tutorials/first-mvc-app/start-mvc/_static/output_macos_VS22.png)
+
+* Close the browser window.  Visual Studio for Mac will stop the application.
 
 ---
 

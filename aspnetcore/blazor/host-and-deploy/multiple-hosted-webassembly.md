@@ -5,7 +5,7 @@ description: Learn how to configure a hosted Blazor WebAssembly app to host mult
 monikerRange: '>= aspnetcore-3.1 < aspnetcore-8.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 05/12/2023
+ms.date: 02/09/2024
 uid: blazor/host-and-deploy/multiple-hosted-webassembly
 zone_pivot_groups: blazor-multiple-hosted-wasm-apps
 ---
@@ -317,7 +317,7 @@ In the server app's `Program.cs` file, remove the following code, which appears 
 
 :::zone-end
 
-For more information on <xref:Microsoft.AspNetCore.Builder.StaticFileExtensions.UseStaticFiles%2A>, see <xref:blazor/fundamentals/static-files#static-file-middleware>.
+For more information on <xref:Microsoft.AspNetCore.Builder.StaticFileExtensions.UseStaticFiles%2A>, see <xref:blazor/fundamentals/static-files>.
 
 For more information on `UseBlazorFrameworkFiles` and `MapFallbackToFile`, see the following resources:
 
@@ -439,8 +439,6 @@ If you plan to serve MVC views from the server app, add an `Index` view and a `H
 
 `Controllers/HomeController.cs`:
 
-:::moniker range=">= aspnetcore-6.0"
-
 ```csharp
 using Microsoft.AspNetCore.Mvc;
 
@@ -448,33 +446,9 @@ namespace MultipleBlazorApps.Server.Controllers;
 
 public class HomeController : Controller
 {
-    public IActionResult Index()
-    {
-        return View();
-    }
+    public IActionResult Index() => View();
 }
 ```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-```csharp
-using Microsoft.AspNetCore.Mvc;
-
-namespace MultipleBlazorApps.Server.Controllers
-{
-    public class HomeController : Controller
-    {
-        public IActionResult Index()
-        {
-            return View();
-        }
-    }
-}
-```
-
-:::moniker-end
 
 > [!NOTE]
 > The preceding `Index` view is a minimal example purely for demonstration purposes. If the app requires additional MVC assets, such as a layout, styles, scripts, and imports, obtain them from an app created from the MVC project template. For more information, see <xref:tutorials/first-mvc-app/start-mvc>.
@@ -504,7 +478,7 @@ In the preceding example URLs, the `{DEFAULT PORT}` placeholder is the default p
 :::zone-end
 
 > [!IMPORTANT]
-> When running the app with the `dotnet run` command (.NET CLI), confirm that the command shell is open in the `Server` folder of the solution.
+> When running the app with the `dotnet watch` (or `dotnet run`) command (.NET CLI), confirm that the command shell is open in the `Server` folder of the solution.
 >
 > When using Visual Studio's start button to run the app, confirm that the `MultipleBlazorApps.Server` project is set as the startup project (highlighted in Solution Explorer). 
 
@@ -529,7 +503,7 @@ For example, the source for a Jeep image (`jeep-yj.png`) in the `vehicle` folder
 Add the [Razor class library (RCL)](xref:blazor/components/class-libraries) to the solution as a new project:
 
 * Right-click the solution in **Solution Explorer** and select **Add** > **New Project**.
-* Use the **Razor Class Library** project template to create the project. The examples in this section use the project name `ComponentLibrary`, which is also the RCL's assembly name. Do ***not*** select the **Support pages and views** checkbox.
+* Use the **Razor Class Library** project template to create the project. The examples in this section use the project name `ComponentLibrary`, which is also the RCL's assembly name. Don't select the **Support pages and views** checkbox.
 
 For each hosted Blazor WebAssembly client app, create a project reference for the RCL project by right-clicking each client project in **Solution Explorer** and selecting **Add** > **Project Reference**.
 

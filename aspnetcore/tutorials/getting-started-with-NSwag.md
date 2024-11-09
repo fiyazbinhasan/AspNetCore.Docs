@@ -2,8 +2,9 @@
 title: Get started with NSwag and ASP.NET Core
 author: zuckerthoben
 description: Learn how to use NSwag to generate documentation and help pages for an ASP.NET Core web API.
-ms.author: scaddie
+ms.author: wpickett
 ms.custom: mvc
+monikerRange: ">= aspnetcore-3.1 <= aspnetcore-8.0"
 ms.date: 12/05/2019
 uid: tutorials/get-started-with-nswag
 ---
@@ -29,7 +30,7 @@ Install NSwag to:
 * Serve the Swagger UI to browse and test the web API.
 * Serve the Redoc to add API documentation for the Web API.
 
-To use the [NSwag](https://github.com/RicoSuter/NSwag) ASP.NET Core middleware, install the [NSwag.AspNetCore](https://www.nuget.org/packages/NSwag.AspNetCore/) NuGet package. This package contains the middleware to generate and serve the Swagger specification, Swagger UI (v2 and v3), and [ReDoc UI](https://github.com/Rebilly/ReDoc).
+To use the [NSwag](https://github.com/RicoSuter/NSwag) ASP.NET Core middleware, install the [NSwag.AspNetCore](https://www.nuget.org/packages/NSwag.AspNetCore/) NuGet package. This package contains the middleware to generate and serve the Swagger specification, Swagger UI (v2 and v3), and [ReDoc UI](https://github.com/Rebilly/ReDoc). NSwag 14 supports only v3 of the Swagger UI spec.
 
 Use one of the following approaches to install the NSwag NuGet package:
 
@@ -65,7 +66,7 @@ Run the following command from the **Integrated Terminal**:
 dotnet add NSwagSample.csproj package NSwag.AspNetCore
 ```
 
-### [.NET Core CLI](#tab/netcore-cli)
+### [.NET CLI](#tab/net-cli)
 
 Run the following command:
 
@@ -112,7 +113,7 @@ You can take advantage of NSwag's code generation capabilities by choosing one o
 * In the **Outputs** area, click the **CSharp Client** checkbox. Depending on your project, you can also choose **TypeScript Client** or **CSharp Web API Controller**. If you select **CSharp Web API Controller**, a service specification rebuilds the service, serving as a reverse generation.
 * Click **Generate Outputs** to produce a complete C# client implementation of the *TodoApi.NSwag* project. To see the generated client code, click the **CSharp Client** tab:
 
-:::code language="csharp" source="web-api-help-pages-using-swagger/_static/v6-nswag-generated-todoclient.cs" range="17-46":::
+:::code language="csharp" source="web-api-help-pages-using-swagger/_static/v6-nswag-generated-todoclient.cs" range="19-55":::
 
 > [!TIP]
 > The C# client code is generated based on selections in the **Settings** tab. Modify the settings to perform tasks such as default namespace renaming and synchronous method generation.
@@ -161,7 +162,7 @@ Manually add the highlighted lines to the `.csproj` file:
 
 :::code language="xml" source="web-api-help-pages-using-swagger/samples/7.x/NSwagSample/NSwagSample.csproj" id="snippet_GenerateDocumentationFile" highlight="2":::
 
-#### [.NET Core CLI](#tab/netcore-cli)
+#### [.NET CLI](#tab/net-cli)
 
 Manually add the highlighted lines to the `.csproj` file:
 
@@ -210,8 +211,6 @@ The Swagger UI now clearly documents the expected HTTP response codes (and the [
 :::image source="web-api-help-pages-using-swagger/_static/v6-nswag-swagger-post.png" alt-text="Swagger UI showing POST Response Class description 'Returns the newly created Todo item' and '400 - If the item is null' for status code and reason under Response Messages.":::
 
 Conventions can be used as an alternative to explicitly decorating individual actions with `[ProducesResponseType]`. For more information, see <xref:web-api/advanced/conventions>.
-
-To support the `[ProducesResponseType]` decoration, the [Swashbuckle.AspNetCore.Annotations](https://github.com/domaindrivendev/Swashbuckle.AspNetCore/blob/master/README.md#swashbuckleaspnetcoreannotations) package offers extensions to enable and enrich the response, schema, and parameter metadata.
 
 ### Redoc
 
@@ -285,7 +284,7 @@ Run the following command from the **Integrated Terminal**:
 dotnet add TodoApi.csproj package NSwag.AspNetCore
 ```
 
-### [.NET Core CLI](#tab/netcore-cli)
+### [.NET CLI](#tab/net-cli)
 
 Run the following command:
 
@@ -427,7 +426,7 @@ Manually add the highlighted lines to the `.csproj` file:
 
 [!code-xml[](../tutorials/web-api-help-pages-using-swagger/samples/2.1/TodoApi.NSwag/TodoApi.csproj?name=snippet_DocumentationFileElement&highlight=1-2,4)]
 
-#### [.NET Core CLI](#tab/netcore-cli)
+#### [.NET CLI](#tab/net-cli)
 
 Manually add the highlighted lines to the `.csproj` file:
 

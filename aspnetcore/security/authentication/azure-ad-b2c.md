@@ -9,12 +9,12 @@ uid: security/authentication/azure-ad-b2c
 ---
 # Cloud authentication with Azure Active Directory B2C in ASP.NET Core
 
-By [Damien Bod](https://twitter.com/damien_bod)
+By [Damien Bod](https://github.com/damienbod)
 
 [Azure Active Directory B2C](/azure/active-directory-b2c/active-directory-b2c-overview) (Azure AD B2C) is a cloud identity management solution for web and mobile apps. The service provides authentication for apps hosted in the cloud and on-premises. Authentication types include individual accounts, social network accounts, and federated enterprise accounts. Additionally, Azure AD B2C can provide multi-factor authentication with minimal configuration.
 
 > [!TIP]
-> Microsoft Entra ID (previously known as Azure AD) and Azure AD B2C are separate product offerings. An Entra ID tenant generally represents an organization, while an Azure AD B2C tenant represents a collection of identities to be used with relying party applications. To learn more, see [Azure AD B2C: Frequently asked questions (FAQ)](/azure/active-directory-b2c/active-directory-b2c-faqs).
+> Microsoft Entra ID, Microsoft Entra External ID and Azure AD B2C are separate product offerings. An Entra ID tenant generally represents an organization, while an Azure AD B2C tenant or a Microsoft Entra External ID  tenant can represent a collection of identities to be used with relying party applications. To learn more, see [Azure AD B2C: Frequently asked questions (FAQ)](/azure/active-directory-b2c/active-directory-b2c-faqs).
 
 > [!TIP]
 > [Microsoft Entra External ID for customers](/azure/active-directory/external-identities/customers/overview-customers-ciam) is Microsoft’s new customer identity and access management (CIAM) solution.
@@ -24,7 +24,7 @@ In this tutorial, you'll learn how to configure an ASP.NET Core app for authenti
 ## Prerequisites
 
 - An Azure account with an active subscription. [Create an account for free](https://azure.microsoft.com/free/dotnet).
-- .NET 5.0 SDK or later. [Install the latest .NET 5.0 SDK](https://dotnet.microsoft.com/download/dotnet/5.0) for your platform.
+- .NET SDK. [Install the latest .NET SDK](https://dotnet.microsoft.com/download/dotnet) for your platform.
 
 ## Preparation
 
@@ -53,7 +53,7 @@ In this tutorial, you'll learn how to configure an ASP.NET Core app for authenti
     
     In the preceding:
 
-    - `Microsoft.Identity.Web` includes the basic set of dependencies for authenticating with the Microsoft Identity platform.
+    - `Microsoft.Identity.Web` includes the basic set of dependencies for authenticating with the Microsoft identity platform.
     - `Microsoft.Identity.Web.UI` includes UI functionality encapsulated in an area named `MicrosoftIdentity`.
 
 1. Add an `AzureADB2C` object to `appsettings.json`.
@@ -100,7 +100,7 @@ In this tutorial, you'll learn how to configure an ASP.NET Core app for authenti
 
         In the preceding code:
 
-        - Calls to the `AddAuthentication` and `AddMicrosoftIdentityWebApp` methods configure the app to use Open ID Connect, specifically configured for the Microsoft Identity platform.
+        - Calls to the `AddAuthentication` and `AddMicrosoftIdentityWebApp` methods configure the app to use Open ID Connect, specifically configured for the Microsoft identity platform.
         - `AddAuthorization` initializes ASP.NET Core authorization.
         - The `AddRazorPages` call configures the app so anonymous browsers can view the Index page. All other requests require authentication.
         - `AddMvcOptions` and `AddMicrosoftIdentityUI` add the required UI components for redirecting to/from Azure AD B2C.

@@ -5,7 +5,7 @@ description: Learn how to use Entity Framework Core (EF Core) in Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: jeliknes
 ms.custom: mvc
-ms.date: 03/27/2023
+ms.date: 02/09/2024
 uid: blazor/blazor-ef-core
 ---
 # ASP.NET Core Blazor with Entity Framework Core (EF Core)
@@ -19,52 +19,101 @@ Server-side Blazor is a stateful app framework. The app maintains an ongoing con
 > [!NOTE]
 > This article addresses EF Core in server-side Blazor apps. Blazor WebAssembly apps run in a WebAssembly sandbox that prevents most direct database connections. Running EF Core in Blazor WebAssembly is beyond the scope of this article.
 
+:::moniker range=">= aspnetcore-8.0"
+
+This guidance applies to components that adopt interactive server-side rendering (interactive SSR) in a Blazor Web App.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+This guidance applies to the **`Server`** project of a hosted Blazor WebAssembly solution or a Blazor Server app.
+
+:::moniker-end
+
+## Secure authentication flow required for production apps
+
+This article uses a local database that doesn't require user authentication. Production apps should use the most secure authentication flow available. For more information on authentication for deployed test and production Blazor apps, see the articles in the [Blazor *Security and Identity* node](xref:blazor/security/index).
+
+For Microsoft Azure services, we recommend using *managed identities*. Managed identities securely authenticate to Azure services without storing credentials in app code. For more information, see the following resources:
+
+* [What are managed identities for Azure resources? (Microsoft Entra documentation)](/entra/identity/managed-identities-azure-resources/overview)
+* Azure services documentation
+  * [Managed identities in Microsoft Entra for Azure SQL](/azure/azure-sql/database/authentication-azure-ad-user-assigned-managed-identity)
+  * [How to use managed identities for App Service and Azure Functions](/azure/app-service/overview-managed-identity)
+
 ## Sample app
 
-The sample app was built as a reference for server-side Blazor apps that use EF Core. The sample app includes a grid with sorting and filtering, delete, add, and update operations. The sample demonstrates use of EF Core to handle optimistic concurrency.
+The sample app was built as a reference for server-side Blazor apps that use EF Core. The sample app includes a grid with sorting and filtering, delete, add, and update operations.
 
-[View or download sample code](https://github.com/dotnet/blazor-samples) ([how to download](xref:index#how-to-download-a-sample))
-
-The sample uses a local [SQLite](https://www.sqlite.org/index.html) database so that it can be used on any platform. The sample also configures database logging to show the SQL queries that are generated. This is configured in `appsettings.Development.json`:
+The sample demonstrates use of EF Core to handle optimistic concurrency. However, [native database-generated concurrency tokens](/ef/core/saving/concurrency?tabs=fluent-api#native-database-generated-concurrency-tokens) aren't supported for SQLite databases, which is the database provider for the sample app. To demonstrate concurrency with the sample app, adopt a different database provider that supports database-generated concurrency tokens (for example, the [SQL Server provider](/ef/core/providers/sql-server)).
 
 :::moniker range=">= aspnetcore-8.0"
 
-:::code language="json" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/appsettings.Development.json" highlight="8":::
+[View or download sample code](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps)): Select the folder that matches the version of .NET that you're adopting. Within the version folder, access the sample named `BlazorWebAppEFCore`.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+[View or download sample code](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps)): Select the folder that matches the version of .NET that you're adopting. Within the version folder, access the sample named `BlazorServerEFCoreSample`.
+
+:::moniker-end
+
+The sample uses a local [SQLite](https://www.sqlite.org/index.html) database so that it can be used on any platform. The sample also configures database logging to show the SQL queries that are generated. This is configured in `appsettings.Development.json`:
+
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="json" source="~/../blazor-samples/9.0/BlazorWebAppEFCore/appsettings.Development.json":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="json" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/appsettings.Development.json":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
-:::code language="json" source="~/../blazor-samples/7.0/BlazorServerEFCoreSample/appsettings.Development.json" highlight="8":::
+:::code language="json" source="~/../blazor-samples/7.0/BlazorServerEFCoreSample/appsettings.Development.json":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-:::code language="json" source="~/../blazor-samples/6.0/BlazorServerEFCoreSample/appsettings.Development.json" highlight="8":::
+:::code language="json" source="~/../blazor-samples/6.0/BlazorServerEFCoreSample/appsettings.Development.json":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
-:::code language="json" source="~/../blazor-samples/5.0/BlazorServerEFCoreSample/appsettings.Development.json" highlight="8":::
+:::code language="json" source="~/../blazor-samples/5.0/BlazorServerEFCoreSample/appsettings.Development.json":::
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-5.0"
 
-:::code language="json" source="~/../blazor-samples/3.1/BlazorServerEFCoreSample/appsettings.Development.json" highlight="8":::
+:::code language="json" source="~/../blazor-samples/3.1/BlazorServerEFCoreSample/appsettings.Development.json":::
 
 :::moniker-end
 
 The grid, add, and view components use the "context-per-operation" pattern, where a context is created for each operation. The edit component uses the "context-per-component" pattern, where a context is created for each component.
 
 > [!NOTE]
-> Some of the code examples in this topic require namespaces and services that aren't shown. To inspect the fully working code, including the required [`@using`](xref:mvc/views/razor#using) and [`@inject`](xref:mvc/views/razor#inject) directives for Razor examples, see the [sample app](https://github.com/dotnet/blazor-samples).
+> Some of the code examples in this topic require namespaces and services that aren't shown. To inspect the fully working code, including the required [`@using`](xref:mvc/views/razor#using) and [`@inject`](xref:mvc/views/razor#inject) directives for Razor examples, see the [sample app](#sample-app).
+
+:::moniker range=">= aspnetcore-8.0"
+
+## Build a Blazor movie database app tutorial
+
+For a tutorial experience building an app that uses EF Core to work with a database, see <xref:blazor/tutorials/movie-database-app/index>. The tutorial shows you how to create a Blazor Web App that can display and manage movies in a movie database.
+
+:::moniker-end
 
 ## Database access
 
-EF Core relies on a <xref:Microsoft.EntityFrameworkCore.DbContext> as the means to [configure database access](/ef/core/miscellaneous/configuring-dbcontext) and act as a [*unit of work*](https://martinfowler.com/eaaCatalog/unitOfWork.html). EF Core provides the <xref:Microsoft.Extensions.DependencyInjection.EntityFrameworkServiceCollectionExtensions.AddDbContext%2A> extension for ASP.NET Core apps that registers the context as a *scoped* service by default. In server-side Blazor apps, scoped service registrations can be problematic because the instance is shared across components within the user's circuit. <xref:Microsoft.EntityFrameworkCore.DbContext> isn't thread safe and isn't designed for concurrent use. The existing lifetimes are inappropriate for these reasons:
+EF Core relies on a <xref:Microsoft.EntityFrameworkCore.DbContext> as the means to [configure database access](/ef/core/miscellaneous/configuring-dbcontext) and act as a [*unit of work*](https://martinfowler.com/eaaCatalog/unitOfWork.html). EF Core provides the <xref:Microsoft.Extensions.DependencyInjection.EntityFrameworkServiceCollectionExtensions.AddDbContext%2A> extension for ASP.NET Core apps that registers the context as a *scoped* service. In server-side Blazor apps, scoped service registrations can be problematic because the instance is shared across components within the user's circuit. <xref:Microsoft.EntityFrameworkCore.DbContext> isn't thread safe and isn't designed for concurrent use. The existing lifetimes are inappropriate for these reasons:
 
 * **Singleton** shares state across all users of the app and leads to inappropriate concurrent use.
 * **Scoped** (the default) poses a similar issue between components for the same user.
@@ -72,7 +121,7 @@ EF Core relies on a <xref:Microsoft.EntityFrameworkCore.DbContext> as the means 
 
 The following recommendations are designed to provide a consistent approach to using EF Core in server-side Blazor apps.
 
-* By default, consider using one context per operation. The context is designed for fast, low overhead instantiation:
+* Consider using one context per operation. The context is designed for fast, low overhead instantiation:
 
   ```csharp
   using var context = new MyContext();
@@ -102,7 +151,7 @@ The following recommendations are designed to provide a consistent approach to u
 
   Place operations after the `Loading = true;` line in the `try` block.
   
-  Loading logic doesn't require locking database records because thread safety isn't a concern. The loading logic is used to disable UI controls so that users don't inadvertently select buttons or update fields while data is fetched.
+  Thread safety isn't a concern, so loading logic doesn't require locking database records. The loading logic is used to disable UI controls so that users don't inadvertently select buttons or update fields while data is fetched.
   
 * If there's any chance that multiple threads may access the same code block, [inject a factory](#scope-to-the-component-lifetime) and make a new instance per operation. Otherwise, injecting and using the context is usually sufficient.
 
@@ -115,6 +164,8 @@ The fastest way to create a new <xref:Microsoft.EntityFrameworkCore.DbContext> i
 * Using [`DbContextOptions`](/ef/core/miscellaneous/configuring-dbcontext#configuring-dbcontextoptions) to configure the context.
 * Using a connection string per <xref:Microsoft.EntityFrameworkCore.DbContext>, such as when you use [ASP.NET Core's Identity model](xref:security/authentication/customize_identity_model). For more information, see [Multi-tenancy (EF Core documentation)](/ef/core/miscellaneous/multitenancy).
 
+[!INCLUDE[](~/blazor/security/includes/secure-authentication-flows.md)]
+
 The recommended approach to create a new <xref:Microsoft.EntityFrameworkCore.DbContext> with dependencies is to use a factory. EF Core 5.0 or later provides a built-in factory for creating new contexts.
 
 :::moniker range="< aspnetcore-5.0"
@@ -124,13 +175,19 @@ The recommended approach to create a new <xref:Microsoft.EntityFrameworkCore.DbC
 In the preceding factory:
 
 * <xref:Microsoft.Extensions.DependencyInjection.ActivatorUtilities.CreateInstance%2A?displayProperty=nameWithType> satisfies any dependencies via the service provider.
-* `IDbContextFactory` is available in EF Core ASP.NET Core 5.0 or later, so the interface is [implemented in the sample app for ASP.NET Core 3.x](https://github.com/dotnet/blazor-samples/blob/main/3.1/BlazorServerEFCoreSample/Data/IDbContextFactory.cs).
+* <xref:Microsoft.EntityFrameworkCore.IDbContextFactory%601> is available in EF Core ASP.NET Core 5.0 or later, so the interface is [implemented in the sample app for ASP.NET Core 3.x](https://github.com/dotnet/blazor-samples/blob/main/3.1/BlazorServerEFCoreSample/Data/IDbContextFactory.cs).
 
 :::moniker-end
 
 The following example configures [SQLite](https://www.sqlite.org/index.html) and enables data logging. The code uses an extension method (`AddDbContextFactory`) to configure the database factory for DI and provide default options:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="csharp" source="~/../blazor-samples/9.0/BlazorWebAppEFCore/Program.cs" id="snippet1":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
 
 :::code language="csharp" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/Program.cs" id="snippet1":::
 
@@ -170,33 +227,39 @@ In the home page of the sample app, `IDbContextFactory<ContactContext>` is injec
 
 A `DbContext` is created using the factory (`DbFactory`) to delete a contact in the `DeleteContactAsync` method:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
 
-:::code language="csharp" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/Components/Pages/Home.razor" id="snippet1":::
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorWebAppEFCore/Components/Pages/Home.razor" id="snippet1":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/Components/Pages/Home.razor" id="snippet1":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
-:::code language="csharp" source="~/../blazor-samples/7.0/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
+:::code language="razor" source="~/../blazor-samples/7.0/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-:::code language="csharp" source="~/../blazor-samples/6.0/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
+:::code language="razor" source="~/../blazor-samples/6.0/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
-:::code language="csharp" source="~/../blazor-samples/5.0/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
+:::code language="razor" source="~/../blazor-samples/5.0/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-5.0"
 
-:::code language="csharp" source="~/../blazor-samples/3.1/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
+:::code language="razor" source="~/../blazor-samples/3.1/BlazorServerEFCoreSample/Pages/Index.razor" id="snippet1":::
 
 :::moniker-end
 
@@ -237,7 +300,13 @@ You can use the factory to create a context and track it for the lifetime of the
 
 The sample app ensures the context is disposed when the component is disposed:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="csharp" source="~/../blazor-samples/9.0/BlazorWebAppEFCore/Components/Pages/EditContact.razor" id="snippet1":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
 
 :::code language="csharp" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/Components/Pages/EditContact.razor" id="snippet1":::
 
@@ -269,7 +338,13 @@ The sample app ensures the context is disposed when the component is disposed:
 
 Finally, [`OnInitializedAsync`](xref:blazor/components/lifecycle) is overridden to create a new context. In the sample app, [`OnInitializedAsync`](xref:blazor/components/lifecycle) loads the contact in the same method:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="csharp" source="~/../blazor-samples/9.0/BlazorWebAppEFCore/Components/Pages/EditContact.razor" id="snippet2":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
 
 :::code language="csharp" source="~/../blazor-samples/8.0/BlazorWebAppEFCore/Components/Pages/EditContact.razor" id="snippet2":::
 
@@ -306,7 +381,7 @@ In the preceding example:
 
 ## Enable sensitive data logging
 
-<xref:Microsoft.EntityFrameworkCore.DbContextOptionsBuilder.EnableSensitiveDataLogging%2A> includes application data in exception messages and framework logging. The logged data can include the values assigned to properties of entity instances and parameter values for commands sent to the database. Logging data with <xref:Microsoft.EntityFrameworkCore.DbContextOptionsBuilder.EnableSensitiveDataLogging%2A> is a **security risk**, as it may expose passwords and other personally identifiable information (PII) when it logs SQL statements executed against the database.
+<xref:Microsoft.EntityFrameworkCore.DbContextOptionsBuilder.EnableSensitiveDataLogging%2A> includes application data in exception messages and framework logging. The logged data can include the values assigned to properties of entity instances and parameter values for commands sent to the database. Logging data with <xref:Microsoft.EntityFrameworkCore.DbContextOptionsBuilder.EnableSensitiveDataLogging%2A> is a **security risk**, as it may expose passwords and other [Personally Identifiable Information (PII)](xref:blazor/security/index#personally-identifiable-information-pii) when it logs SQL statements executed against the database.
 
 We recommend only enabling <xref:Microsoft.EntityFrameworkCore.DbContextOptionsBuilder.EnableSensitiveDataLogging%2A> for development and testing:
 
@@ -325,3 +400,4 @@ We recommend only enabling <xref:Microsoft.EntityFrameworkCore.DbContextOptionsB
 
 * [EF Core documentation](/ef/)
 * [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples)
+* [Blazor *Security and Identity* node articles](xref:blazor/security/index)

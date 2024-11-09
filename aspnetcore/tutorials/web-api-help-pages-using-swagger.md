@@ -2,20 +2,19 @@
 title: ASP.NET Core web API documentation with Swagger / OpenAPI
 author: RicoSuter
 description: This tutorial provides a walkthrough of adding Swagger to generate documentation and help pages for a web API app.
-ms.author: scaddie
+ms.author: wpickett
 ms.custom: mvc
-ms.date: 10/29/2020
+monikerRange: ">= aspnetcore-3.1 <= aspnetcore-8.0"
+ms.date: 4/25/2024
 uid: tutorials/web-api-help-pages-using-swagger
 ---
 # ASP.NET Core web API documentation with Swagger / OpenAPI
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
 
 :::moniker range=">= aspnetcore-8.0"
 
 By [Christoph Nienaber](https://twitter.com/zuckerthoben) and [Rico Suter](https://blog.rsuter.com/)
 
-Swagger (OpenAPI) is a language-agnostic specification for describing REST APIs. It allows both computers and humans to understand the capabilities of a REST API without direct access to the source code. Its main goals are to:
+[Swagger](https://swagger.io/) ([OpenAPI](https://www.openapis.org/)) is a language-agnostic specification for describing REST APIs. It allows both computers and humans to understand the capabilities of a REST API without direct access to the source code. Its main goals are to:
 
 * Minimize the amount of work needed to connect decoupled services.
 * Reduce the amount of time needed to accurately document a service.
@@ -139,7 +138,7 @@ Each public action method in your controllers can be tested from the UI. Select 
 
 ## Securing Swagger UI endpoints
 
-Call [`MapSwagger().RequireAuthorization`](xref:Microsoft.AspNetCore.Builder.AuthorizationEndpointConventionBuilderExtensions.RequireAuthorization%2A)to secure the Swagger UI endpoints. The following example secures the swagger endpoints:
+Call [`MapSwagger().RequireAuthorization`](xref:Microsoft.AspNetCore.Builder.AuthorizationEndpointConventionBuilderExtensions.RequireAuthorization%2A) to secure the Swagger UI endpoints. The following example secures the swagger endpoints:
 
 :::code language="csharp" source="~/../AspNetCore.Docs.Samples/tutorials/webApiSwagger/secureSwagger/Program.cs"  highlight="26":::
 
@@ -152,6 +151,10 @@ curl -i -H "Authorization: Bearer {token}" https://localhost:{port}/swagger/v1/s
 ```
 
 For more information on testing with JWT tokens, see <xref:security/authentication/jwt>.
+
+## Generate an XML documentation file at compile time.
+
+See [GenerateDocumentationFile](/dotnet/core/project-sdk/msbuild-props#generatedocumentationfile) for more information.
 
 ## Next steps
 

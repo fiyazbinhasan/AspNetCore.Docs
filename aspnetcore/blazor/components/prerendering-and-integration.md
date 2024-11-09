@@ -5,7 +5,7 @@ description: Learn about Razor component integration scenarios for Blazor apps, 
 monikerRange: '>= aspnetcore-3.1 < aspnetcore-8.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/components/prerendering-and-integration
 zone_pivot_groups: blazor-hosting-models
 ---
@@ -21,7 +21,7 @@ zone_pivot_groups: blazor-hosting-models
 This article explains Razor component integration scenarios for Blazor apps, including prerendering of Razor components on the server.
 
 > [!IMPORTANT]
-> Framework changes across ASP.NET Core releases led to different sets of instructions in this article. Before using this article's guidance, confirm that the document version selector on this page matches the version of ASP.NET Core that you intend to use for your app.
+> Framework changes across ASP.NET Core releases led to different sets of instructions in this article. Before using this article's guidance, confirm that the document version selector at the top of this article matches the version of ASP.NET Core that you intend to use for your app.
 
 :::moniker range=">= aspnetcore-7.0"
 
@@ -349,7 +349,7 @@ If a [Component Tag Helper](xref:mvc/views/tag-helpers/builtin-th/component-tag-
     typeof(SomeLibraryComponentToBePreserved))]
 ```
 
-The preceding approach usually isn't required because in most cases the app prerenders its components (which are not trimmed), which in turn references components from libraries (causing them also not to be trimmed). Only use `DynamicDependency` explicitly for prerendering a library component directly when the library is subject to trimming.
+The preceding approach usually isn't required because the app usually prerenders its components (which are not trimmed), which in turn references components from libraries (causing them also not to be trimmed). Only use `DynamicDependency` explicitly for prerendering a library component directly when the library is subject to trimming.
 
 ## Render components in a page or view with a CSS selector
 
@@ -541,9 +541,9 @@ To support routable Razor components in Razor Pages apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(App).Assembly">
+   <Router AppAssembly="typeof(App).Assembly">
        <Found Context="routeData">
-           <RouteView RouteData="@routeData" />
+           <RouteView RouteData="routeData" />
        </Found>
        <NotFound>
            <PageTitle>Not found</PageTitle>
@@ -623,9 +623,9 @@ To support routable Razor components in MVC apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(App).Assembly">
+   <Router AppAssembly="typeof(App).Assembly">
        <Found Context="routeData">
-           <RouteView RouteData="@routeData" />
+           <RouteView RouteData="routeData" />
        </Found>
        <NotFound>
            <PageTitle>Not found</PageTitle>
@@ -843,8 +843,8 @@ The following example is an updated version of the `FetchData` component in a ho
 
 ```razor
 @page "/weather-forecast-preserve-state"
-@implements IDisposable
 @using BlazorSample.Shared
+@implements IDisposable
 @inject IWeatherForecastService WeatherForecastService
 @inject PersistentComponentState ApplicationState
 
@@ -920,6 +920,8 @@ else
 
 By initializing components with the same state used during prerendering, any expensive initialization steps are only executed once. The rendered UI also matches the prerendered UI, so no flicker occurs in the browser.
 
+The persisted prerendered state is transferred to the client, where it's used to restore the component state. [ASP.NET Core Data Protection](xref:security/data-protection/introduction) ensures that the data is transferred securely in Blazor Server apps. For prerendering in a hosted Blazor WebAssembly app, the data is exposed to the browser and must not contain sensitive, private information.
+
 :::zone pivot="webassembly"
 
 ## Additional Blazor WebAssembly resources
@@ -932,8 +934,8 @@ By initializing components with the same state used during prerendering, any exp
   * [Stateful reconnection after prerendering](xref:blazor/components/lifecycle#stateful-reconnection-after-prerendering): Although the content in the section focuses on Blazor Server and stateful SignalR *reconnection*, the scenario for prerendering in hosted Blazor WebAssembly apps (<xref:Microsoft.AspNetCore.Mvc.Rendering.RenderMode.WebAssemblyPrerendered>) involves similar conditions and approaches to prevent executing developer code twice. To preserve state during the execution of initialization code while prerendering, see *Persist prerendered state* section of this article.
   * [Prerendering with JavaScript interop](xref:blazor/components/lifecycle#prerendering-with-javascript-interop)
 * Authentication and authorization subjects that pertain to prerendering
-  * [General aspects](xref:blazor/security/index#aspnet-core-blazor-authentication-and-authorization)
-  * [Prerendering with authentication](xref:blazor/security/webassembly/additional-scenarios#prerendering-with-authentication)
+  * [General aspects](xref:blazor/security/index)
+  * [Prerendering with authentication in hosted Blazor WebAssembly apps](xref:blazor/security/webassembly/additional-scenarios#prerendering-with-authentication)
 * [Host and deploy: Blazor WebAssembly](xref:blazor/host-and-deploy/webassembly)
 * [Handle errors: Prerendering](xref:blazor/fundamentals/handle-errors#prerendering)
 * <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> is executed *twice* when prerendering: [Handle asynchronous navigation events with `OnNavigateAsync`](xref:blazor/fundamentals/routing#handle-asynchronous-navigation-events-with-onnavigateasync)
@@ -947,12 +949,12 @@ By initializing components with the same state used during prerendering, any exp
 A large prerendered state size may exceed the SignalR circuit message size limit, which results in the following:
 
 * The SignalR circuit fails to initialize with an error on the client: :::no-loc text="Circuit host not initialized.":::
-* The reconnection dialog on the client appears when the circuit fails. Recovery isn't possible.
+* The reconnection UI on the client appears when the circuit fails. Recovery isn't possible.
 
 To resolve the problem, use ***either*** of the following approaches:
 
 * Reduce the amount of data that you are putting into the prerendered state.
-* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of service (DoS) attacks.
+* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of Service (DoS) attacks.
 
 ## Additional Blazor Server resources
 
@@ -965,7 +967,7 @@ To resolve the problem, use ***either*** of the following approaches:
 * [Authentication and authorization: General aspects](xref:blazor/security/index#aspnet-core-blazor-authentication-and-authorization)
 * [Handle Errors: Prerendering](xref:blazor/fundamentals/handle-errors#prerendering)
 * [Host and deploy: Blazor Server](xref:blazor/host-and-deploy/server)
-* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/threat-mitigation#cross-site-scripting-xss)
+* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/interactive-server-side-rendering#cross-site-scripting-xss)
 * <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> is executed *twice* when prerendering: [Handle asynchronous navigation events with `OnNavigateAsync`](xref:blazor/fundamentals/routing#handle-asynchronous-navigation-events-with-onnavigateasync)
 
 :::zone-end
@@ -1320,7 +1322,7 @@ If a [Component Tag Helper](xref:mvc/views/tag-helpers/builtin-th/component-tag-
     typeof(SomeLibraryComponentToBePreserved))]
 ```
 
-The preceding approach usually isn't required because in most cases the app prerenders its components (which are not trimmed), which in turn references components from libraries (causing them also not to be trimmed). Only use `DynamicDependency` explicitly for prerendering a library component directly when the library is subject to trimming.
+The preceding approach usually isn't required because the app usually prerenders its components (which are not trimmed), which in turn references components from libraries (causing them also not to be trimmed). Only use `DynamicDependency` explicitly for prerendering a library component directly when the library is subject to trimming.
 
 ## Render components in a page or view with a CSS selector
 
@@ -1515,9 +1517,9 @@ To support routable Razor components in Razor Pages apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(App).Assembly">
+   <Router AppAssembly="typeof(App).Assembly">
        <Found Context="routeData">
-           <RouteView RouteData="@routeData" />
+           <RouteView RouteData="routeData" />
        </Found>
        <NotFound>
            <PageTitle>Not found</PageTitle>
@@ -1603,9 +1605,9 @@ To support routable Razor components in MVC apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(App).Assembly">
+   <Router AppAssembly="typeof(App).Assembly">
        <Found Context="routeData">
-           <RouteView RouteData="@routeData" />
+           <RouteView RouteData="routeData" />
        </Found>
        <NotFound>
            <PageTitle>Not found</PageTitle>
@@ -1865,6 +1867,8 @@ else
 
 By initializing components with the same state used during prerendering, any expensive initialization steps are only executed once. The rendered UI also matches the prerendered UI, so no flicker occurs in the browser.
 
+The persisted prerendered state is transferred to the client, where it's used to restore the component state. [ASP.NET Core Data Protection](xref:security/data-protection/introduction) ensures that the data is transferred securely in Blazor Server apps. For prerendering in a hosted Blazor WebAssembly app, the data is exposed to the browser and must not contain sensitive, private information.
+
 :::zone pivot="webassembly"
 
 ## Additional Blazor WebAssembly resources
@@ -1890,12 +1894,12 @@ By initializing components with the same state used during prerendering, any exp
 A large prerendered state size may exceed the SignalR circuit message size limit, which results in the following:
 
 * The SignalR circuit fails to initialize with an error on the client: :::no-loc text="Circuit host not initialized.":::
-* The reconnection dialog on the client appears when the circuit fails. Recovery isn't possible.
+* The reconnection UI on the client appears when the circuit fails. Recovery isn't possible.
 
 To resolve the problem, use ***either*** of the following approaches:
 
 * Reduce the amount of data that you are putting into the prerendered state.
-* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of service (DoS) attacks.
+* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of Service (DoS) attacks.
 
 ## Additional Blazor Server resources
 
@@ -1908,7 +1912,7 @@ To resolve the problem, use ***either*** of the following approaches:
 * [Authentication and authorization: General aspects](xref:blazor/security/index#aspnet-core-blazor-authentication-and-authorization)
 * [Handle Errors: Prerendering](xref:blazor/fundamentals/handle-errors#prerendering)
 * [Host and deploy: Blazor Server](xref:blazor/host-and-deploy/server)
-* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/threat-mitigation#cross-site-scripting-xss)
+* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/interactive-server-side-rendering#cross-site-scripting-xss)
 
 :::zone-end
 
@@ -2310,7 +2314,7 @@ To support routable Razor components in Razor Pages apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(Program).Assembly">
+   <Router AppAssembly="typeof(Program).Assembly">
        <Found Context="routeData">
            <RouteView RouteData="routeData" />
        </Found>
@@ -2406,7 +2410,7 @@ To support routable Razor components in MVC apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(Program).Assembly">
+   <Router AppAssembly="typeof(Program).Assembly">
        <Found Context="routeData">
            <RouteView RouteData="routeData" />
        </Found>
@@ -2596,12 +2600,12 @@ For more information, see <xref:blazor/components/index#class-name-and-namespace
 A large prerendered state size may exceed the SignalR circuit message size limit, which results in the following:
 
 * The SignalR circuit fails to initialize with an error on the client: :::no-loc text="Circuit host not initialized.":::
-* The reconnection dialog on the client appears when the circuit fails. Recovery isn't possible.
+* The reconnection UI on the client appears when the circuit fails. Recovery isn't possible.
 
 To resolve the problem, use ***either*** of the following approaches:
 
 * Reduce the amount of data that you are putting into the prerendered state.
-* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of service (DoS) attacks.
+* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of Service (DoS) attacks.
 
 ## Additional Blazor Server resources
 
@@ -2614,7 +2618,7 @@ To resolve the problem, use ***either*** of the following approaches:
 * [Authentication and authorization: General aspects](xref:blazor/security/index#aspnet-core-blazor-authentication-and-authorization)
 * [Handle Errors: Prerendering](xref:blazor/fundamentals/handle-errors#prerendering)
 * [Host and deploy: Blazor Server](xref:blazor/host-and-deploy/server)
-* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/threat-mitigation#cross-site-scripting-xss)
+* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/interactive-server-side-rendering#cross-site-scripting-xss)
 
 :::zone-end
 
@@ -2776,7 +2780,7 @@ To support routable Razor components in Razor Pages apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(Program).Assembly">
+   <Router AppAssembly="typeof(Program).Assembly">
        <Found Context="routeData">
            <RouteView RouteData="routeData" />
        </Found>
@@ -2870,7 +2874,7 @@ To support routable Razor components in MVC apps:
    ```razor
    @using Microsoft.AspNetCore.Components.Routing
 
-   <Router AppAssembly="@typeof(Program).Assembly">
+   <Router AppAssembly="typeof(Program).Assembly">
        <Found Context="routeData">
            <RouteView RouteData="routeData" />
        </Found>
@@ -3036,12 +3040,12 @@ For more information, see <xref:blazor/components/index#class-name-and-namespace
 A large prerendered state size may exceed the SignalR circuit message size limit, which results in the following:
 
 * The SignalR circuit fails to initialize with an error on the client: :::no-loc text="Circuit host not initialized.":::
-* The reconnection dialog on the client appears when the circuit fails. Recovery isn't possible.
+* The reconnection UI on the client appears when the circuit fails. Recovery isn't possible.
 
 To resolve the problem, use ***either*** of the following approaches:
 
 * Reduce the amount of data that you are putting into the prerendered state.
-* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of service (DoS) attacks.
+* Increase the [SignalR message size limit](xref:blazor/fundamentals/signalr#server-side-circuit-handler-options). ***WARNING***: Increasing the limit may increase the risk of Denial of Service (DoS) attacks.
 
 ## Additional Blazor Server resources
 
@@ -3054,7 +3058,7 @@ To resolve the problem, use ***either*** of the following approaches:
 * [Authentication and authorization: General aspects](xref:blazor/security/index#aspnet-core-blazor-authentication-and-authorization)
 * [Handle Errors: Prerendering](xref:blazor/fundamentals/handle-errors#prerendering)
 * [Host and deploy: Blazor Server](xref:blazor/host-and-deploy/server)
-* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/threat-mitigation#cross-site-scripting-xss)
+* [Threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/interactive-server-side-rendering#cross-site-scripting-xss)
 
 :::zone-end
 

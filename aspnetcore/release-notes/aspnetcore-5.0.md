@@ -43,10 +43,10 @@ The `Person/Index.cshtml` file:
 ```cshtml
 @model Person
 
-Name: <input asp-for="Model.Name" />
+<label>Name: <input asp-for="Model.Name" /></label>
 <span asp-validation-for="Model.Name" />
 
-Age: <input asp-for="Model.Age" />
+<label>Age: <input asp-for="Model.Age" /></label>
 <span asp-validation-for="Model.Age" />
 ```
 
@@ -114,7 +114,7 @@ With OpenAPI enabled by default, the app launching experience (F5) for web API d
 
 ### Performance improvements
 
-For .NET 5, we made significant improvements to Blazor WebAssembly runtime performance with a specific focus on complex UI rendering and JSON serialization. In our performance tests, Blazor WebAssembly in .NET 5 is two to three times faster for most scenarios. For more information, see [ASP.NET Blog: ASP.NET Core updates in .NET 5 Release Candidate 1](https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-webassembly-performance-improvements).
+For .NET 5, we made significant improvements to .NET WebAssembly runtime performance with a specific focus on complex UI rendering and JSON serialization. In our performance tests, Blazor WebAssembly in .NET 5 is two to three times faster for most scenarios. For more information, see [ASP.NET Blog: ASP.NET Core updates in .NET 5 Release Candidate 1](https://devblogs.microsoft.com/aspnet/asp-net-core-updates-in-net-5-release-candidate-1/#blazor-webassembly-performance-improvements).
 
 ### CSS isolation
 
@@ -126,7 +126,7 @@ The `InputFile` component allows reading one or more files selected by a user fo
 
 ### New `InputRadio` and `InputRadioGroup` components
 
-Blazor has built-in `InputRadio` and `InputRadioGroup` components that simplify data binding to radio button groups with integrated validation. For more information, see <xref:blazor/forms-and-input-components>.
+Blazor has built-in `InputRadio` and `InputRadioGroup` components that simplify data binding to radio button groups with integrated validation. For more information, see <xref:blazor/forms/input-components>.
 
 ### Component virtualization
 
@@ -142,7 +142,7 @@ Use the `FocusAsync` convenience method on element references to set the UI focu
 
 ### Custom validation CSS class attributes
 
-Custom validation CSS class attributes are useful when integrating with CSS frameworks, such as Bootstrap. For more information, see <xref:blazor/forms-and-input-components#custom-validation-css-class-attributes>.
+Custom validation CSS class attributes are useful when integrating with CSS frameworks, such as Bootstrap. For more information, see <xref:blazor/forms/validation#custom-validation-css-class-attributes>.
 
 ### IAsyncDisposable support
 
@@ -160,7 +160,7 @@ The following built-in components support display names with the `DisplayName` p
 * `InputNumber`
 * `InputSelect`
 
-For more information, see <xref:blazor/forms-and-input-components#display-name-support>.
+For more information, see <xref:blazor/forms/index#display-name-support>.
 
 ### Catch-all route parameters
 

@@ -5,7 +5,7 @@ description: Learn how to download files in Blazor apps.
 monikerRange: '>= aspnetcore-6.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/file-downloads
 ---
 # ASP.NET Core Blazor file downloads
@@ -14,14 +14,9 @@ uid: blazor/file-downloads
 
 This article explains how to download files in Blazor apps.
 
-[!INCLUDE[](~/blazor/includes/location-client-and-server-net6-or-later.md)]
+## File downloads
 
-Files can be downloaded from the app's own static assets or from any other location:
-
-* ASP.NET Core apps use [Static File Middleware](xref:fundamentals/static-files) to serve files to clients of server-side apps.
-* The guidance in this article also applies to other types of file servers that don't use .NET, such as Content Delivery Networks (CDNs).
-
-This article covers approaches for the following scenarios:
+This article covers approaches for the following scenarios, where a file shouldn't be opened by a browser but downloaded and saved on the client:
 
 * [Stream file content to a raw binary data buffer on the client](#download-from-a-stream): Typically, this approach is used for relatively small files (\< 250 MB).
 * [Download a file via a URL without streaming](#download-from-a-url): Usually, this approach is used for relatively large files (> 250 MB).
@@ -30,7 +25,7 @@ When downloading files from a different origin than the app, Cross-Origin Resour
 
 ## Security considerations
 
-Use caution when providing users with the ability to download files from a server. Attackers may execute [denial of service (DOS)](/windows-hardware/drivers/ifs/denial-of-service) attacks, [API exploitation attacks](https://developer.mozilla.org/docs/Web/HTML/Element/a#security_and_privacy), or attempt to compromise networks and servers in other ways.
+Use caution when providing users with the ability to download files from a server. Cyberattackers may execute [Denial of Service (DoS)](/windows-hardware/drivers/ifs/denial-of-service) attacks, [API exploitation attacks](https://developer.mozilla.org/docs/Web/HTML/Element/a#security_and_privacy), or attempt to compromise networks and servers in other ways.
 
 Security steps that reduce the likelihood of a successful attack are:
 
@@ -42,7 +37,17 @@ Security steps that reduce the likelihood of a successful attack are:
 
 *This section applies to files that are typically up to 250 MB in size.*
 
-The recommended approach for downloading relatively small files (\< 250 MB) is to stream file content to a raw binary data buffer on the client with [JavaScript (JS) interop](xref:blazor/js-interop/index).
+:::moniker range=">= aspnetcore-8.0"
+
+The recommended approach for downloading relatively small files (&lt; 250 MB) is to stream file content to a raw binary data buffer on the client with [JavaScript (JS) interop](xref:blazor/js-interop/index). This approach is effective for components that adopt an interactive render mode but not components that adopt static server-side rendering (static SSR).
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+The recommended approach for downloading relatively small files (&lt; 250 MB) is to stream file content to a raw binary data buffer on the client with [JavaScript (JS) interop](xref:blazor/js-interop/index).
+
+:::moniker-end
 
 > [!WARNING]
 > The approach in this section reads the file's content into a [JS `ArrayBuffer`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/ArrayBuffer). This approach loads the entire file into the client's memory, which can impair performance. To download relatively large files (\>= 250 MB), we recommend following the guidance in the [Download from a URL](#download-from-a-url) section.
@@ -75,7 +80,7 @@ The following `downloadFileFromStream` JS function:
 ```
 
 > [!NOTE]
-> For general guidance on JS location and our recommendations for production apps, see <xref:blazor/js-interop/index#javascript-location>.
+> For general guidance on JS location and our recommendations for production apps, see <xref:blazor/js-interop/javascript-location>.
 
 The following component:
 
@@ -89,39 +94,15 @@ The following component:
 
 `FileDownload1.razor`:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
 
-```razor
-@page "/file-download-1"
-@attribute [RenderModeServer]
-@using System.IO
-@inject IJSRuntime JS
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/FileDownload1.razor":::
 
-<h1>File Download Example 1</h1>
+:::moniker-end
 
-<button @onclick="DownloadFileFromStream">
-    Download File From Stream
-</button>
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
 
-@code {
-    private Stream GetFileStream()
-    {
-        var randomBinaryData = new byte[50 * 1024];
-        var fileStream = new MemoryStream(randomBinaryData);
-
-        return fileStream;
-    }
-
-    private async Task DownloadFileFromStream()
-    {
-        var fileStream = GetFileStream();
-        var fileName = "log.bin";
-        using var streamRef = new DotNetStreamReference(stream: fileStream);
-
-        await JS.InvokeVoidAsync("downloadFileFromStream", fileName, streamRef);
-    }
-}
-```
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/FileDownload1.razor":::
 
 :::moniker-end
 
@@ -140,10 +121,7 @@ The following component:
 For a component in a server-side app that must return a <xref:System.IO.Stream> for a physical file, the component can call <xref:System.IO.File.OpenRead%2A?displayProperty=nameWithType>, as the following example demonstrates:
 
 ```csharp
-private Stream GetFileStream()
-{
-    return File.OpenRead(@"{PATH}");
-}
+private Stream GetFileStream() => File.OpenRead(@"{PATH}");
 ```
 
 In the preceding example, the `{PATH}` placeholder is the path to the file. The `@` prefix indicates that the string is a [*verbatim string literal*](/dotnet/csharp/programming-guide/strings/#verbatim-string-literals), which permits the use of backslashes (`\`) in a Windows OS path and embedded double-quotes (`""`) for a single quote in the path. Alternatively, avoid the string literal (`@`) and use either of the following approaches:
@@ -155,11 +133,35 @@ In the preceding example, the `{PATH}` placeholder is the path to the file. The 
 
 *This section applies to files that are relatively large, typically 250 MB or larger.*
 
+:::moniker range=">= aspnetcore-8.0"
+
+The recommended approach for downloading relatively large files (&gt;= 250 MB) with interactively-rendered components or files of any size for statically-rendered components is to use JS to trigger an anchor element with the file's name and URL.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+The recommended approach for downloading relatively large files (&gt;= 250 MB) is to use JS to trigger an anchor element with the file's name and URL.
+
+:::moniker-end
+
 The example in this section uses a download file named `quote.txt`, which is placed in a folder named `files` in the app's web root (`wwwroot` folder). The use of the `files` folder is only for demonstration purposes. You can organize downloadable files in any folder layout within the web root (`wwwroot` folder) that you prefer, including serving the files directly from the `wwwroot` folder.
 
 `wwwroot/files/quote.txt`:
 
-:::moniker range=">= aspnetcore-7.0"
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="text" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/wwwroot/files/quote.txt":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="text" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/wwwroot/files/quote.txt":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
 :::code language="text" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/wwwroot/files/quote.txt":::
 
@@ -191,37 +193,29 @@ The following `triggerFileDownload` JS function:
 ```
 
 > [!NOTE]
-> For general guidance on JS location and our recommendations for production apps, see <xref:blazor/js-interop/index#javascript-location>.
+> For general guidance on JS location and our recommendations for production apps, see <xref:blazor/js-interop/javascript-location>.
 
 The following example component downloads the file from the same origin that the app uses. If the file download is attempted from a different origin, configure Cross-Origin Resource Sharing (CORS). For more information, see the [Cross-Origin Resource Sharing (CORS)](#cross-origin-resource-sharing-cors) section.
 
-Change the port in the following example to match the localhost development port of your environment.
-
 `FileDownload2.razor`:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
 
-```razor
-@page "/file-download-2"
-@attribute [RenderModeServer]
-@inject IJSRuntime JS
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/FileDownload2.razor":::
 
-<h1>File Download Example 2</h1>
+For interactive components, the button in the preceding example calls the `DownloadFileFromURL` handler to invoke the JavaScript (JS) function `triggerFileDownload`.
 
-<button @onclick="DownloadFileFromURL">
-    Download File From URL
-</button>
+If the component adopts static server-side rendering (static SSR), add an event handler for the button ([`addEventListener` (MDN documentation)](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)) to call `triggerFileDownload` following the guidance in <xref:blazor/js-interop/ssr>.
 
-@code {
-    private async Task DownloadFileFromURL()
-    {
-        var fileName = "quote.txt";
-        var fileURL = Path.Combine("https://localhost:7029", "files", fileName);
+:::moniker-end
 
-        await JS.InvokeVoidAsync("triggerFileDownload", fileName, fileURL);
-    }
-}
-```
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/FileDownload2.razor":::
+
+For interactive components, the button in the preceding example calls the `DownloadFileFromURL` handler to invoke the JavaScript (JS) function `triggerFileDownload`.
+
+If the component adopts static server-side rendering (static SSR), add an event handler for the button ([`addEventListener` (MDN documentation)](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)) to call `triggerFileDownload` following the guidance in <xref:blazor/js-interop/ssr>.
 
 :::moniker-end
 
@@ -229,11 +223,15 @@ Change the port in the following example to match the localhost development port
 
 :::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/file-downloads/FileDownload2.razor":::
 
+Change the port in the preceding example to match the localhost development port of your environment.
+
 :::moniker-end
 
 :::moniker range="< aspnetcore-7.0"
 
 :::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/file-downloads/FileDownload2.razor":::
+
+Change the port in the preceding example to match the localhost development port of your environment.
 
 :::moniker-end
 
@@ -251,8 +249,10 @@ For more information on CORS with ASP.NET Core apps and other Microsoft products
 
 ## Additional resources
 
+* <xref:blazor/fundamentals/static-files>
 * <xref:blazor/js-interop/index>
+* <xref:blazor/js-interop/javascript-location>
+* <xref:blazor/js-interop/ssr>
 * [`<a>`: The Anchor element: Security and privacy (MDN documentation)](https://developer.mozilla.org/docs/Web/HTML/Element/a#security_and_privacy)
 * <xref:blazor/file-uploads>
-* <xref:blazor/forms-and-input-components>
-* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples)
+* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))

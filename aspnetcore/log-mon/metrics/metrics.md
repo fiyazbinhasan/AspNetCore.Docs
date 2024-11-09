@@ -4,9 +4,8 @@ description: Metrics for ASP.NET Core apps
 author: rick-anderson
 ms.author: riande
 monikerRange: '>= aspnetcore-8.0'
-ms.date: 6/30/2023
+ms.date: 10/18/2023
 ms.topic: article
-ms.prod: aspnet-core
 uid: log-mon/metrics/metrics
 ---
 
@@ -20,7 +19,8 @@ Metrics are numerical measurements reported over time. They're typically used to
 
 These metrics can be reported to a monitoring system at regular intervals. Dashboards can be setup to view metrics and alerts created to notify people of problems. If the web service is intended to respond to requests within 400 ms and starts responding in 600 ms, the monitoring system can notify the operations staff that the app response is slower than normal.
 
-See [ASP.NET Core metrics](https://github.com/dotnet/aspnetcore/issues/47536) for ASP.NET Core specific metrics. See [.NET metrics](/dotnet/core/diagnostics/metrics) for .NET metrics.
+> [!TIP]
+> See [ASP.NET Core metrics](/dotnet/core/diagnostics/built-in-metrics-aspnetcore) for a comprehensive list of all instruments together with their attributes.
 
 ## Using metrics
 
@@ -51,8 +51,6 @@ Replace the contents of `Program.cs` with the following code:
 
 :::code language="csharp" source="~/log-mon/metrics/metrics/samples/web-metrics/Program.cs":::
 
-<!-- Review TODO: Add link to available meters -->
-
 ## View metrics with dotnet-counters
 
 [dotnet-counters](/dotnet/core/diagnostics/dotnet-counters) is a command-line tool that can view live metrics for .NET Core apps on demand. It doesn't require setup, making it useful for ad-hoc investigations or verifying that metric instrumentation is working. It works with both <xref:System.Diagnostics.Metrics?displayProperty=nameWithType> based APIs and [EventCounters](/dotnet/core/diagnostics/event-counters).
@@ -63,7 +61,7 @@ If the [dotnet-counters](/dotnet/core/diagnostics/dotnet-counters) tool isn't in
 dotnet tool update -g dotnet-counters
 ```
 
-While the test app is running, launch [dotnet-counters](/dotnet/core/diagnostics/dotnet-counters). The following command shows an example of `dotnet-counters` monitoring all metrics from the `Microsoft.AspNetCore.Hosting` meter.
+While the test app is running, launch [dotnet-counters](/dotnet/core/diagnostics/dotnet-counters). The following command shows an example of `dotnet-counters` monitoring all metrics from the [`Microsoft.AspNetCore.Hosting` meter](/dotnet/core/diagnostics/built-in-metrics-aspnetcore).
 
 ```dotnetcli
 dotnet-counters monitor -n WebMetric --counters Microsoft.AspNetCore.Hosting
@@ -103,7 +101,7 @@ The proceeding example:
 
 * Adds middleware to enrich the ASP.NET Core request metric.
 * Gets the <xref:Microsoft.AspNetCore.Http.Features.IHttpMetricsTagsFeature> from the `HttpContext`. The feature is only present on the context if someone is listening to the metric. Verify `IHttpMetricsTagsFeature` is not `null` before using it.
-* Adds a custom tag containing the request's marketing source to the `http.server.request.duration` metric.
+* Adds a custom tag containing the request's marketing source to the [`http.server.request.duration`](/dotnet/core/diagnostics/built-in-metrics-aspnetcore) metric.
   * The tag has the name `mkt_medium` and a value based on the [utm_medium](https://wikipedia.org/wiki/UTM_parameters) query string value. The `utm_medium` value is resolved to a known range of values.
   * The tag allows requests to be categorized by marketing medium type, which could be useful when analyzing web app traffic.
 
@@ -116,7 +114,7 @@ Metrics are created using APIs in the <xref:System.Diagnostics.Metrics> namespac
 
 ### Creating metrics in ASP.NET Core apps with `IMeterFactory`
 
-We recommended creating `Meter` instances in ASP.NET Core apps with <xref:System.Diagnostics.Metrics.IMeterFactory>.
+We recommended creating <xref:System.Diagnostics.Metrics.Meter> instances in ASP.NET Core apps with <xref:System.Diagnostics.Metrics.IMeterFactory>.
 
 ASP.NET Core registers <xref:System.Diagnostics.Metrics.IMeterFactory> in dependency injection (DI) by default. The meter factory integrates metrics with DI, making isolating and collecting metrics easy. `IMeterFactory` is especially useful for testing. It allows for multiple tests to run side-by-side and only collecting metrics values that are recorded in a test.
 
@@ -139,7 +137,6 @@ dotnet-counters monitor -n WebMetric --counters Contoso.Web
 ```
 
 Output similar to the following is displayed:
-
 
 ```dotnetcli
 Press p to pause, r to resume, q to quit.
@@ -218,23 +215,23 @@ Alternatively, enter counter category such as `kestrel` in the **Expression** in
 
 ### Show metrics on a Grafana dashboard
 
-1. Follow the [installation instructions](https://prometheus.io/docs/visualization/grafana/#creating-a-prometheus-graph) to install Grafana and connect it to a Prometheus data source.
+* Follow the [installation instructions](https://prometheus.io/docs/visualization/grafana/#creating-a-prometheus-graph) to install Grafana and connect it to a Prometheus data source.
 
-1. Follow [Creating a Prometheus graph](https://prometheus.io/docs/visualization/grafana/#creating-a-prometheus-graph). Alternatively, download a JSON file from [aspnetcore-grafana dashboards](https://github.com/JamesNK/aspnetcore-grafana/tree/main/dashboards) to configure Grafana.
+* Follow [Creating a Prometheus graph](https://prometheus.io/docs/visualization/grafana/#creating-a-prometheus-graph). Alternatively, pre-built dashboards for .NET metrics are available to download at [.NET team dashboards @ grafana.com](https://aka.ms/dotnet/grafana-dashboards). Downloaded dashboard JSON can be [imported into Grafana](https://grafana.com/docs/grafana/latest/dashboards/manage-dashboards/#import-a-dashboard).
 
 ![dashboard-screenshot2](~/log-mon/metrics/metrics/static/dashboard-screenshot.png)
 
 ## Test metrics in ASP.NET Core apps
 
-It's possible to test metrics in ASP.NET Core apps. One way to do that is collect and assert metrics values in [ASP.NET Core integration tests](xref:test/integration-tests) using <xref:Microsoft.Extensions.Telemetry.Testing.Metering.MetricCollector%601>.
+It's possible to test metrics in ASP.NET Core apps. One way to do that is collect and assert metrics values in [ASP.NET Core integration tests](xref:test/integration-tests) using <xref:Microsoft.Extensions.Diagnostics.Metrics.Testing.MetricCollector%601>.
 
 :::code language="csharp" source="~/log-mon/metrics/metrics/samples/metric-tests/BasicTests.cs" id="snippet_TestClass":::
 
 The proceeding test:
 
 * Bootstraps a web app in memory with <xref:Microsoft.AspNetCore.Mvc.Testing.WebApplicationFactory%601>. `Program` in the factory's generic argument specifies the web app.
-* Collects metrics values with <xref:Microsoft.Extensions.Telemetry.Testing.Metering.MetricCollector%601>.
-  * Requires a package reference to `Microsoft.Extensions.Telemetry.Testing`.
+* Collects metrics values with <xref:Microsoft.Extensions.Diagnostics.Metrics.Testing.MetricCollector%601>
+  * Requires a package reference to `Microsoft.Extensions.Diagnostics.Testing`
   * The `MetricCollector<T>` is created using the web app's <xref:System.Diagnostics.Metrics.IMeterFactory>. This allows the collector to only report metrics values recorded by test.
   * Includes the meter name, `Microsoft.AspNetCore.Hosting`, and counter name, `http.server.request.duration` to collect.
 * Makes an HTTP request to the web app.
@@ -242,6 +239,4 @@ The proceeding test:
 
 ## ASP.NET Core meters and counters
 
-* [HostingMetrics](https://source.dot.net/#Microsoft.AspNetCore.Hosting/Internal/HostingMetrics.cs,0e3eae9d5e50ff0d)
-* [KestrelMetrics](https://source.dot.net/#Microsoft.AspNetCore.Server.Kestrel.Core/Internal/Infrastructure/KestrelMetrics.cs,8d505625d99068a6)
-* SignalR [HttpConnectionsMetrics](https://source.dot.net/#Microsoft.AspNetCore.Http.Connections/Internal/HttpConnectionsMetrics.cs,2d63d88d7202e42d,references)
+See [ASP.NET Core metrics](/dotnet/core/diagnostics/built-in-metrics-aspnetcore) for a list of ASP.NET Core meters and counters.

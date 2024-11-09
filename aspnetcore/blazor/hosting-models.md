@@ -5,7 +5,7 @@ description: Learn about Blazor hosting models and how to pick which one to use.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/hosting-models
 ---
 # ASP.NET Core Blazor hosting models
@@ -20,7 +20,7 @@ NOTE: Daggered lines under the table (&dagger;, &Dagger;) use a double-space at 
 
 :::moniker range=">= aspnetcore-8.0"
 
-This article explains Blazor hosting models, which can be applied in different parts of a Blazor app at either compile time or runtime.
+This article explains Blazor hosting models, primarily focused on Blazor Server and Blazor WebAssembly apps in versions of .NET earlier than .NET 8. The guidance in this article is relevant under all .NET releases for Blazor Hybrid apps that run on native mobile and desktop platforms. Blazor Web Apps in .NET 8 or later are better conceptualized by how Razor components are rendered, which is described as their *render mode*. Render modes are briefly touched on in the *Fundamentals* overview article and covered in detail in <xref:blazor/components/render-modes> of the *Components* node.
 
 :::moniker-end
 
@@ -30,19 +30,7 @@ This article explains Blazor hosting models and how to choose which one to use.
 
 :::moniker-end
 
-:::moniker range=">= aspnetcore-8.0"
-
-Blazor is a web framework for building web UI components ([Razor components](xref:blazor/components/index)) that can be hosted in different ways:
-
-* Server-side in ASP.NET Core (*Blazor Server* or statically rendered).
-* Client-side in the browser on a [WebAssembly](https://webassembly.org/)-based .NET runtime (*Blazor WebAssembly*).
-* Client-side in a native mobile or desktop app that renders components to an embedded Web View control (*Blazor Hybrid*).
-
-Regardless of the hosting model, the way you build Razor components *is the same*. The same Razor components can be used with any of the hosting models unchanged.
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
+:::moniker range=">= aspnetcore-6.0"
 
 Blazor is a web framework for building web UI components ([Razor components](xref:blazor/components/index)) that can be hosted in different ways. Razor components can run server-side in ASP.NET Core (*Blazor Server*) versus client-side in the browser on a [WebAssembly](https://webassembly.org/)-based .NET runtime (*Blazor WebAssembly*, *Blazor WASM*). You can also host Razor components in native mobile and desktop apps that render to an embedded Web View control (*Blazor Hybrid*). Regardless of the hosting model, the way you build Razor components *is the same*. The same Razor components can be used with any of the hosting models unchanged.
 
@@ -140,9 +128,9 @@ The .NET [Intermediate Language (IL)](/dotnet/standard/glossary#il) interpreter 
 
 :::moniker range=">= aspnetcore-6.0"
 
-Blazor supports ahead-of-time (AOT) compilation, where you can compile your .NET code directly into WebAssembly. AOT compilation results in runtime performance improvements at the expense of a larger app size. For more information, see <xref:blazor/host-and-deploy/webassembly#ahead-of-time-aot-compilation>. 
+Blazor supports ahead-of-time (AOT) compilation, where you can compile your .NET code directly into WebAssembly. AOT compilation results in runtime performance improvements at the expense of a larger app size. For more information, see <xref:blazor/tooling/webassembly#ahead-of-time-aot-compilation>. 
 
-The same [.NET WebAssembly build tools](xref:blazor/tooling#net-webassembly-build-tools) used for AOT compilation also [relink the .NET WebAssembly runtime](xref:blazor/host-and-deploy/webassembly#runtime-relinking) to trim unused runtime code. Blazor also trims unused code from .NET framework libraries. The .NET compiler further precompresses a standalone Blazor WebAssembly app for a smaller app payload.
+The same [.NET WebAssembly build tools](xref:blazor/tooling/webassembly) used for AOT compilation also [relink the .NET WebAssembly runtime](xref:blazor/tooling/webassembly#runtime-relinking) to trim unused runtime code. Blazor also trims unused code from .NET framework libraries. The .NET compiler further precompresses a standalone Blazor WebAssembly app for a smaller app payload.
 
 WebAssembly-rendered Razor components can use [native dependencies](xref:blazor/webassembly-native-dependencies) built to run on WebAssembly.
 
@@ -205,35 +193,35 @@ Select the Blazor hosting model based on the app's feature requirements. The fol
 
 Blazor Hybrid apps include .NET MAUI, WPF, and Windows Forms framework apps.
 
-| Feature | Blazor Server | Blazor WebAssembly (WASM) | Blazor Hybrid |
-| --- | :---: | :---: | :---: |
-| [Complete .NET API compatibility](#complete-net-api-compatibility) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [Direct access to server and network resources](#direct-access-to-server-and-network-resources) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; |
-| [Small payload size with fast initial load time](#small-payload-size-with-fast-initial-load-time) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> |
-| [Near native execution speed](#near-native-execution-speed) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>&Dagger; | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [App code secure and private on the server](#app-code-secure-and-private-on-the-server) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; |
-| [Run apps offline once downloaded](#run-apps-offline-once-downloaded) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [Static site hosting](#static-site-hosting) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> |
-| [Offloads processing to clients](#offloads-processing-to-clients) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [Full access to native client capabilities](#full-access-to-native-client-capabilities) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [Web-based deployment](#web-based-deployment) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> |
+Feature | Blazor Server | Blazor WebAssembly (WASM) | Blazor Hybrid
+--- | :---: | :---: | :---:
+[Complete .NET API compatibility](#complete-net-api-compatibility) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[Direct access to server and network resources](#direct-access-to-server-and-network-resources) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger;
+[Small payload size with fast initial load time](#small-payload-size-with-fast-initial-load-time) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>
+[Near native execution speed](#near-native-execution-speed) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>&Dagger; | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[App code secure and private on the server](#app-code-secure-and-private-on-the-server) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger;
+[Run apps offline once downloaded](#run-apps-offline-once-downloaded) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[Static site hosting](#static-site-hosting) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>
+[Offloads processing to clients](#offloads-processing-to-clients) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[Full access to native client capabilities](#full-access-to-native-client-capabilities) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[Web-based deployment](#web-based-deployment) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>
 
 &dagger;Blazor WebAssembly and Blazor Hybrid apps can use server-based APIs to access server/network resources and access private and secure app code.  
-&Dagger;Blazor WebAssembly only reaches near-native performance with [ahead-of-time (AOT) compilation](xref:blazor/host-and-deploy/webassembly#ahead-of-time-aot-compilation).
+&Dagger;Blazor WebAssembly only reaches near-native performance with [ahead-of-time (AOT) compilation](xref:blazor/tooling/webassembly#ahead-of-time-aot-compilation).
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-6.0"
 
-| Feature | Blazor Server | Blazor WebAssembly (WASM) |
-| --- | :---: | :---: |
-| [Complete .NET API compatibility](#complete-net-api-compatibility) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> |
-| [Direct access to server and network resources](#direct-access-to-server-and-network-resources) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; |
-| [Small payload size with fast initial load time](#small-payload-size-with-fast-initial-load-time) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> |
-| [App code secure and private on the server](#app-code-secure-and-private-on-the-server) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger; |
-| [Run apps offline once downloaded](#run-apps-offline-once-downloaded) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [Static site hosting](#static-site-hosting) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
-| [Offloads processing to clients](#offloads-processing-to-clients) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> |
+Feature | Blazor Server | Blazor WebAssembly (WASM)
+--- | :---: | :---:
+[Complete .NET API compatibility](#complete-net-api-compatibility) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>
+[Direct access to server and network resources](#direct-access-to-server-and-network-resources) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger;
+[Small payload size with fast initial load time](#small-payload-size-with-fast-initial-load-time) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>
+[App code secure and private on the server](#app-code-secure-and-private-on-the-server) | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span> | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span>&dagger;
+[Run apps offline once downloaded](#run-apps-offline-once-downloaded) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[Static site hosting](#static-site-hosting) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
+[Offloads processing to clients](#offloads-processing-to-clients) | <span aria-hidden="true">❌</span><span class="visually-hidden">Not supported</span> | <span aria-hidden="true">✔️</span><span class="visually-hidden">Supported</span>
 
 &dagger;Blazor WebAssembly apps can use server-based APIs to access server/network resources and access private and secure app code.
 
@@ -251,7 +239,7 @@ To create a Blazor Hybrid app, see the articles under <xref:blazor/hybrid/tutori
 
 :::moniker range=">= aspnetcore-8.0"
 
-Components rendered for the Blazor Server hosting model and Blazor Hybrid apps have complete .NET API compatibility, while components rendered for Blazor WebAssembly are limited to a subset of .NET APIs. When an app's specification requires one or more .NET APIs that are unavailable to WebAssembly-rendered components, then choose to render components for Blazor Server or use Blazor Hybrid.
+Components rendered for the Blazor Server hosting model and Blazor Hybrid apps have complete .NET API compatibility, while components rendered for Blazor WebAssembly are limited to a [subset of .NET APIs](xref:blazor/fundamentals/index#subset-of-net-apis-for-blazor-webassembly-apps). When an app's specification requires one or more .NET APIs that are unavailable to WebAssembly-rendered components, then choose to render components for Blazor Server or use Blazor Hybrid.
 
 :::moniker-end
 
@@ -306,7 +294,7 @@ To avoid server-based APIs for Blazor WebAssembly apps, adopt Blazor Server, whi
 
 :::moniker range=">= aspnetcore-8.0"
 
-Rendering components from the server reduces the app payload size and improves initial load times. When a fast initial load time is desired, use the Blazor Server hosting model or consider static server rendering.
+Rendering components from the server reduces the app payload size and improves initial load times. When a fast initial load time is desired, use the Blazor Server hosting model or consider static server-side rendering.
 
 :::moniker-end
 
@@ -322,7 +310,7 @@ Blazor Server apps have relatively small payload sizes with faster initial load 
 
 Blazor Hybrid apps run using the .NET runtime natively on the target platform, which offers the best possible speed.
 
-Components rendered for the Blazor WebAssembly hosting model, including Progressive Web Apps (PWAs), and standalone Blazor WebAssembly apps run using the .NET runtime for WebAssembly, which is slower than running directly on the platform. Consider using [ahead-of-time (AOT) compiled](xref:blazor/host-and-deploy/webassembly#ahead-of-time-aot-compilation) to improve runtime performance when using Blazor WebAssembly.
+Components rendered for the Blazor WebAssembly hosting model, including Progressive Web Apps (PWAs), and standalone Blazor WebAssembly apps run using the .NET runtime for WebAssembly, which is slower than running directly on the platform. Consider using [ahead-of-time (AOT) compiled](xref:blazor/tooling/webassembly#ahead-of-time-aot-compilation) to improve runtime performance when using Blazor WebAssembly.
 
 :::moniker-end
 
@@ -330,7 +318,7 @@ Components rendered for the Blazor WebAssembly hosting model, including Progress
 
 Blazor Hybrid apps run using the .NET runtime natively on the target platform, which offers the best possible speed.
 
-Blazor WebAssembly, including Progressive Web Apps (PWAs), apps run using the .NET runtime for WebAssembly, which is slower than running directly on the platform, even for apps that are [ahead-of-time (AOT) compiled](xref:blazor/host-and-deploy/webassembly#ahead-of-time-aot-compilation) for WebAssembly in the browser.
+Blazor WebAssembly, including Progressive Web Apps (PWAs), apps run using the .NET runtime for WebAssembly, which is slower than running directly on the platform, even for apps that are [ahead-of-time (AOT) compiled](xref:blazor/tooling/webassembly#ahead-of-time-aot-compilation) for WebAssembly in the browser.
 
 :::moniker-end
 

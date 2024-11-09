@@ -1,37 +1,45 @@
 ---
-title: "Tutorial: Publish an ASP.NET Core app using native AOT"
+title: "Tutorial: Publish an ASP.NET Core app using Native AOT"
 author: mitchdenny
-description: Learn about how to publish an ASP.NET Core app using native AOT.
+description: Learn about how to publish an ASP.NET Core app using Native AOT.
 monikerRange: '>= aspnetcore-8.0'
 ms.topic: tutorial
+content_well_notification: AI-contribution
 ms.author: midenn
 ms.custom: mvc
 ms.date: 08/10/2023
 uid: fundamentals/native-aot-tutorial
+ai-usage: ai-assisted
 ---
-# Tutorial: Publish an ASP.NET Core app using native AOT
+# Tutorial: Publish an ASP.NET Core app using Native AOT
+
+<!-- UPDATE 9.0 Activate after release and INCLUDE is updated
+
+[!INCLUDE[](~/includes/not-latest-version.md)]
+
+-->
 
 ASP.NET Core 8.0 introduces support for [.NET native ahead-of-time (AOT)](/dotnet/core/deploying/native-aot/).
 
 > [!NOTE]
-> * The native AOT feature is currently in preview.
-> * In .NET 8, not all ASP.NET Core features are compatible with native AOT.
-> * Tabs are provided for the [.NET Core CLI](/dotnet/core/tools/) and [Visual Studio](https://visualstudio.microsoft.com/vs/preview/) instructions:
+> * The Native AOT feature is currently in preview.
+> * In .NET 8, not all ASP.NET Core features are compatible with Native AOT.
+> * Tabs are provided for the [.NET CLI](/dotnet/core/tools/) and [Visual Studio](https://visualstudio.microsoft.com/vs/preview/) instructions:
 >   * Visual Studio is a prerequisite even if the CLI tab is selected.
 >   * The CLI must be used to publish even if the Visual Studio tab is selected.
 
 ## Prerequisites
 
-# [.NET Core CLI](#tab/netcore-cli) 
+# [.NET CLI](#tab/net-cli) 
 
 * [!INCLUDE[](~/includes/8.0-SDK.md)]
-* On Linux, see [Prerequisites for native AOT deployment](/dotnet/core/deploying/native-aot/?tabs=net8plus#prerequisites-for-native-aot-deployment).
+* On Linux, see [Prerequisites for Native AOT deployment](/dotnet/core/deploying/native-aot/?tabs=net8plus#prerequisites-for-native-aot-deployment).
 * [Visual Studio 2022 Preview](https://visualstudio.microsoft.com/vs/preview/) with the **Desktop development with C++** workload installed.
 
   ![Visual Studio workload selection dialog showing "Desktop development with C++" selected.](~/fundamentals/aot/_static/cpponly.png)
 
 > [!NOTE]
-> Visual Studio 2022 Preview is required because native AOT requires [link.exe](/cpp/build/reference/linker-options) and the Visual C++ static runtime libraries. There are no plans to support native AOT ***without*** Visual Studio.
+> Visual Studio 2022 Preview is required because Native AOT requires [link.exe](/cpp/build/reference/linker-options) and the Visual C++ static runtime libraries. There are no plans to support Native AOT ***without*** Visual Studio.
 
 # [Visual Studio](#tab/visual-studio)
 
@@ -45,11 +53,11 @@ ASP.NET Core 8.0 introduces support for [.NET native ahead-of-time (AOT)](/dotne
 
 ---
 
-## Create a web app with native AOT
+## Create a web app with Native AOT
 
-Create an ASP.NET Core API app that is configured to work with native AOT:
+Create an ASP.NET Core API app that is configured to work with Native AOT:
 
-# [.NET Core CLI](#tab/netcore-cli) 
+# [.NET CLI](#tab/net-cli) 
 
 Run the following commands:
 
@@ -60,7 +68,7 @@ dotnet new webapiaot -o MyFirstAotWebApi && cd MyFirstAotWebApi
 Output similar to the following example is displayed:
 
 ```output
-The template "ASP.NET Core Web API (native AOT)" was created successfully.
+The template "ASP.NET Core Web API (Native AOT)" was created successfully.
 
 Processing post-creation actions...
 Restoring C:\Code\Demos\MyFirstAotWebApi\MyFirstAotWebApi.csproj:
@@ -71,17 +79,17 @@ Restore succeeded.
 
 # [Visual Studio](#tab/visual-studio)
 
-1. Create a new `ASP.NET Core Web API (native AOT)` project.
+1. Create a new `ASP.NET Core Web API (Native AOT)` project.
 1. Name the project **MyFirstAotWebApi**.
 1. Select **Create**.
 
 ---
 
-## Publish the native AOT app
+## Publish the Native AOT app
 
-Verify the app can be published using native AOT:
+Verify the app can be published using Native AOT:
 
-# [.NET Core CLI](#tab/netcore-cli) 
+# [.NET CLI](#tab/net-cli) 
 
 ```dotnetcli
 dotnet publish
@@ -161,3 +169,9 @@ info: Microsoft.Hosting.Lifetime[0]
 
 * <xref:fundamentals/native-aot>
 * [Native AOT deployment](/dotnet/core/deploying/native-aot/)
+* [Using the configuration binder source generator](https://andrewlock.net/exploring-the-dotnet-8-preview-using-the-new-configuration-binder-source-generator/)
+* [The minimal API AOT compilation template](https://andrewlock.net/exploring-the-dotnet-8-preview-the-minimal-api-aot-template/)
+* [Comparing `WebApplication.CreateBuilder` to `CreateSlimBuilder`](https://andrewlock.net/exploring-the-dotnet-8-preview-comparing-createbuilder-to-the-new-createslimbuilder-method/)
+* [Exploring the new minimal API source generator](https://andrewlock.net/exploring-the-dotnet-8-preview-exploring-the-new-minimal-api-source-generator/)
+* [Replacing method calls with Interceptors](https://andrewlock.net/exploring-the-dotnet-8-preview-changing-method-calls-with-interceptors/)
+* [Configuration-binding source generator](/dotnet/core/whats-new/dotnet-8#configuration-binding-source-generator)

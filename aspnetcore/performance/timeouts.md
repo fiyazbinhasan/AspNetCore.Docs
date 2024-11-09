@@ -2,7 +2,7 @@
 title: Request timeouts middleware in ASP.NET Core
 description: Learn how to configure and use request timeout middleware in ASP.NET Core.
 author: tdykstra
-ms.author: riande
+ms.author: tdykstra
 monikerRange: '>= aspnetcore-8.0'
 ms.date: 09/25/2023
 uid: performance/timeouts
@@ -36,7 +36,7 @@ Adding the middleware to the app doesn't automatically start triggering timeouts
 
 ## Configure one endpoint or page
 
-For minimal API apps, configure an endpoint to time out by calling <xref:Microsoft.AspNetCore.Builder.RequestTimeoutsIEndpointConventionBuilderExtensions.WithRequestTimeout%2A>, or by applying the [`[RequestTimeout]`](xref:Microsoft.AspNetCore.Http.Timeouts.RequestTimeoutAttribute) attribute, as shown in the following example:
+For minimal API apps, configure an endpoint to timeout by calling <xref:Microsoft.AspNetCore.Builder.RequestTimeoutsIEndpointConventionBuilderExtensions.WithRequestTimeout%2A>, or by applying the [`[RequestTimeout]`](xref:Microsoft.AspNetCore.Http.Timeouts.RequestTimeoutAttribute) attribute, as shown in the following example:
 
 :::code language="csharp" source="~/performance/timeouts/samples/8.x/Program.cs" id="oneendpoint" highlight="20,24":::
 

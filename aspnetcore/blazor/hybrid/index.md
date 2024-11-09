@@ -5,7 +5,7 @@ description: Explore ASP.NET Core Blazor Hybrid, a way to build interactive clie
 monikerRange: '>= aspnetcore-6.0'
 ms.author: riande
 ms.custom: "mvc"
-ms.date: 11/21/2022
+ms.date: 02/09/2024
 uid: blazor/hybrid/index
 ---
 # ASP.NET Core Blazor Hybrid
@@ -86,6 +86,32 @@ For more information, see the following resources:
 
 * [Xamarin.Forms String and Image Localization](/xamarin/xamarin-forms/app-fundamentals/localization/): The guidance generally applies to Blazor Hybrid apps. Not every scenario is supported at this time.
 * [Blazor Image component to display images that are not accessible through HTTP endpoints (dotnet/aspnetcore #25274)](https://github.com/dotnet/aspnetcore/issues/25274)
+
+:::moniker range=">= aspnetcore-8.0"
+
+## Access scoped services from native UI
+
+<xref:Microsoft.AspNetCore.Components.WebView.Maui.BlazorWebView> has a <xref:Microsoft.AspNetCore.Components.WebView.Wpf.BlazorWebView.TryDispatchAsync%2A> method that calls a specified `Action<ServiceProvider>` asynchronously and passes in the scoped services available in Razor components. This enables code from the native UI to access scoped services such as <xref:Microsoft.AspNetCore.Components.NavigationManager>:
+
+```csharp
+private async void MyMauiButtonHandler(object sender, EventArgs e)
+{
+    var wasDispatchCalled = await _blazorWebView.TryDispatchAsync(sp =>
+    {
+        var navMan = sp.GetRequiredService<NavigationManager>();
+        navMan.CallSomeNavigationApi(...);
+    });
+
+    if (!wasDispatchCalled)
+    {
+        ...
+    }
+}
+```
+
+When `wasDispatchCalled` is `false`, consider what to do if the call wasn't dispatched. Generally, the dispatch shouldn't fail. If it fails, OS resources might be exhausted. If resources are exhausted, consider logging a message, throwing an exception, and perhaps alerting the user.
+
+:::moniker-end
 
 ## Additional resources
 

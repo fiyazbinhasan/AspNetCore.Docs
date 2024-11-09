@@ -5,7 +5,7 @@ description: Learn how to secure an ASP.NET Core Blazor WebAssembly standalone a
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 03/15/2023
+ms.date: 06/07/2024
 uid: blazor/security/webassembly/standalone-with-authentication-library
 ---
 # Secure an ASP.NET Core Blazor WebAssembly standalone app with the Authentication library
@@ -14,7 +14,7 @@ uid: blazor/security/webassembly/standalone-with-authentication-library
 
 This article explains how to secure an ASP.NET Core Blazor WebAssembly standalone app with the Blazor WebAssembly Authentication library.
 
-The Blazor WebAssembly Authentication library (`Authentication.js`) only supports the Proof Key for Code Exchange (PKCE) authorization code flow via the [Microsoft Authentication Library (MSAL, `msal.js`)](/azure/active-directory/develop/msal-overview). To implement other grant flows, access the MSAL guidance to implement MSAL directly, but we don't support or recommend the use of grant flows other than PKCE for Blazor apps.
+The Blazor WebAssembly Authentication library (`Authentication.js`) only supports the Proof Key for Code Exchange (PKCE) authorization code flow via the [Microsoft Authentication Library (MSAL, `msal.js`)](/entra/identity-platform/msal-overview). To implement other grant flows, access the MSAL guidance to implement MSAL directly, but we don't support or recommend the use of grant flows other than PKCE for Blazor apps.
 
 *For Microsoft Entra (ME-ID) and Azure Active Directory B2C (AAD B2C) guidance, don't follow the guidance in this topic. See <xref:blazor/security/webassembly/standalone-with-microsoft-entra-id> or <xref:blazor/security/webassembly/standalone-with-azure-active-directory-b2c>.*
 
@@ -30,7 +30,7 @@ The subsections of the walkthrough explain how to:
 
 ### Register an app
 
-Register an app with an [OpenID Connect (OIDC)](https://openid.net/connect/) Identity Provider (IP) following the guidance provided by the maintainer of the IP.
+Register an app with an [OpenID Connect (OIDC)](https://openid.net/developers/how-connect-works/) Identity Provider (IP) following the guidance provided by the maintainer of the IP.
 
 Record the following information:
 
@@ -57,13 +57,13 @@ After choosing the **Blazor WebAssembly App** template, set the **Authentication
 
 :::moniker range="< aspnetcore-8.0"
 
-After choosing the **Blazor WebAssembly App** template, set the **Authentication type** to **Individual Accounts**. Confirm that the **ASP.NET Core Hosted** checkbox is ***not*** selected.
+After choosing the **Blazor WebAssembly App** template, set the **Authentication type** to **Individual Accounts**. Confirm that the **ASP.NET Core Hosted** checkbox isn't selected.
 
 :::moniker-end
 
 The **Individual Accounts** selection uses ASP.NET Core's [Identity](xref:security/authentication/identity) system. This selection adds authentication support and doesn't result in storing users in a database. The following sections of this article provide further details.
 
-# [Visual Studio Code / .NET Core CLI](#tab/visual-studio-code+netcore-cli)
+# [Visual Studio Code / .NET CLI](#tab/visual-studio-code+net-cli)
 
 Create a new Blazor WebAssembly project with an authentication mechanism in an empty folder. Specify the `Individual` authentication mechanism with the `-au|--auth` option to use ASP.NET Core's [Identity](xref:security/authentication/identity) system. This selection adds authentication support and doesn't result in storing users in a database. The following sections of this article provide further details.
 
@@ -103,7 +103,7 @@ Google OAuth 2.0 OIDC example for an app that runs on the `localhost` address at
     "ClientId": "2...7-e...q.apps.googleusercontent.com",
     "PostLogoutRedirectUri": "https://localhost:5001/authentication/logout-callback",
     "RedirectUri": "https://localhost:5001/authentication/login-callback",
-    "ResponseType": "id_token"
+    "ResponseType": "code"
   }
 }
 ```
@@ -121,7 +121,7 @@ Use one of the following approaches to run the app:
   * Select the **Run** button.
   * Use **Debug** > **Start Debugging** from the menu.
   * Press <kbd>F5</kbd>.
-* .NET CLI command shell: Execute the `dotnet run` command from the app's folder.
+* .NET CLI command shell: Execute the `dotnet watch` (or `dotnet run`) command from the app's folder.
 
 ## Parts of the app
 
@@ -212,7 +212,7 @@ For more information, see the following sections of the *Additional scenarios* a
 
 ## Troubleshoot
 
-[!INCLUDE[](~/blazor/security/includes/troubleshoot.md)]
+[!INCLUDE[](~/blazor/security/includes/troubleshoot-wasm.md)]
 
 ## Additional resources
 

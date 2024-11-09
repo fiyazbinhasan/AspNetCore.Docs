@@ -3,11 +3,13 @@ title: ASP.NET Core Best Practices
 author: mjrousos
 description: Tips for maximizing performance and reliability in ASP.NET Core apps.
 monikerRange: '>= aspnetcore-2.1'
-ms.author: riande
+ms.author: tdykstra
 ms.date: 12/20/2022
 uid: fundamentals/best-practices
 ---
 # ASP.NET Core Best Practices
+
+[!INCLUDE[](~/includes/not-latest-version.md)]
 
 By [Mike Rousos](https://github.com/mjrousos)
 
@@ -35,6 +37,7 @@ A common performance problem in ASP.NET Core apps is blocking calls that could b
 * **Do** call data access, I/O, and long-running operations APIs asynchronously if an asynchronous API is available.
 * **Do not** use <xref:System.Threading.Tasks.Task.Run%2A?displayProperty=nameWithType> to make a synchronous API asynchronous.
 * **Do** make controller/Razor Page actions asynchronous. The entire call stack is asynchronous in order to benefit from [async/await](/dotnet/csharp/programming-guide/concepts/async/) patterns.
+* **Consider** using message brokers like [Azure Service Bus](/azure/service-bus-messaging/service-bus-messaging-overview) to offload long-running calls
 
 A profiler, such as [PerfView](https://github.com/Microsoft/perfview), can be used to find threads frequently added to the [Thread Pool](/windows/desktop/procthread/thread-pools). The `Microsoft-Windows-DotNETRuntime/ThreadPoolWorkerThread/Start` event indicates a thread added to the thread pool. <!--  For more information, see [async guidance docs](TBD-Link_To_Davifowl_Doc)  -->
 
@@ -130,7 +133,7 @@ Most requests to an ASP.NET Core app can be handled by a controller or page mode
 Recommendations:
 
 * **Do not** wait for long-running tasks to complete as part of ordinary HTTP request processing.
-* **Do** consider handling long-running requests with [background services](xref:fundamentals/host/hosted-services) or out of process with an [Azure Function](/azure/azure-functions/). Completing work out-of-process is especially beneficial for CPU-intensive tasks.
+* **Do** consider handling long-running requests with [background services](xref:fundamentals/host/hosted-services) or out of process possibly with an [Azure Function](/azure/azure-functions/) and/or using a message broker like [Azure Service Bus](/azure/service-bus-messaging/service-bus-messaging-overview). Completing work out-of-process is especially beneficial for CPU-intensive tasks.
 * **Do** use real-time communication options, such as [SignalR](xref:signalr/introduction), to communicate with clients asynchronously.
 
 ## Minify client assets
@@ -259,7 +262,7 @@ The preceding code frequently captures a null or incorrect `HttpContext` in the 
 
 ## Do not access HttpContext from multiple threads
 
-`HttpContext` is **not** thread-safe. Accessing `HttpContext` from multiple threads in parallel can result in unexpected behavior such as hangs, crashes, and data corruption.
+`HttpContext` is **not** thread-safe. Accessing `HttpContext` from multiple threads in parallel can result in unexpected behavior such as the server to stop responding, crashes, and data corruption.
 
 **Do not do this:** The following example makes three parallel requests and logs the incoming request path before and after the outgoing HTTP request. The request path is accessed from multiple threads, potentially in parallel.
 
@@ -365,7 +368,7 @@ For more information, see [Host ASP.NET Core on Windows with IIS](xref:host-and-
 
 ## Don't assume that HttpRequest.ContentLength is not null
 
-`HttpRequest.ContentLength` is null if the `Content-Length` header is not received. Null in that case means the length of the request body is not known; it doesn't mean the length is zero. Because all comparisons with null (except `==`) return false, the comparison `Request.ContentLength > 1024`, for example, might return `false` when the request body size is more than 1024. Not knowing this can lead to security holes in apps. You might think you're guarding against too-large requests when you aren't.
+`HttpRequest.ContentLength` is null if the `Content-Length` header is not received. Null in that case means the length of the request body is not known; it doesn't mean the length is zero. Because all comparisons with null (except `==`) return false, the comparison `Request.ContentLength > 1024`, for example, might return `false` when the request body size is more than 1024. Not knowing this can lead to security holes in apps. You might think you're protecting against too-large requests when you aren't.
 
 For more information, see [this StackOverflow answer](https://stackoverflow.com/a/73201538/652224).
 

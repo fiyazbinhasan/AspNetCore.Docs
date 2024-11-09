@@ -3,8 +3,8 @@ title: Introduction to Razor Pages in ASP.NET Core
 author: tdykstra
 description: Explains how Razor Pages in ASP.NET Core makes coding page-focused scenarios easier and more productive than using MVC.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.date: 08/28/2023
+ms.author: tdykstra
+ms.date: 8/28/2023
 uid: razor-pages/index
 ---
 
@@ -134,7 +134,7 @@ The `PageModel` class allows separation of the logic of a page from its presenta
 
 The page has an `OnPostAsync` *handler method*, which runs on `POST` requests (when a user posts the form). Handler methods for any HTTP verb can be added. The most common handlers are:
 
-* `OnGet` to initialize state needed for the page. In the preceding code, the `OnGet` method displays the `CreateModel.cshtml` Razor Page.
+* `OnGet` to initialize state needed for the page. In the preceding code, the `OnGet` method displays the `Create.cshtml` Razor Page.
 * `OnPost` to handle form submissions.
 
 The `Async` naming suffix is optional but is often used by convention for asynchronous functions. The preceding code is typical for Razor Pages.
@@ -187,7 +187,7 @@ In the previous code, posting the form:
 
 The `Customer` property uses [`[BindProperty]`](xref:Microsoft.AspNetCore.Mvc.BindPropertyAttribute) attribute to opt in to model binding:
 
-[!code-csharp[](~/razor-pages/index/6.0sample/RazorPagesContacts/Pages/Customers/Create.cshtml.cs?name=snippet&highlight=15-16)]
+[!code-csharp[](~/razor-pages/index/6.0sample/RazorPagesContacts/Pages/Customers/Create.cshtml.cs?name=snippet_OnPostAsync&highlight=1-2)]
 
 `[BindProperty]` should **not** be used on models containing properties that should not be changed by the client. For more information, see [Overposting](xref:data/ef-rp/crud#overposting).
 

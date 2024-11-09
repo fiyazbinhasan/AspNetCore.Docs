@@ -3,7 +3,7 @@ title: App startup in ASP.NET Core
 author: rick-anderson
 description: Learn how the Startup class in ASP.NET Core configures services and the app's request pipeline.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
+ms.author: wpickett
 ms.custom: mvc
 ms.date: 5/5/2023
 uid: fundamentals/startup
@@ -17,6 +17,8 @@ By [Rick Anderson](https://twitter.com/RickAndMSFT)
 :::moniker range=">= aspnetcore-7.0"
 
 ASP.NET Core apps created with the web templates contain the application startup code in the `Program.cs` file.
+
+For Blazor startup guidance, which adds to or supersedes the guidance in this article, see <xref:blazor/fundamentals/startup>.
 
 The following app startup code supports:
 

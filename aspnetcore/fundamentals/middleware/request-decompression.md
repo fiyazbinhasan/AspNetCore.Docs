@@ -9,6 +9,8 @@ uid: fundamentals/middleware/request-decompression
 ---
 # Request decompression in ASP.NET Core
 
+[!INCLUDE[](~/includes/not-latest-version.md)]
+
 By [David Acker](https://github.com/david-acker)
 
 Request decompression middleware:
@@ -33,7 +35,7 @@ If the middleware encounters a request with compressed content but is unable to 
 
 ## Configuration
 
-The following code shows how to enable request decompression for the [default](#default) `Content-Encoding` types:
+The following code uses <xref:Microsoft.Extensions.DependencyInjection.RequestDecompressionServiceExtensions.AddRequestDecompression(Microsoft.Extensions.DependencyInjection.IServiceCollection)> and <xref:Microsoft.AspNetCore.Builder.RequestDecompressionBuilderExtensions.UseRequestDecompression%2A> to enable request decompression for the [default](#default) `Content-Encoding` types:
 
 [!code-csharp[](samples/request-decompression/7.x/Program.cs?name=snippet_WithDefaultProviders&highlight=3,7)]
 
@@ -61,7 +63,7 @@ Custom decompression providers are registered with <xref:Microsoft.AspNetCore.Re
 
 ## Request size limits
 
-In order to guard against [zip bombs or decompression bombs](https://en.wikipedia.org/wiki/Zip_bomb):
+In order to protect against [zip bombs or decompression bombs](https://en.wikipedia.org/wiki/Zip_bomb):
 
 * The maximum size of the decompressed request body is limited to the request body size limit enforced by the endpoint or server.
 * If the number of bytes read from the decompressed request body stream exceeds the limit, an [InvalidOperationException](xref:System.InvalidOperationException) is thrown to prevent additional bytes from being read from the stream.

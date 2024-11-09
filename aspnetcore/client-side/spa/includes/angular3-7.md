@@ -17,7 +17,7 @@ dotnet new angular -o my-new-app
 cd my-new-app
 ```
 
-Run the app from either Visual Studio or the .NET Core CLI:
+Run the app from either Visual Studio or the .NET CLI:
 
 # [Visual Studio](#tab/visual-studio/)
 
@@ -25,7 +25,7 @@ Open the generated `.csproj` file, and run the app as normal from there.
 
 The build process restores npm dependencies on the first run, which can take several minutes. Subsequent builds are much faster.
 
-# [.NET Core CLI](#tab/netcore-cli/)
+# [.NET CLI](#tab/net-cli/)
 
 Ensure you have an environment variable called `ASPNETCORE_ENVIRONMENT` with a value of `Development`. On Windows (in non-PowerShell prompts), run `SET ASPNETCORE_ENVIRONMENT=Development`. On Linux or macOS, run `export ASPNETCORE_ENVIRONMENT=Development`.
 
@@ -39,7 +39,7 @@ The project template creates an ASP.NET Core app and an Angular app. The ASP.NET
 
 ## Add pages, images, styles, and modules
 
-The `ClientApp` directory contains a standard Angular CLI app. See the official [Angular documentation](https://angular.io) for more information.
+The `ClientApp` directory contains a standard Angular CLI app. See the official [Angular documentation](https://angular.dev) for more information.
 
 There are slight differences between the Angular app created by this template and the one created by Angular CLI itself (via `ng new`); however, the app's capabilities are unchanged. The app created by the template contains a [Bootstrap](https://getbootstrap.com/)-based layout and a basic routing example.
 
@@ -51,7 +51,7 @@ In a command prompt, switch to the `ClientApp` subdirectory:
 cd ClientApp
 ```
 
-If you have the `ng` tool installed globally, you can run any of its commands. For example, you can run `ng lint`, `ng test`, or any of the other [Angular CLI commands](https://angular.io/cli). There's no need to run `ng serve` though, because your ASP.NET Core app deals with serving both server-side and client-side parts of your app. Internally, it uses `ng serve` in development.
+If you have the `ng` tool installed globally, you can run any of its commands. For example, you can run `ng lint`, `ng test`, or any of the other [Angular CLI commands](https://angular.dev/cli). There's no need to run `ng serve` though, because your ASP.NET Core app deals with serving both server-side and client-side parts of your app. Internally, it uses `ng serve` in development.
 
 If you don't have the `ng` tool installed, run `npm run ng` instead. For example, you can run `npm run ng lint` or `npm run ng test`.
 
@@ -87,7 +87,7 @@ npm start
 
 When you start your ASP.NET Core app, it won't launch an Angular CLI server. The instance you started manually is used instead. This enables it to start and restart faster. It's no longer waiting for Angular CLI to rebuild your client app each time.
 
-When the proxy is launched, the target URL and port is inferred from the environment variables set by .NET, `ASPNETCORE_URLS` and `ASPNETCORE_HTTPS_PORT`. To set the URLs or HTTPS port, use one of the environment variables or change the value in `proxy.conf.json`.
+When the proxy is launched, the target URL and port is inferred from the environment variables set by .NET, `ASPNETCORE_URLS` and `ASPNETCORE_HTTPS_PORTS`. To set the URLs or HTTPS port, use one of the environment variables or change the value in `proxy.conf.json`.
 
 [!INCLUDE[](~/includes/spa-proxy.md)]
 
@@ -112,7 +112,7 @@ dotnet new angular -o my-new-app
 cd my-new-app
 ```
 
-Run the app from either Visual Studio or the .NET Core CLI:
+Run the app from either Visual Studio or the .NET CLI:
 
 # [Visual Studio](#tab/visual-studio/)
 
@@ -120,7 +120,7 @@ Open the generated `.csproj` file, and run the app as normal from there.
 
 The build process restores npm dependencies on the first run, which can take several minutes. Subsequent builds are much faster.
 
-# [.NET Core CLI](#tab/netcore-cli/)
+# [.NET CLI](#tab/net-cli/)
 
 Ensure you have an environment variable called `ASPNETCORE_ENVIRONMENT` with a value of `Development`. On Windows (in non-PowerShell prompts), run `SET ASPNETCORE_ENVIRONMENT=Development`. On Linux or macOS, run `export ASPNETCORE_ENVIRONMENT=Development`.
 
@@ -144,7 +144,7 @@ The project template creates an ASP.NET Core app and an Angular app. The ASP.NET
 
 ## Add pages, images, styles, and modules
 
-The `ClientApp` directory contains a standard Angular CLI app. See the official [Angular documentation](https://angular.io) for more information.
+The `ClientApp` directory contains a standard Angular CLI app. See the official [Angular documentation](https://angular.dev) for more information.
 
 There are slight differences between the Angular app created by this template and the one created by Angular CLI itself (via `ng new`); however, the app's capabilities are unchanged. The app created by the template contains a [Bootstrap](https://getbootstrap.com/)-based layout and a basic routing example.
 
@@ -156,7 +156,7 @@ In a command prompt, switch to the `ClientApp` subdirectory:
 cd ClientApp
 ```
 
-If you have the `ng` tool installed globally, you can run any of its commands. For example, you can run `ng lint`, `ng test`, or any of the other [Angular CLI commands](https://angular.io/cli). There's no need to run `ng serve` though, because your ASP.NET Core app deals with serving both server-side and client-side parts of your app. Internally, it uses `ng serve` in development.
+If you have the `ng` tool installed globally, you can run any of its commands. For example, you can run `ng lint`, `ng test`, or any of the other [Angular CLI commands](https://angular.dev/cli). There's no need to run `ng serve` though, because your ASP.NET Core app deals with serving both server-side and client-side parts of your app. Internally, it uses `ng serve` in development.
 
 If you don't have the `ng` tool installed, run `npm run ng` instead. For example, you can run `npm run ng lint` or `npm run ng test`.
 
@@ -201,7 +201,7 @@ There's a drawback to this default setup. Each time you modify your C# code and 
 
 When you start your ASP.NET Core app, it won't launch an Angular CLI server. The instance you started manually is used instead. This enables it to start and restart faster. It's no longer waiting for Angular CLI to rebuild your client app each time.
 
-When the proxy is launched, the target URL and port is inferred from the environment variables set by .NET, `ASPNETCORE_URLS` and `ASPNETCORE_HTTPS_PORT`. To set the URLs or HTTPS port, use one of the environment variables or change the value in `proxy.conf.json`.
+When the proxy is launched, the target URL and port is inferred from the environment variables set by .NET, `ASPNETCORE_URLS` and `ASPNETCORE_HTTPS_PORTS`. To set the URLs or HTTPS port, use one of the environment variables or change the value in `proxy.conf.json`.
 
 ### Pass data from .NET code into TypeScript code
 

@@ -5,7 +5,7 @@ description: Learn how to control head content in Blazor apps, including how to 
 monikerRange: '>= aspnetcore-6.0'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/components/control-head-content
 ---
 # Control `<head>` content in ASP.NET Core Blazor apps
@@ -24,15 +24,27 @@ The following example sets the page's title and description using Razor.
 
 `ControlHeadContent.razor`:
 
-:::moniker range=">= aspnetcore-7.0"
+:::moniker range=">= aspnetcore-9.0"
 
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/control-head-content/ControlHeadContent.razor" highlight="13,15-17":::
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/ControlHeadContent.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/ControlHeadContent.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
+
+:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/control-head-content/ControlHeadContent.razor":::
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-7.0"
 
-:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/control-head-content/ControlHeadContent.razor" highlight="13,15-17":::
+:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/control-head-content/ControlHeadContent.razor":::
 
 :::moniker-end
 
@@ -59,6 +71,20 @@ In a **required**, shared `_Layout.cshtml` file of a prerendered hosted Blazor W
 ```
 
 :::moniker-end
+
+## Set a page title for components via a layout
+
+Set the page title in a [layout component](xref:blazor/components/layouts):
+
+```razor
+@inherits LayoutComponentBase
+
+<PageTitle>Page Title</PageTitle>
+
+<div class="page">
+    ...  
+</div>
+```
 
 ## `HeadOutlet` component
 
@@ -111,32 +137,49 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 
 When the [`::after` pseudo-selector](https://developer.mozilla.org/docs/Web/CSS/::after) is specified, the contents of the root component are appended to the existing head contents instead of replacing the content. This allows the app to retain static head content in `wwwroot/index.html` without having to repeat the content in the app's Razor components.
 
-## Not found page title
+:::moniker range=">= aspnetcore-8.0"
+
+## Set a default page title in a Blazor Web App
+
+Set the page title in the `App` component (`App.razor`):
+
+```razor
+<head>
+    ...
+    <HeadOutlet />
+    <PageTitle>Page Title</PageTitle>
+</head>
+```
+
+:::moniker-end
+
+## Not found page title in a Blazor WebAssembly app
 
 :::moniker range=">= aspnetcore-8.0"
 
-*This section only applies to Blazor WebAssembly apps.*
-
-In Blazor apps created from Blazor WebAssembly project template, the `NotFound` component template in the `App` component (`App.razor`) sets the page title to `Not found`.
+In Blazor apps created from the Blazor WebAssembly Standalone App project template, the `NotFound` component template in the `App` component (`App.razor`) sets the page title to `Not found`.
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-8.0"
 
-In Blazor apps created from Blazor project templates, the `NotFound` component template in the `App` component (`App.razor`) sets the page title to `Not found`.
+In Blazor apps created from a Blazor project template, the `NotFound` component template in the `App` component (`App.razor`) sets the page title to `Not found`.
 
 :::moniker-end
 
 `App.razor`:
 
 ```razor
-<PageTitle>Not found</PageTitle>
+<NotFound>
+    <PageTitle>Not found</PageTitle>
+    ...
+</NotFound>
 ```
 
 ## Additional resources
 
 * [Control headers in C# code at startup](xref:blazor/fundamentals/startup#control-headers-in-c-code)
-* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples)
+* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))
 
 Mozilla MDN Web Docs documentation:
 

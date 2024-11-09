@@ -5,37 +5,39 @@ description: Learn how to secure Blazor WebAssembly apps as single-page applicat
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 02/28/2023
+ms.date: 02/09/2024
 uid: blazor/security/webassembly/index
 ---
 # Secure ASP.NET Core Blazor WebAssembly
 
 [!INCLUDE[](~/includes/not-latest-version.md)]
 
-Blazor WebAssembly apps are secured in the same manner as single-page applications (SPAs). There are several approaches for authenticating users to SPAs, but the most common and comprehensive approach is to use an implementation based on the [OAuth 2.0 protocol](https://oauth.net/), such as [OpenID Connect (OIDC)](https://openid.net/connect/).
+Blazor WebAssembly apps are secured in the same manner as single-page applications (SPAs). There are several approaches for authenticating users to SPAs, but the most common and comprehensive approach is to use an implementation based on the [OAuth 2.0 protocol](https://oauth.net/), such as [OpenID Connect (OIDC)](https://openid.net/developers/how-connect-works/).
 
 The Blazor WebAssembly security documentation primarily focuses on how to accomplish user authentication and authorization tasks. For OAuth 2.0/OIDC general concept coverage, see the resources in the [main overview article's *Additional resources* section](xref:blazor/security/index#additional-resources).
 
-## Client-side/SPA security
+## Client-side/SPA security of sensitive data and credentials
 
-A Blazor WebAssembly app's .NET/C# codebase is served to clients, and the app's code can't be protected from inspection and tampering by users. Never place anything of a secret nature into a Blazor WebAssembly app, such as private .NET/C# code, security keys, passwords, or any other type of sensitive information.
+A Blazor WebAssembly app's .NET/C# codebase is served to clients, and the app's code can't be protected from inspection and tampering by users. Never place credentials or secrets into a Blazor WebAssembly app, such as app secrets, connection strings, passwords, private .NET/C# code, or other sensitive data.
 
 To protect .NET/C# code and use [ASP.NET Core Data Protection](xref:security/data-protection/introduction) features to secure data, use a server-side ASP.NET Core web API. Have the client-side Blazor WebAssembly app call the server-side web API for secure app features and data processing. For more information, see <xref:blazor/call-web-api?pivots=webassembly> and the articles in this node.
 
+For local development testing, the [Secret Manager tool](xref:security/app-secrets) is recommended for securing sensitive data.
+
 ## Authentication library
 
-Blazor WebAssembly supports authenticating and authorizing apps using OIDC via the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) library using the [Microsoft Identity Platform](/azure/active-directory/develop/). The library provides a set of primitives for seamlessly authenticating against ASP.NET Core backends. The library can authenticate against any third-party Identity Provider (IP) that supports OIDC, which are called OpenID Providers (OP).
+Blazor WebAssembly supports authenticating and authorizing apps using OIDC via the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) library using the [Microsoft identity platform](/entra/identity-platform/). The library provides a set of primitives for seamlessly authenticating against ASP.NET Core backends. The library can authenticate against any third-party Identity Provider (IP) that supports OIDC, which are called OpenID Providers (OP).
 
-The authentication support in the Blazor WebAssembly Library (`Authentication.js`) is built on top of the [Microsoft Authentication Library (MSAL, `msal.js`)](/azure/active-directory/develop/msal-overview), which is used to handle the underlying authentication protocol details. The Blazor WebAssembly Library only supports the Proof Key for Code Exchange (PKCE) authorization code flow. Implicit grant isn't supported.
+The authentication support in the Blazor WebAssembly Library (`Authentication.js`) is built on top of the [Microsoft Authentication Library (MSAL, `msal.js`)](/entra/identity-platform/msal-overview), which is used to handle the underlying authentication protocol details. The Blazor WebAssembly Library only supports the Proof Key for Code Exchange (PKCE) authorization code flow. Implicit grant isn't supported.
 
 Other options for authenticating SPAs exist, such as the use of SameSite cookies. However, the engineering design of Blazor WebAssembly uses OAuth and OIDC as the best option for authentication in Blazor WebAssembly apps. [Token-based authentication](xref:security/anti-request-forgery#token-based-authentication) based on [JSON Web Tokens (JWTs)](https://datatracker.ietf.org/doc/html/rfc7519) was chosen over [cookie-based authentication](xref:security/anti-request-forgery#cookie-based-authentication) for functional and security reasons:
 
 :::moniker range=">= aspnetcore-8.0"
 
-* Using a token-based protocol offers a smaller attack surface area, as the tokens aren't sent in all requests.
-* Server endpoints don't require protection against [Cross-Site Request Forgery (CSRF)](xref:security/anti-request-forgery) because the tokens are sent explicitly. This allows you to host Blazor WebAssembly apps alongside MVC or Razor pages apps.
+* Using a token-based protocol offers fewer vulnerabilities, as the tokens aren't sent in all requests.
+* The tokens are explicitly sent to the server, so server endpoints don't require protection against [Cross-Site Request Forgery (CSRF)](xref:security/anti-request-forgery). This allows you to host Blazor WebAssembly apps alongside MVC or Razor pages apps.
 * Tokens have narrower permissions than cookies. For example, tokens can't be used to manage the user account or change a user's password unless such functionality is explicitly implemented.
-* Tokens have a short lifetime, one hour by default, which limits the attack window. Tokens can also be revoked at any time.
+* Tokens have a short lifetime, one hour, which limits the attack window. Tokens can also be revoked at any time.
 * Self-contained JWTs offer guarantees to the client and server about the authentication process. For example, a client has the means to detect and validate that the tokens it receives are legitimate and were emitted as part of a given authentication process. If a third party attempts to switch a token in the middle of the authentication process, the client can detect the switched token and avoid using it.
 * Tokens with OAuth and OIDC don't rely on the user agent behaving correctly to ensure that the app is secure.
 * Token-based protocols, such as OAuth and OIDC, allow for authenticating and authorizing users in standalone Blazor Webassembly apps with the same set of security characteristics.
@@ -44,10 +46,10 @@ Other options for authenticating SPAs exist, such as the use of SameSite cookies
 
 :::moniker range="< aspnetcore-8.0"
 
-* Using a token-based protocol offers a smaller attack surface area, as the tokens aren't sent in all requests.
-* Server endpoints don't require protection against [Cross-Site Request Forgery (CSRF)](xref:security/anti-request-forgery) because the tokens are sent explicitly. This allows you to host Blazor WebAssembly apps alongside MVC or Razor pages apps.
+* Using a token-based protocol offers fewer vulnerabilities, as the tokens aren't sent in all requests.
+* The tokens are explicitly sent to the server, so server endpoints don't require protection against [Cross-Site Request Forgery (CSRF)](xref:security/anti-request-forgery). This allows you to host Blazor WebAssembly apps alongside MVC or Razor pages apps.
 * Tokens have narrower permissions than cookies. For example, tokens can't be used to manage the user account or change a user's password unless such functionality is explicitly implemented.
-* Tokens have a short lifetime, one hour by default, which limits the attack window. Tokens can also be revoked at any time.
+* Tokens have a short lifetime, one hour, which limits the attack window. Tokens can also be revoked at any time.
 * Self-contained JWTs offer guarantees to the client and server about the authentication process. For example, a client has the means to detect and validate that the tokens it receives are legitimate and were emitted as part of a given authentication process. If a third party attempts to switch a token in the middle of the authentication process, the client can detect the switched token and avoid using it.
 * Tokens with OAuth and OIDC don't rely on the user agent behaving correctly to ensure that the app is secure.
 * Token-based protocols, such as OAuth and OIDC, allow for authenticating and authorizing users of hosted Blazor WebAssembly solution clients and standalone Blazor Webassembly apps with the same set of security characteristics.
@@ -104,7 +106,7 @@ The state stored by the History API provides the following benefits for remote a
 
 * The state passed to the secured app endpoint is tied to the navigation performed to authenticate the user at the `authentication/login` endpoint.
 * Extra work encoding and decoding data is avoided.
-* The attack surface area is reduced. Unlike using the query string to store navigation state, a top-level navigation or influence from a different origin can't set the state stored by the History API.
+* Vulnerabilities are reduced. Unlike using the query string to store navigation state, a top-level navigation or influence from a different origin can't set the state stored by the History API.
 * The history entry is replaced upon successful authentication, so the state attached to the history entry is removed and doesn't require clean up.
 
 <xref:Microsoft.AspNetCore.Components.WebAssembly.Authentication.InteractiveRequestOptions> represents the request to the identity provider for logging in or provisioning an access token.
@@ -181,7 +183,7 @@ When these scenarios are implemented in documentation examples, ***two*** identi
 
 Although refresh tokens can't be secured in Blazor WebAssembly apps, they can be used if you implement them with appropriate security strategies.
 
-For standalone Blazor WebAssembly apps in ASP.NET Core 6.0 or later, we recommend using:
+For standalone Blazor WebAssembly apps in ASP.NET Core in .NET 6 or later, we recommend using:
 
 * The [OAuth 2.0 Authorization Code flow (Code) with Proof Key for Code Exchange (PKCE)](https://oauth.net/2/pkce/).
 * A refresh token that has a short expiration.
@@ -196,7 +198,7 @@ For hosted Blazor WebAssembly solutions, refresh tokens can be maintained and us
 
 For more information, see the following resources:
 
-* [Microsoft identity platform refresh tokens: Refresh token lifetime](/azure/active-directory/develop/refresh-tokens#refresh-token-lifetime)
+* [Microsoft identity platform refresh tokens: Refresh token lifetime](/entra/identity-platform/refresh-tokens#refresh-token-lifetime)
 * [OAuth 2.0 for Browser-Based Apps (IETF specification)](https://datatracker.ietf.org/doc/html/draft-ietf-oauth-browser-based-apps-11#section-4)
 
 ## Establish claims for users
@@ -238,48 +240,37 @@ If Windows Authentication is used with Blazor Webassembly or with any other SPA 
 
 For more information, see <xref:security/anti-request-forgery>.
 
-:::moniker range="< aspnetcore-8.0"
-
-<!-- UPDATE 8.0 Versioning out because this applies
-     directly to hosted WASM. Check with the PU
-     to confirm no replacement guidance in the 
-     BWA/WebAssembly world -->
-
 ## Secure a SignalR hub
 
-To secure a SignalR hub:
+To secure a SignalR hub in the server API project, apply the [`[Authorize]` attribute](xref:Microsoft.AspNetCore.Authorization.AuthorizeAttribute) to the hub class or to methods of the hub class.
 
-* In the **:::no-loc text="Server":::** project, apply the [`[Authorize]` attribute](xref:Microsoft.AspNetCore.Authorization.AuthorizeAttribute) to the hub class or to methods of the hub class.
+In a client project with prerendering, such as hosted Blazor WebAssembly (ASP.NET Core in .NET 7 or earlier) or a Blazor Web App (ASP.NET Core in .NET 8 or later), see the guidance in <xref:blazor/fundamentals/signalr#client-side-signalr-cross-origin-negotiation-for-authentication>.
 
-* In the **:::no-loc text="Client":::** project's component, supply an access token to the hub connection:
+In a client project component without prerendering, such as standalone Blazor WebAssembly, or non-browser apps, supply an access token to the hub connection, as the following example demonstrates. For more information, see <xref:signalr/authn-and-authz#bearer-token-authentication>.
 
-  ```razor
-  @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-  @inject IAccessTokenProvider TokenProvider
-  @inject NavigationManager Navigation
+```razor
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject IAccessTokenProvider TokenProvider
+@inject NavigationManager Navigation
+
+...
+
+var tokenResult = await TokenProvider.RequestAccessToken();
+
+if (tokenResult.TryGetToken(out var token))
+{
+    hubConnection = new HubConnectionBuilder()
+        .WithUrl(Navigation.ToAbsoluteUri("/chathub"), 
+            options => { options.AccessTokenProvider = () => Task.FromResult(token?.Value); })
+        .Build();
 
   ...
-
-  var tokenResult = await TokenProvider.RequestAccessToken();
-
-  if (tokenResult.TryGetToken(out var token))
-  {
-      hubConnection = new HubConnectionBuilder()
-          .WithUrl(Navigation.ToAbsoluteUri("/chathub"), 
-              options => { options.AccessTokenProvider = () => Task.FromResult(token?.Value); })
-          .Build();
-
-    ...
-  }
-  ```
-
-For more information, see <xref:signalr/authn-and-authz#bearer-token-authentication>.
-
-:::moniker-end
+}
+```
 
 ## Logging
 
-*This section applies to Blazor WebAssembly apps in ASP.NET Core 7.0 or later.*
+*This section applies to Blazor WebAssembly apps in ASP.NET Core in .NET 7 or later.*
 
 To enable debug or trace logging, see the *Authentication logging (Blazor WebAssembly)* section in a 7.0 or later version of the <xref:blazor/fundamentals/logging> article.
 
@@ -323,21 +314,21 @@ Further configuration guidance is found in the following articles:
 
 ## Use the Authorization Code flow with PKCE
 
-Microsoft identity platform's [Microsoft Authentication Library for JavaScript (MSAL)](/azure/active-directory/develop/msal-overview) v2.0 or later provides support for the [Authorization Code flow](/azure/active-directory/develop/v2-oauth2-auth-code-flow) with [Proof Key for Code Exchange (PKCE)](https://oauth.net/2/pkce/) and [Cross-Origin Resource Sharing (CORS)](xref:security/cors) for single-page applications, including Blazor. 
+Microsoft identity platform's [Microsoft Authentication Library for JavaScript (MSAL)](/entra/identity-platform/msal-overview) v2.0 or later provides support for the [Authorization Code flow](/entra/identity-platform/v2-oauth2-auth-code-flow) with [Proof Key for Code Exchange (PKCE)](https://oauth.net/2/pkce/) and [Cross-Origin Resource Sharing (CORS)](xref:security/cors) for single-page applications, including Blazor. 
 
 **Microsoft doesn't recommend using Implicit grant.**
 
 For more information, see the following resources:
 
-* [Authentication flow support in MSAL: Implicit grant](/azure/active-directory/develop/msal-authentication-flows#implicit-grant)
-* [Microsoft identity platform and implicit grant flow: Prefer the auth code flow](/azure/active-directory/develop/v2-oauth2-implicit-grant-flow#prefer-the-auth-code-flow)
-* [Microsoft identity platform and OAuth 2.0 authorization code flow](/azure/active-directory/develop/v2-oauth2-auth-code-flow)
+* [Authentication flow support in MSAL: Implicit grant](/entra/identity-platform/msal-authentication-flows#implicit-grant)
+* [Microsoft identity platform and implicit grant flow: Prefer the auth code flow](/entra/identity-platform/v2-oauth2-implicit-grant-flow#prefer-the-auth-code-flow)
+* [Microsoft identity platform and OAuth 2.0 authorization code flow](/entra/identity-platform/v2-oauth2-auth-code-flow)
 
 ## Additional resources
 
 * Microsoft identity platform documentation
-  * [General documentation](/azure/active-directory/develop/)
-  * [Access tokens](/azure/active-directory/develop/access-tokens)
+  * [General documentation](/entra/identity-platform/)
+  * [Access tokens](/entra/identity-platform/access-tokens)
 * <xref:host-and-deploy/proxy-load-balancer>
   * Using Forwarded Headers Middleware to preserve HTTPS scheme information across proxy servers and internal networks.
   * Additional scenarios and use cases, including manual scheme configuration, request path changes for correct request routing, and forwarding the request scheme for Linux and non-IIS reverse proxies.

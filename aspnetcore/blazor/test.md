@@ -5,14 +5,14 @@ description: Learn how to test Razor components in Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/test
 ---
 # Test Razor components in ASP.NET Core Blazor
 
 [!INCLUDE[](~/includes/not-latest-version.md)]
 
-By: [Egil Hansen](https://egilhansen.com/)
+By [Egil Hansen](https://egilhansen.com/)
 
 Testing Razor components is an important aspect of releasing stable and maintainable Blazor apps.
 
@@ -163,4 +163,7 @@ The following actions take place at each step of the test:
 
 ## Additional resources
 
-[Getting Started with bUnit](https://bunit.dev/docs/getting-started/): bUnit instructions include guidance on creating a test project, referencing testing framework packages, and building and running tests.
+<!-- UPDATE 9.0 Check on staleness of Oslo talk link -->
+
+* [Getting Started with bUnit](https://bunit.dev/docs/getting-started/): bUnit instructions include guidance on creating a test project, referencing testing framework packages, and building and running tests.
+* [How to create maintainable and testable Blazor components - Egil Hansen - NDC Oslo 2022](https://www.youtube.com/watch?v=L_n-12FglLI)

@@ -1,3 +1,6 @@
+---
+ms.custom: linux-related-content
+---
 :::moniker range="= aspnetcore-5.0"
 This guide explains setting up a production-ready ASP.NET Core environment on an Ubuntu 16.04 server. These instructions likely work with newer versions of Ubuntu, but the instructions haven't been tested with newer versions.
 
@@ -199,7 +202,7 @@ KillSignal=SIGINT
 SyslogIdentifier=dotnet-example
 User=www-data
 Environment=ASPNETCORE_ENVIRONMENT=Production
-Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+Environment=DOTNET_NOLOGO=true
 
 [Install]
 WantedBy=multi-user.target

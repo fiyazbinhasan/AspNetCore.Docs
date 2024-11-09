@@ -5,7 +5,7 @@ description: Learn about Blazor app logging, including configuration and how to 
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 08/01/2023
+ms.date: 02/09/2024
 uid: blazor/fundamentals/logging
 ---
 # ASP.NET Core Blazor logging
@@ -18,8 +18,6 @@ uid: blazor/fundamentals/logging
 -->
 
 This article explains Blazor app logging, including configuration and how to write log messages from Razor components.
-
-[!INCLUDE[](~/blazor/includes/location-client-and-server-net31-or-later.md)]
 
 ## Configuration
 
@@ -55,29 +53,39 @@ The following example:
 
 `Counter1.razor`:
 
-<!-- UPDATE 8.0 The highlights will break. -->
+:::moniker range=">= aspnetcore-9.0"
 
-:::moniker range=">= aspnetcore-7.0"
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/Counter1.razor":::
 
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/logging/Counter1.razor" highlight="2,15":::
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/Counter1.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
+
+:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/logging/Counter1.razor":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/logging/Counter1.razor" highlight="2,15":::
+:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/logging/Counter1.razor":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
-:::code language="razor" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/Pages/logging/Counter1.razor" highlight="3,16":::
+:::code language="razor" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/Pages/logging/Counter1.razor":::
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-5.0"
 
-:::code language="razor" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/Pages/logging/Counter1.razor" highlight="3,16":::
+:::code language="razor" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/Pages/logging/Counter1.razor":::
 
 :::moniker-end
 
@@ -85,32 +93,41 @@ The following example demonstrates logging with an <xref:Microsoft.Extensions.Lo
 
 `Counter2.razor`:
 
-<!-- UPDATE 8.0 The highlights will break. -->
+:::moniker range=">= aspnetcore-9.0"
 
-:::moniker range=">= aspnetcore-7.0"
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/Counter2.razor":::
 
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/logging/Counter2.razor" highlight="2,15-16":::
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/Counter2.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
+
+:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/logging/Counter2.razor":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/logging/Counter2.razor" highlight="2,15-16":::
+:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/logging/Counter2.razor":::
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
-:::code language="razor" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/Pages/logging/Counter2.razor" highlight="3,16-17":::
+:::code language="razor" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/Pages/logging/Counter2.razor":::
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-5.0"
 
-:::code language="razor" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/Pages/logging/Counter2.razor" highlight="3,16-17":::
+:::code language="razor" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/Pages/logging/Counter2.razor":::
 
 :::moniker-end
-
 
 ## Server-side logging
 
@@ -328,8 +345,6 @@ After ***either*** of the preceding filters is added to the app, the console out
 
 ## Client-side custom logger provider
 
-<!-- UPDATE 8.0 Confirm this works in the client of a BWA -->
-
 The example in this section demonstrates a custom logger provider for further customization.
 
 Add a package reference to the app for the [`Microsoft.Extensions.Logging.Configuration`](https://www.nuget.org/packages/Microsoft.Extensions.Logging.Configuration) package.
@@ -501,8 +516,6 @@ In the following `CustomLoggerExample` component:
 
 ```razor
 @page "/custom-logger-example"
-@attribute [RenderModeWebAssembly]
-@using Microsoft.Extensions.Logging
 @inject ILogger<CustomLoggerExample> Logger
 
 <p>
@@ -593,28 +606,9 @@ Run the app again. Select the **`Log Messages`** button. Notice that the logging
 
 ## Client-side log scopes
 
-The developer tools console logger doesn't support [log scopes](xref:fundamentals/logging/index#log-scopes). However, a [custom logger](#client-side-custom-logger-provider) can support log scopes. For an unsupported example that you can further develop to suit your needs, see the prototype in the `dotnet/blazor-samples` GitHub repository:
+The developer tools console logger doesn't support [log scopes](xref:fundamentals/logging/index#log-scopes). However, a [custom logger](#client-side-custom-logger-provider) can support log scopes. For an unsupported example that you can further develop to suit your needs, see the `BlazorWebAssemblyScopesLogger` sample app in the [Blazor samples GitHub repository](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps)).
 
-:::moniker-end
-
-<!-- UPDATE 8.0 When creating this app, move from the Index component to a
-     'CustomLoggerExample' component -->
-
-:::moniker range=">= aspnetcore-7.0"
-
-[`BlazorWebAssemblyScopesLogger` sample app](https://github.com/dotnet/blazor-samples/tree/main/7.0/BlazorWebAssemblyScopesLogger)
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-[`BlazorWebAssemblyScopesLogger` sample app](https://github.com/dotnet/blazor-samples/tree/main/6.0/BlazorWebAssemblyScopesLogger)
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0"
-
-The sample app uses standard ASP.NET Core `BeginScope` logging syntax to indicate scopes for logged messages. The `Logger` service in the following example is an `ILogger<CustomLoggerExample>`, which is injected into the app's `CustomLoggerExample` component (`CustomLoggerExample.razor`).
+The sample app uses standard ASP.NET Core <xref:Microsoft.Extensions.Logging.LoggerExtensions.BeginScope%2A> logging syntax to indicate scopes for logged messages. The `Logger` service in the following example is an `ILogger<CustomLoggerExample>`, which is injected into the app's `CustomLoggerExample` component (`CustomLoggerExample.razor`).
 
 ```csharp
 using (Logger.BeginScope("L1"))
@@ -654,8 +648,6 @@ The `{CLASS}` placeholder in the preceding example is `BlazorWebAssemblyScopesLo
 
 ## Prerendered component logging
 
-<!-- UPDATE 8.0 Cross-link 'prerendered components' -->
-
 Prerendered components execute [component initialization code twice](xref:blazor/components/lifecycle#component-initialization-oninitializedasync). Logging takes place server-side on the first execution of initialization code and client-side on the second execution of initialization code. Depending on the goal of logging during initialization, check logs server-side, client-side, or both.
 
 ## SignalR client logging with the SignalR client builder
@@ -666,17 +658,38 @@ In Blazor script start configuration, pass in the `configureSignalR` configurati
 
 For the `configureLogging` log level value, pass the argument as either the string or integer log level shown in the following table.
 
-| <xref:Microsoft.Extensions.Logging.LogLevel>             | String setting | Integer setting |
-| -------------------------------------------------------- | :------------: | :-------------: |
-| <xref:Microsoft.Extensions.Logging.LogLevel.Trace>       | `trace`        | 0               |
-| <xref:Microsoft.Extensions.Logging.LogLevel.Debug>       | `debug`        | 1               |
-| <xref:Microsoft.Extensions.Logging.LogLevel.Information> | `information`  | 2               |
-| <xref:Microsoft.Extensions.Logging.LogLevel.Warning>     | `warning`      | 3               |
-| <xref:Microsoft.Extensions.Logging.LogLevel.Error>       | `error`        | 4               |
-| <xref:Microsoft.Extensions.Logging.LogLevel.Critical>    | `critical`     | 5               |
-| <xref:Microsoft.Extensions.Logging.LogLevel.None>        | `none`         | 6               |
+<xref:Microsoft.Extensions.Logging.LogLevel>             | String setting | Integer setting
+-------------------------------------------------------- | :------------: | :-------------:
+<xref:Microsoft.Extensions.Logging.LogLevel.Trace>       | `trace`        | 0
+<xref:Microsoft.Extensions.Logging.LogLevel.Debug>       | `debug`        | 1
+<xref:Microsoft.Extensions.Logging.LogLevel.Information> | `information`  | 2
+<xref:Microsoft.Extensions.Logging.LogLevel.Warning>     | `warning`      | 3
+<xref:Microsoft.Extensions.Logging.LogLevel.Error>       | `error`        | 4
+<xref:Microsoft.Extensions.Logging.LogLevel.Critical>    | `critical`     | 5
+<xref:Microsoft.Extensions.Logging.LogLevel.None>        | `none`         | 6
 
-Example 1: Set the <xref:Microsoft.Extensions.Logging.LogLevel.Information> log level with a string value:
+Example 1: Set the <xref:Microsoft.Extensions.Logging.LogLevel.Information> log level with a string value.
+
+:::moniker range=">= aspnetcore-8.0"
+
+Blazor Web App:
+
+```html
+<script src="{BLAZOR SCRIPT}" autostart="false"></script>
+<script>
+  Blazor.start({
+    circuit: {
+      configureSignalR: function (builder) {
+        builder.configureLogging("information");
+      }
+    }
+  });
+</script>
+```
+
+Blazor Server:
+
+:::moniker-end
 
 ```html
 <script src="{BLAZOR SCRIPT}" autostart="false"></script>
@@ -689,22 +702,46 @@ Example 1: Set the <xref:Microsoft.Extensions.Logging.LogLevel.Information> log 
 </script>
 ```
 
-In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
 
-Example 2: Set the <xref:Microsoft.Extensions.Logging.LogLevel.Information> log level with an integer value:
+Example 2: Set the <xref:Microsoft.Extensions.Logging.LogLevel.Information> log level with an integer value.
+
+:::moniker range=">= aspnetcore-8.0"
+
+Blazor Web App:
 
 ```html
-<script src="{BLAZOR SCRIPT}"></script>
+<script src="{BLAZOR SCRIPT}" autostart="false"></script>
 <script>
   Blazor.start({
-    configureSignalR: function (builder) {
-      builder.configureLogging(2);
+    circuit: {
+      configureSignalR: function (builder) {
+        builder.configureLogging(2); // LogLevel.Information
+      }
     }
   });
 </script>
 ```
 
-In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.
+Blazor Server:
+
+:::moniker-end
+
+```html
+<script src="{BLAZOR SCRIPT}" autostart="false"></script>
+<script>
+  Blazor.start({
+    configureSignalR: function (builder) {
+      builder.configureLogging(2); // LogLevel.Information
+    }
+  });
+</script>
+```
+
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+> [!NOTE]
+> Using an integer to specify the logging level in Example 2, often referred to as a *magic number* or *magic constant*, is considered a poor coding practice because the integer doesn't clearly identify the logging level when viewing the source code. If minimizing the bytes transferred to the browser is a priority, using an integer might be justified (consider removing the comment in such cases).
 
 For more information on Blazor startup (`Blazor.start()`), see <xref:blazor/fundamentals/startup>.
 
@@ -750,7 +787,7 @@ Provide a `Logging:LogLevel:HubConnection` app setting in the default `appsettin
 
 At the top of the Razor component file (`.razor`):
 
-* Inject an <xref:Microsoft.Extensions.Logging.ILoggerProvider> to add a `WebAssemblyConsoleLogger` to the logging providers passed to <xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilder>. Unlike a traditional <xref:Microsoft.Extensions.Logging.Console.ConsoleLogger>, `WebAssemblyConsoleLogger` is a wrapper around browser-specific logging APIs (for example, `console.log`). Use of `WebAssemblyConsoleLogger` makes logging possible within Mono inside a browser context.
+* Inject an <xref:Microsoft.Extensions.Logging.ILoggerProvider> to add a `WebAssemblyConsoleLogger` to the logging providers passed to <xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilder>. Unlike a <xref:Microsoft.Extensions.Logging.Console.ConsoleLoggerProvider>, `WebAssemblyConsoleLogger` is a wrapper around browser-specific logging APIs (for example, `console.log`). Use of `WebAssemblyConsoleLogger` makes logging possible within Mono inside a browser context.
 * Inject an `IConfiguration` to read the `Logging:LogLevel:HubConnection` app setting.
 
 > [!NOTE]
@@ -835,6 +872,5 @@ Use ***either*** of the following approaches:
 * [Implement a custom logging provider in .NET](/dotnet/core/extensions/custom-logging-provider)
 * Browser developer tools documentation:
   * [Chrome DevTools](https://developer.chrome.com/docs/devtools/)
-  * [Firefox Developer Tools](https://developer.mozilla.org/docs/Tools)
   * [Microsoft Edge Developer Tools overview](/microsoft-edge/devtools-guide-chromium/)
-* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples)
+* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))

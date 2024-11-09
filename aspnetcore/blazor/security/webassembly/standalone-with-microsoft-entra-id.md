@@ -5,7 +5,7 @@ description: Learn how to secure an ASP.NET Core Blazor WebAssembly standalone a
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: "devx-track-csharp, mvc"
-ms.date: 03/10/2023
+ms.date: 06/07/2024
 uid: blazor/security/webassembly/standalone-with-microsoft-entra-id
 ---
 # Secure an ASP.NET Core Blazor WebAssembly standalone app with Microsoft Entra ID
@@ -27,7 +27,7 @@ The subsections of the walkthrough explain how to:
 
 ### Create a tenant in Azure
 
-Follow the guidance in [Quickstart: Set up a tenant](/azure/active-directory/develop/quickstart-create-new-tenant) to create a tenant in ME-ID.
+Follow the guidance in [Quickstart: Set up a tenant](/entra/identity-platform/quickstart-create-new-tenant) to create a tenant in ME-ID.
 
 ### Register an app in Azure
 
@@ -37,16 +37,16 @@ Register an ME-ID app:
 1. Provide a **Name** for the app (for example, **Blazor Standalone ME-ID**).
 1. Choose a **Supported account types**. You may select **Accounts in this organizational directory only** for this experience.
 1. Set the **Redirect URI** dropdown list to **Single-page application (SPA)** and provide the following redirect URI: `https://localhost/authentication/login-callback`. If you know the production redirect URI for the Azure default host (for example, `azurewebsites.net`) or the custom domain host (for example, `contoso.com`), you can also add the production redirect URI at the same time that you're providing the `localhost` redirect URI. Be sure to include the port number for non-`:443` ports in any production redirect URIs that you add.
-1. If you're using an [unverified publisher domain](/azure/active-directory/develop/howto-configure-publisher-domain), clear the **Permissions** > **Grant admin consent to openid and offline_access permissions** checkbox. If the publisher domain is verified, this checkbox isn't present.
+1. If you're using an [unverified publisher domain](/entra/identity-platform/howto-configure-publisher-domain), clear the **Permissions** > **Grant admin consent to openid and offline_access permissions** checkbox. If the publisher domain is verified, this checkbox isn't present.
 1. Select **Register**.
 
 > [!NOTE]
-> Supplying the port number for a `localhost` ME-ID redirect URI isn't required. For more information, see [Redirect URI (reply URL) restrictions and limitations: Localhost exceptions (Azure documentation)](/azure/active-directory/develop/reply-url#localhost-exceptions).
+> Supplying the port number for a `localhost` ME-ID redirect URI isn't required. For more information, see [Redirect URI (reply URL) restrictions and limitations: Localhost exceptions (Entra documentation)](/entra/identity-platform/reply-url#localhost-exceptions).
 
 Record the following information:
 
-* Application (client) ID (for example, `41451fa7-82d9-4673-8fa5-69eff5a761fd`)
-* Directory (tenant) ID (for example, `e86c78e2-8bb4-4c41-aefd-918e0565a45e`)
+* Application (client) ID (for example, `00001111-aaaa-2222-bbbb-3333cccc4444`)
+* Directory (tenant) ID (for example, `aaaabbbb-0000-cccc-1111-dddd2222eeee`)
 
 In **Authentication** > **Platform configurations** > **Single-page application**:
 
@@ -66,8 +66,8 @@ dotnet new blazorwasm -au SingleOrg --client-id "{CLIENT ID}" -o {PROJECT NAME} 
 | Placeholder      | Azure portal name       | Example                                |
 | ---------------- | ----------------------- | -------------------------------------- |
 | `{PROJECT NAME}` | &mdash;                 | `BlazorSample`                         |
-| `{CLIENT ID}`    | Application (client) ID | `41451fa7-82d9-4673-8fa5-69eff5a761fd` |
-| `{TENANT ID}`    | Directory (tenant) ID   | `e86c78e2-8bb4-4c41-aefd-918e0565a45e` |
+| `{CLIENT ID}`    | Application (client) ID | `00001111-aaaa-2222-bbbb-3333cccc4444` |
+| `{TENANT ID}`    | Directory (tenant) ID   | `aaaabbbb-0000-cccc-1111-dddd2222eeee` |
 
 The output location specified with the `-o|--output` option creates a project folder if it doesn't exist and becomes part of the project's name.
 
@@ -81,7 +81,7 @@ Use one of the following approaches to run the app:
   * Select the **Run** button.
   * Use **Debug** > **Start Debugging** from the menu.
   * Press <kbd>F5</kbd>.
-* .NET CLI command shell: Execute the `dotnet run` command from the app's folder.
+* .NET CLI command shell: Execute the `dotnet watch` (or `dotnet run`) command from the app's folder.
 
 ## Parts of the app
 
@@ -89,7 +89,7 @@ This section describes the parts of an app generated from the Blazor WebAssembly
 
 ### Authentication package
 
-When an app is created to use Work or School Accounts (`SingleOrg`), the app automatically receives a package reference for the [Microsoft Authentication Library](/azure/active-directory/develop/msal-overview) ([`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal)). The package provides a set of primitives that help the app authenticate users and obtain tokens to call protected APIs.
+When an app is created to use Work or School Accounts (`SingleOrg`), the app automatically receives a package reference for the [Microsoft Authentication Library](/entra/identity-platform/msal-overview) ([`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal)). The package provides a set of primitives that help the app authenticate users and obtain tokens to call protected APIs.
 
 If adding authentication to an app, manually add the [`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal) package to the app.
 
@@ -132,7 +132,7 @@ Example:
 {
   "AzureAd": {
     "Authority": "https://login.microsoftonline.com/e86c78e2-...-918e0565a45e",
-    "ClientId": "41451fa7-82d9-4673-8fa5-69eff5a761fd",
+    "ClientId": "00001111-aaaa-2222-bbbb-3333cccc4444",
     "ValidateAuthority": true
   }
 }
@@ -156,11 +156,14 @@ Specify additional scopes with `AdditionalScopesToConsent`:
 options.ProviderOptions.AdditionalScopesToConsent.Add("{ADDITIONAL SCOPE URI}");
 ```
 
+> [!NOTE]
+> <xref:Microsoft.Authentication.WebAssembly.Msal.Models.MsalProviderOptions.AdditionalScopesToConsent%2A> isn't able to provision delegated user permissions for Microsoft Graph via the Microsoft Entra ID consent UI when a user first uses an app registered in Microsoft Azure. For more information, see <xref:blazor/security/webassembly/graph-api?pivots=graph-sdk-5#defaultaccesstokenscopes-versus-additionalscopestoconsent>.
+
 For more information, see the following resources:
 
 * [Request additional access tokens](xref:blazor/security/webassembly/additional-scenarios#request-additional-access-tokens)
 * [Attach tokens to outgoing requests](xref:blazor/security/webassembly/additional-scenarios#attach-tokens-to-outgoing-requests)
-* [Quickstart: Configure an application to expose web APIs](/azure/active-directory/develop/quickstart-configure-app-expose-web-apis)
+* [Quickstart: Configure an application to expose web APIs](/entra/identity-platform/quickstart-configure-app-expose-web-apis)
 * [Access token scopes for Microsoft Graph API](xref:blazor/security/webassembly/graph-api)
 
 ### Login mode
@@ -193,14 +196,15 @@ For more information, see the following resources:
 
 ## Troubleshoot
 
-[!INCLUDE[](~/blazor/security/includes/troubleshoot.md)]
+[!INCLUDE[](~/blazor/security/includes/troubleshoot-wasm.md)]
 
 ## Additional resources
 
+* [Identity and account types for single- and multitenant apps](/security/zero-trust/develop/identity-supported-account-types)
 * <xref:blazor/security/webassembly/additional-scenarios>
 * [Build a custom version of the Authentication.MSAL JavaScript library](xref:blazor/security/webassembly/additional-scenarios#build-a-custom-version-of-the-authenticationmsal-javascript-library)
 * [Unauthenticated or unauthorized web API requests in an app with a secure default client](xref:blazor/security/webassembly/additional-scenarios#unauthenticated-or-unauthorized-web-api-requests-in-an-app-with-a-secure-default-client)
 * <xref:blazor/security/webassembly/meid-groups-roles>
 * <xref:security/authentication/azure-active-directory/index>
-* [Microsoft identity platform documentation](/azure/active-directory/develop/)
-* [Security best practices for application properties in Microsoft Entra ID](/azure/active-directory/develop/security-best-practices-for-app-registration)
+* [Microsoft identity platform documentation](/entra/identity-platform/)
+* [Security best practices for application properties in Microsoft Entra ID](/entra/identity-platform/security-best-practices-for-app-registration)

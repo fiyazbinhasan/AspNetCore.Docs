@@ -5,7 +5,7 @@ description: Learn about Blazor app configuration, including app settings, authe
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 11/08/2022
+ms.date: 02/09/2024
 uid: blazor/fundamentals/configuration
 ---
 # ASP.NET Core Blazor configuration
@@ -14,27 +14,54 @@ uid: blazor/fundamentals/configuration
 
 This article explains how to configure Blazor apps, including app settings, authentication, and logging configuration.
 
-[!INCLUDE[](~/blazor/includes/location-client.md)]
+:::moniker range=">= aspnetcore-8.0"
 
-For server-side ASP.NET Core app configuration, see <xref:fundamentals/configuration/index>.
+This guidance applies to client-side project configuration in a Blazor Web App or a standalone Blazor WebAssembly app.
 
-On the client, configuration is loaded from the following app settings files by default:
+Default behavior in Blazor Web Apps:
+
+* For server-side configuration:
+  * See <xref:fundamentals/configuration/index> for guidance.
+  * Only configuration in the project's root app settings files is loaded.
+  * The remainder of this article only applies to client-side configuration in the `.Client` project. 
+* For client-side configuration (`.Client` project), configuration is loaded from the following app settings files:
+  * `wwwroot/appsettings.json`.
+  * `wwwroot/appsettings.{ENVIRONMENT}.json`, where the `{ENVIRONMENT}` placeholder is the app's [runtime environment](xref:fundamentals/environments).
+
+In standalone Blazor WebAssembly apps, configuration is loaded from the following app settings files:
 
 * `wwwroot/appsettings.json`.
 * `wwwroot/appsettings.{ENVIRONMENT}.json`, where the `{ENVIRONMENT}` placeholder is the app's [runtime environment](xref:fundamentals/environments).
 
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+This guidance applies to the **`Client`** project of a hosted Blazor WebAssembly solution or a Blazor WebAssembly app.
+
+For server-side ASP.NET Core app configuration in the **`Server`** project of a hosted Blazor WebAssembly solution, see <xref:fundamentals/configuration/index>.
+
+On the client, configuration is loaded from the following app settings files:
+
+* `wwwroot/appsettings.json`.
+* `wwwroot/appsettings.{ENVIRONMENT}.json`, where the `{ENVIRONMENT}` placeholder is the app's [runtime environment](xref:fundamentals/environments).
+
+:::moniker-end
+
 > [!NOTE]
 > Logging configuration placed into an app settings file in `wwwroot` isn't loaded by default. For more information, see the [Logging configuration](#logging-configuration) section later in this article.
+>
+> In some scenarios, such as with Azure services, it's important to use an environment file name segment that exactly matches the environment name. For example, use the file name `appsettings.Staging.json` with a capital ":::no-loc text="S":::" for the `Staging` environment. For recommended conventions, see the opening remarks of <xref:blazor/fundamentals/environments>.
 
 Other configuration providers registered by the app can also provide configuration, but not all providers or provider features are appropriate:
 
 * [Azure Key Vault configuration provider](xref:security/key-vault-configuration): The provider isn't supported for managed identity and application ID (client ID) with client secret scenarios. Application ID with a client secret isn't recommended for any ASP.NET Core app, especially client-side apps because the client secret can't be secured client-side to access the Azure Key Vault service.
-* [Azure App configuration provider](/azure/azure-app-configuration/quickstart-aspnet-core-app): The provider isn't appropriate for client-side apps because they don't run on a server in Azure.
+* [Azure App configuration provider](/azure/azure-app-configuration/quickstart-aspnet-core-app): The provider isn't appropriate for a client-side app because the app doesn't run on a server in Azure.
 
 For more information on configuration providers, see <xref:fundamentals/configuration/index>.
 
 > [!WARNING]
-> Configuration and settings files are visible to users on the client, and users can tamper with the data. **Don't store app secrets, credentials, or any other sensitive data in the app's configuration or files.**
+> Configuration and settings files in the web root (`wwwroot` folder) are visible to users on the client, and users can tamper with the data. **Don't store app secrets, credentials, or any other sensitive data in any web root file.**
 
 ## App settings configuration
 
@@ -42,35 +69,29 @@ Configuration in app settings files are loaded by default. In the following exam
 
 `wwwroot/appsettings.json`:
 
-:::moniker range=">= aspnetcore-7.0"
-
-:::code language="json" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/wwwroot/appsettings.json" highlight="2":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-:::code language="json" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/wwwroot/appsettings.json" highlight="2":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
-
-:::code language="json" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/wwwroot/appsettings.json" highlight="2":::
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-5.0"
-
-:::code language="json" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/wwwroot/appsettings.json" highlight="2":::
-
-:::moniker-end
+```json
+{
+    "h1FontSize": "50px"
+}
+```
 
 Inject an <xref:Microsoft.Extensions.Configuration.IConfiguration> instance into a component to access the configuration data.
 
 `ConfigExample.razor`:
 
-:::moniker range=">= aspnetcore-7.0"
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_WebAssembly/Pages/ConfigExample.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_WebAssembly/Pages/ConfigExample.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
 :::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/configuration/ConfigExample.razor":::
 
@@ -97,7 +118,7 @@ Inject an <xref:Microsoft.Extensions.Configuration.IConfiguration> instance into
 Client security restrictions prevent direct access to files via user code, including settings files for app configuration. To read configuration files in addition to `appsettings.json`/`appsettings.{ENVIRONMENT}.json` from the `wwwroot` folder into configuration, use an <xref:System.Net.Http.HttpClient>.
 
 > [!WARNING]
-> Configuration and settings files are visible to users on the client, and users can tamper with the data. **Don't store app secrets, credentials, or any other sensitive data in the app's configuration or files.**
+> Configuration and settings files in the web root (`wwwroot` folder) are visible to users on the client, and users can tamper with the data. **Don't store app secrets, credentials, or any other sensitive data in any web root file.**
 
 The following example reads a configuration file (`cars.json`) into the app's configuration.
 
@@ -131,6 +152,8 @@ using var stream = await response.Content.ReadAsStreamAsync();
 builder.Configuration.AddJsonStream(stream);
 ```
 
+The preceding example sets the base address with `builder.HostEnvironment.BaseAddress` (<xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment.BaseAddress%2A?displayProperty=nameWithType>), which gets the base address for the app and is typically derived from the `<base>` tag's `href` value in the host page.
+
 ## Memory Configuration Source
 
 The following example uses a <xref:Microsoft.Extensions.Configuration.Memory.MemoryConfigurationSource> in the `Program` file to supply additional configuration.
@@ -143,35 +166,39 @@ using Microsoft.Extensions.Configuration.Memory;
 
 In the `Program` file:
 
-:::moniker range=">= aspnetcore-7.0"
+```csharp
+var vehicleData = new Dictionary<string, string?>()
+{
+    { "color", "blue" },
+    { "type", "car" },
+    { "wheels:count", "3" },
+    { "wheels:brand", "Blazin" },
+    { "wheels:brand:type", "rally" },
+    { "wheels:year", "2008" },
+};
 
-:::code language="csharp" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Program.cs" id="snippet1":::
+var memoryConfig = new MemoryConfigurationSource { InitialData = vehicleData };
 
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-:::code language="csharp" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Program.cs" id="snippet1":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
-
-:::code language="csharp" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/Program.cs" id="snippet1":::
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-5.0"
-
-:::code language="csharp" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/Program.cs" id="snippet1":::
-
-:::moniker-end
+builder.Configuration.Add(memoryConfig);
+```
 
 Inject an <xref:Microsoft.Extensions.Configuration.IConfiguration> instance into a component to access the configuration data.
 
 `MemoryConfig.razor`:
 
-:::moniker range=">= aspnetcore-7.0"
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_WebAssembly/Pages/MemoryConfig.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_WebAssembly/Pages/MemoryConfig.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
 :::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/configuration/MemoryConfig.razor":::
 
@@ -210,7 +237,7 @@ Obtain a section of the configuration in C# code with <xref:Microsoft.Extensions
 
 ## Authentication configuration
 
-Provide authentication configuration in an app settings file.
+Provide ***public*** authentication configuration in an app settings file.
 
 `wwwroot/appsettings.json`:
 
@@ -229,6 +256,9 @@ Load the configuration for an Identity provider with <xref:Microsoft.Extensions.
 builder.Services.AddOidcAuthentication(options =>
     builder.Configuration.Bind("Local", options.ProviderOptions));
 ```
+
+> [!WARNING]
+> Configuration and settings files in the web root (`wwwroot` folder) are visible to users on the client, and users can tamper with the data. **Don't store app secrets, credentials, or any other sensitive data in any web root file.**
 
 ## Logging configuration
 

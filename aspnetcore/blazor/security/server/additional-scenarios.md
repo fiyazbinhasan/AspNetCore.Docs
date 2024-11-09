@@ -5,7 +5,7 @@ description: Learn how to configure server-side Blazor for additional security s
 monikerRange: '>= aspnetcore-3.1'
 ms.author: riande
 ms.custom: mvc
-ms.date: 02/16/2023
+ms.date: 02/09/2024
 uid: blazor/security/server/additional-scenarios
 ---
 # Server-side ASP.NET Core Blazor additional security scenarios
@@ -14,24 +14,28 @@ uid: blazor/security/server/additional-scenarios
 
 This article explains how to configure server-side Blazor for additional security scenarios, including how to pass tokens to a Blazor app.
 
-[!INCLUDE[](~/blazor/includes/location-client-and-server-net31-or-later.md)]
+> [!NOTE]
+> The code examples in this article adopt [nullable reference types (NRTs) and .NET compiler null-state static analysis](xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis), which are supported in ASP.NET Core in .NET 6 or later. When targeting ASP.NET Core 5.0 or earlier, remove the null type designation (`?`) from the `string?`, `TodoItem[]?`, `WeatherForecast[]?`, and `IEnumerable<GitHubBranch>?` types in the article's examples.
 
 ## Pass tokens to a server-side Blazor app
 
-<!-- UPDATE 8.0 I don't think it will be necessary to showcase
-     passing antiforgery tokens for BWAs (and this guidance is 
-     probably changing for the other tokens as well), so we'll 
-     probably version the section out in favor of a new section 
-     on BWA token handling. -->
+:::moniker range=">= aspnetcore-8.0"
 
-Tokens available outside of the Razor components in a server-side Blazor app can be passed to components with the approach described in this section. The example in this section focuses on passing access, refresh, and [anti-request forgery (XSRF) token](xref:security/anti-request-forgery) tokens to the Blazor app, but the approach is valid for other HTTP context state.
+Updating this section for Blazor Web Apps is pending [Update section on passing tokens in Blazor Web Apps (`dotnet/AspNetCore.Docs` #31691)](https://github.com/dotnet/AspNetCore.Docs/issues/31691). For more information, see [Problem providing Access Token to HttpClient in Interactive Server mode (`dotnet/aspnetcore` #52390)](https://github.com/dotnet/aspnetcore/issues/52390).
+
+For Blazor Server, view the [7.0 version of this article section](xref:blazor/security/server/additional-scenarios?view=aspnetcore-7.0#pass-tokens-to-a-server-side-blazor-app).
+
+<!--
+Tokens available outside of the Razor components in a Blazor Web App can be passed to components with the approach described in this section. The example in this section focuses on passing access and refresh tokens, but the approach is valid for other HTTP context state provided by <xref:Microsoft.AspNetCore.Http.HttpContext>.
 
 > [!NOTE]
-> Passing the XSRF token to Razor components is useful in scenarios where components POST to Identity or other endpoints that require validation. If your app only requires access and refresh tokens, you can remove the XSRF token code from the following example.
+> Passing the [anti-request forgery (CSRF/XSRF) token](xref:security/anti-request-forgery) to Razor components is useful in scenarios where components POST to Identity or other endpoints that require validation. However, don't follow the guidance in this section for processing form POST requests or web API requests with XSRF support. The Blazor framework provides built-in antiforgery support for forms and calling web APIs. For more information, see the following resources:
+>
+> * General support for antiforgery: <xref:blazor/security/index#antiforgery-support>
+> * Antiforgery support for forms: <xref:blazor/forms/index#antiforgery-support>
+> * Antiforgery support for web API: <xref:blazor/call-web-api#antiforgery-support>
 
 Authenticate the app as you would with a regular Razor Pages or MVC app. Provision and save the tokens to the authentication cookie.
-
-:::moniker range=">= aspnetcore-6.0"
 
 In the `Program` file:
 
@@ -46,185 +50,39 @@ builder.Services.Configure<OpenIdConnectOptions>(
 {
     options.ResponseType = OpenIdConnectResponseType.Code;
     options.SaveTokens = true;
-
-    options.Scope.Add("offline_access");
+    options.Scope.Add(OpenIdConnectScope.OfflineAccess);
 });
 ```
 
-:::moniker-end
+<xref:Microsoft.AspNetCore.Authentication.OpenIdConnect?displayProperty=fullName> and <xref:Microsoft.IdentityModel.Protocols.OpenIdConnect?displayProperty=fullName> API is provided by the [`Microsoft.AspNetCore.Authentication.OpenIdConnect`](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.OpenIdConnect) NuGet package.
 
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
+[!INCLUDE[](~/includes/package-reference.md)]
 
-In `Startup.cs`:
+Optionally, additional scopes are added with `options.Scope.Add("{SCOPE}");`, where the `{SCOPE}` placeholder is the additional scope to add.
 
-```csharp
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-
-...
-
-services.Configure<OpenIdConnectOptions>(
-    OpenIdConnectDefaults.AuthenticationScheme, options =>
-{
-    options.ResponseType = OpenIdConnectResponseType.Code;
-    options.SaveTokens = true;
-
-    options.Scope.Add("offline_access");
-});
-```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-5.0"
-
-In `Startup.cs`:
-
-```csharp
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-
-...
-
-services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
-{
-    options.ResponseType = OpenIdConnectResponseType.Code;
-    options.SaveTokens = true;
-
-    options.Scope.Add("offline_access");
-});
-```
-
-:::moniker-end
-
-Optionally, additional scopes are added with `options.Scope.Add("{SCOPE}");`, where the placeholder `{SCOPE}` is the additional scope to add.
-
-Define a **scoped** token provider service that can be used within the Blazor app to resolve the tokens from [dependency injection (DI)](xref:blazor/fundamentals/dependency-injection).
+Define a token provider service that can be used within the Blazor app to resolve the tokens from [dependency injection (DI)](xref:blazor/fundamentals/dependency-injection).
 
 `TokenProvider.cs`:
-
-:::moniker range=">= aspnetcore-6.0"
 
 ```csharp
 public class TokenProvider
 {
     public string? AccessToken { get; set; }
     public string? RefreshToken { get; set; }
-    public string? XsrfToken { get; set; }
 }
 ```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-```csharp
-public class TokenProvider
-{
-    public string AccessToken { get; set; }
-    public string RefreshToken { get; set; }
-    public string XsrfToken { get; set; }
-}
-```
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0"
 
 In the `Program` file, add services for:
 
-* <xref:System.Net.Http.IHttpClientFactory>: Used in a `WeatherForecastService` class that obtains weather data from a server API with an access token.
-* `TokenProvider`: Holds the access and refresh tokens.
+* <xref:System.Net.Http.IHttpClientFactory>: Used in service classes to obtain data from a server API with an access token. The example in this section is a weather forecast data service (`WeatherForecastService`) that requires an access token.
+* `TokenProvider`: Holds the access and refresh tokens. Register the token provider service as a ***scoped*** service.
 
 ```csharp
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<TokenProvider>();
 ```
 
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-In `Startup.ConfigureServices` of `Startup.cs`, add services for:
-
-* <xref:System.Net.Http.IHttpClientFactory>: Used in a `WeatherForecastService` class that obtains weather data from a server API with an access token.
-* `TokenProvider`: Holds the access and refresh tokens.
-
-```csharp
-services.AddHttpClient();
-services.AddScoped<TokenProvider>();
-```
-
-:::moniker-end
-
-Define a class to pass in the initial app state with the access and refresh tokens.
-
-`InitialApplicationState.cs`:
-
-:::moniker range=">= aspnetcore-6.0"
-
-```csharp
-public class InitialApplicationState
-{
-    public string? AccessToken { get; set; }
-    public string? RefreshToken { get; set; }
-    public string? XsrfToken { get; set; }
-}
-```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-```csharp
-public class InitialApplicationState
-{
-    public string AccessToken { get; set; }
-    public string RefreshToken { get; set; }
-    public string XsrfToken { get; set; }
-}
-```
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-7.0"
-
-In the `Pages/_Host.cshtml` file, create and instance of `InitialApplicationState` and pass it as a parameter to the app:
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-In the `Pages/_Layout.cshtml` file, create and instance of `InitialApplicationState` and pass it as a parameter to the app:
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-In the `Pages/_Host.cshtml` file, create and instance of `InitialApplicationState` and pass it as a parameter to the app:
-
-:::moniker-end
-
-```cshtml
-@using Microsoft.AspNetCore.Authentication
-@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
-
-...
-
-@{
-    var tokens = new InitialApplicationState
-    {
-        AccessToken = await HttpContext.GetTokenAsync("access_token"),
-        RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
-        XsrfToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken
-    };
-}
-
-<component ... param-InitialState="tokens" ... />
-```
-
-In the `App` component (`App.razor`), resolve the service and initialize it with the data from the parameter:
-
-:::moniker range=">= aspnetcore-6.0"
+In the `App` component (`Components/App.razor`), resolve the service and initialize it with the data from [`HttpContext` as a cascaded parameter](xref:blazor/security/index#avoid-ihttpcontextaccessorhttpcontext-in-razor-components):
 
 ```razor
 @inject TokenProvider TokenProvider
@@ -232,58 +90,22 @@ In the `App` component (`App.razor`), resolve the service and initialize it with
 ...
 
 @code {
-    [Parameter]
-    public InitialApplicationState? InitialState { get; set; }
+    [CascadingParameter]
+    public HttpContext? HttpContext { get; set; }
 
     protected override Task OnInitializedAsync()
     {
-        TokenProvider.AccessToken = InitialState?.AccessToken;
-        TokenProvider.RefreshToken = InitialState?.RefreshToken;
-        TokenProvider.XsrfToken = InitialState?.XsrfToken;
+        TokenProvider.AccessToken = await HttpContext.GetTokenAsync("access_token");
+        TokenProvider.RefreshToken = await HttpContext.GetTokenAsync("refresh_token");
 
         return base.OnInitializedAsync();
     }
 }
 ```
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-6.0"
-
-```razor
-@inject TokenProvider TokenProvider
-
-...
-
-@code {
-    [Parameter]
-    public InitialApplicationState InitialState { get; set; }
-
-    protected override Task OnInitializedAsync()
-    {
-        TokenProvider.AccessToken = InitialState.AccessToken;
-        TokenProvider.RefreshToken = InitialState.RefreshToken;
-        TokenProvider.XsrfToken = InitialState.XsrfToken;
-
-        return base.OnInitializedAsync();
-    }
-}
-```
-
-:::moniker-end
-
-> [!NOTE]
-> An alternative to assigning the initial state to the `TokenProvider` in the preceding example is to copy the data into a scoped service within <xref:Microsoft.AspNetCore.Components.ComponentBase.OnInitializedAsync%2A> for use across the app.
-
-Add a package reference to the app for the [`Microsoft.AspNet.WebApi.Client`](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Client) NuGet package.
-
-[!INCLUDE[](~/includes/package-reference.md)]
 
 In the service that makes a secure API request, inject the token provider and retrieve the token for the API request:
 
 `WeatherForecastService.cs`:
-
-:::moniker range=">= aspnetcore-6.0"
 
 ```csharp
 using System;
@@ -317,9 +139,217 @@ public class WeatherForecastService
 }
 ```
 
+-->
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+Tokens available outside of the Razor components in a server-side Blazor app can be passed to components with the approach described in this section. The example in this section focuses on passing access, refresh, and [anti-request forgery (XSRF) token](xref:security/anti-request-forgery) tokens to the Blazor app, but the approach is valid for other HTTP context state.
+
+> [!NOTE]
+> Passing the XSRF token to Razor components is useful in scenarios where components POST to Identity or other endpoints that require validation. If your app only requires access and refresh tokens, you can remove the XSRF token code from the following example.
+
+Authenticate the app as you would with a regular Razor Pages or MVC app. Provision and save the tokens to the authentication cookie.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
+
+In the `Program` file:
+
+```csharp
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
+...
+
+builder.Services.Configure<OpenIdConnectOptions>(
+    OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.ResponseType = OpenIdConnectResponseType.Code;
+    options.SaveTokens = true;
+    options.Scope.Add(OpenIdConnectScope.OfflineAccess);
+});
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
+
+In `Startup.cs`:
+
+```csharp
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
+...
+
+services.Configure<OpenIdConnectOptions>(
+    OpenIdConnectDefaults.AuthenticationScheme, options =>
+{
+    options.ResponseType = OpenIdConnectResponseType.Code;
+    options.SaveTokens = true;
+    options.Scope.Add(OpenIdConnectScope.OfflineAccess);
+});
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-5.0"
+
+In `Startup.cs`:
+
+```csharp
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
+...
+
+services.Configure<OpenIdConnectOptions>(AzureADDefaults.OpenIdScheme, options =>
+{
+    options.ResponseType = OpenIdConnectResponseType.Code;
+    options.SaveTokens = true;
+    options.Scope.Add(OpenIdConnectScope.OfflineAccess);
+});
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+Optionally, additional scopes are added with `options.Scope.Add("{SCOPE}");`, where the `{SCOPE}` placeholder is the additional scope to add.
+
+Define a **scoped** token provider service that can be used within the Blazor app to resolve the tokens from [dependency injection (DI)](xref:blazor/fundamentals/dependency-injection).
+
+`TokenProvider.cs`:
+
+```csharp
+public class TokenProvider
+{
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
+    public string? XsrfToken { get; set; }
+}
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
+
+In the `Program` file, add services for:
+
+* <xref:System.Net.Http.IHttpClientFactory>: Used in a `WeatherForecastService` class that obtains weather data from a server API with an access token.
+* `TokenProvider`: Holds the access and refresh tokens.
+
+```csharp
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<TokenProvider>();
+```
+
 :::moniker-end
 
 :::moniker range="< aspnetcore-6.0"
+
+In `Startup.ConfigureServices` of `Startup.cs`, add services for:
+
+* <xref:System.Net.Http.IHttpClientFactory>: Used in a `WeatherForecastService` class that obtains weather data from a server API with an access token.
+* `TokenProvider`: Holds the access and refresh tokens.
+
+```csharp
+services.AddHttpClient();
+services.AddScoped<TokenProvider>();
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+Define a class to pass in the initial app state with the access and refresh tokens.
+
+`InitialApplicationState.cs`:
+
+```csharp
+public class InitialApplicationState
+{
+    public string? AccessToken { get; set; }
+    public string? RefreshToken { get; set; }
+    public string? XsrfToken { get; set; }
+}
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
+
+In the `Pages/_Host.cshtml` file, create and instance of `InitialApplicationState` and pass it as a parameter to the app:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
+
+In the `Pages/_Layout.cshtml` file, create and instance of `InitialApplicationState` and pass it as a parameter to the app:
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-6.0"
+
+In the `Pages/_Host.cshtml` file, create and instance of `InitialApplicationState` and pass it as a parameter to the app:
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+```cshtml
+@using Microsoft.AspNetCore.Authentication
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Xsrf
+
+...
+
+@{
+    var tokens = new InitialApplicationState
+    {
+        AccessToken = await HttpContext.GetTokenAsync("access_token"),
+        RefreshToken = await HttpContext.GetTokenAsync("refresh_token"),
+        XsrfToken = Xsrf.GetAndStoreTokens(HttpContext).RequestToken
+    };
+}
+
+<component ... param-InitialState="tokens" ... />
+```
+
+In the `App` component (`App.razor`), resolve the service and initialize it with the data from the parameter:
+
+```razor
+@inject TokenProvider TokenProvider
+
+...
+
+@code {
+    [Parameter]
+    public InitialApplicationState? InitialState { get; set; }
+
+    protected override Task OnInitializedAsync()
+    {
+        TokenProvider.AccessToken = InitialState?.AccessToken;
+        TokenProvider.RefreshToken = InitialState?.RefreshToken;
+        TokenProvider.XsrfToken = InitialState?.XsrfToken;
+
+        return base.OnInitializedAsync();
+    }
+}
+```
+
+> [!NOTE]
+> An alternative to assigning the initial state to the `TokenProvider` in the preceding example is to copy the data into a scoped service within <xref:Microsoft.AspNetCore.Components.ComponentBase.OnInitializedAsync%2A> for use across the app.
+
+Add a package reference to the app for the [`Microsoft.AspNet.WebApi.Client`](https://www.nuget.org/packages/Microsoft.AspNet.WebApi.Client) NuGet package.
+
+[!INCLUDE[](~/includes/package-reference.md)]
+
+In the service that makes a secure API request, inject the token provider and retrieve the token for the API request:
+
+`WeatherForecastService.cs`:
 
 ```csharp
 using System;
@@ -347,20 +377,15 @@ public class WeatherForecastService
         var response = await http.SendAsync(request);
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadAsAsync<WeatherForecast[]>();
+        return await response.Content.ReadFromJsonAsync<WeatherForecast[]>() ?? 
+            Array.Empty<WeatherForecast>();
     }
 }
 ```
 
-:::moniker-end
-
 For an XSRF token passed to a component, inject the `TokenProvider` and add the XSRF token to the POST request. The following example adds the token to a logout endpoint POST. The scenario for the following example is that the logout endpoint (`Areas/Identity/Pages/Account/Logout.cshtml`, [scaffolded into the app](xref:security/authentication/scaffold-identity#scaffold-identity-into-a-server-side-blazor-app)) doesn't specify an <xref:Microsoft.AspNetCore.Mvc.IgnoreAntiforgeryTokenAttribute> (`@attribute [IgnoreAntiforgeryToken]`) because it performs some action in addition to a normal logout operation that must be protected. The endpoint requires a valid XSRF token to successfully process the request.
 
 In a component that presents a **Logout** button to authorized users:
-
-<!-- UPDATE 8.0 If the form survives, we'll update it to
-     use the new 8.0 plain HTML forms features and the 
-     new antiforgery token API. -->
 
 ```razor
 @inject TokenProvider TokenProvider
@@ -381,6 +406,8 @@ In a component that presents a **Logout** button to authorized users:
 </AuthorizeView>
 ```
 
+:::moniker-end
+
 ## Set the authentication scheme
 
 :::moniker range=">= aspnetcore-6.0"
@@ -395,7 +422,24 @@ For an app that uses more than one Authentication Middleware and thus has more t
 
 :::moniker-end
 
-:::moniker range=">= aspnetcore-5.0"
+:::moniker range=">= aspnetcore-8.0"
+
+```csharp
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+
+...
+
+app.MapRazorComponents<App>().RequireAuthorization(
+    new AuthorizeAttribute
+    {
+        AuthenticationSchemes = OpenIdConnectDefaults.AuthenticationScheme
+    })
+    .AddInteractiveServerRenderMode();
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-8.0"
 
 ```csharp
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -454,7 +498,7 @@ If tacking on a segment to the authority isn't appropriate for the app's OIDC pr
 
 ### Code changes
 
-* The list of claims in the ID token changes for v2.0 endpoints. For more information, see [Why update to Microsoft identity platform (v2.0)?](/azure/active-directory/azuread-dev/azure-ad-endpoint-comparison) in the Azure documentation.
+* The list of claims in the ID token changes for v2.0 endpoints. Microsoft documentation on the changes has been retired, but guidance on the claims in an ID token is available in the [ID token claims reference](/entra/identity-platform/id-token-claims-reference).
 * Since resources are specified in scope URIs for v2.0 endpoints, remove the <xref:Microsoft.AspNetCore.Builder.OpenIdConnectOptions.Resource?displayProperty=nameWithType> property setting in <xref:Microsoft.AspNetCore.Builder.OpenIdConnectOptions>:
 
   ```csharp
@@ -465,8 +509,6 @@ If tacking on a segment to the authority isn't appropriate for the app's OIDC pr
           ...
       }
   ```
-
-  For more information, see [Scopes, not resources](/azure/active-directory/azuread-dev/azure-ad-endpoint-comparison#scopes-not-resources) in the Azure documentation.
 
 ### App ID URI
 
@@ -492,13 +534,13 @@ You can find the App ID URI to use in the OIDC provider app registration descrip
 
 ## Circuit handler to capture users for custom services
 
-Use a <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler> to capture a user from the <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider> and set the user in a service. If you want to update the user, register a callback to <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider.AuthenticationStateChanged> and queue a <xref:System.Threading.Tasks.Task> to obtain the new user and update the service. The following example demonstrates the approach.
+Use a <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler> to capture a user from the <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider> and set the user in a service. If you want to update the user, register a callback to <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider.AuthenticationStateChanged> and enqueue a <xref:System.Threading.Tasks.Task> to obtain the new user and update the service. The following example demonstrates the approach.
 
 In the following example:
 
 * <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler.OnConnectionUpAsync%2A> is called every time the circuit reconnects, setting the user for the lifetime of the connection. Only the <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler.OnConnectionUpAsync%2A> method is required unless you implement updates via a handler for authentication changes (`AuthenticationChanged` in the following example).
 * <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler.OnCircuitOpenedAsync%2A> is called to attach the authentication changed handler, `AuthenticationChanged`, to update the user. 
-* The `catch` block of the `UpdateAuthentication` task takes no action on exceptions because there's no way to report them at this point in code execution. If an exception is thrown from the task, the exception is reported elsewhere in app.
+* The `catch` block of the `UpdateAuthentication` task takes no action on exceptions because there's no way to report the exceptions at this point in code execution. If an exception is thrown from the task, the exception is reported elsewhere in app.
 
 `UserService.cs`:
 
@@ -513,10 +555,7 @@ public class UserService
 {
     private ClaimsPrincipal currentUser = new(new ClaimsIdentity());
 
-    public ClaimsPrincipal GetUser()
-    {
-        return currentUser;
-    }
+    public ClaimsPrincipal GetUser() => currentUser;
 
     internal void SetUser(ClaimsPrincipal user)
     {
@@ -527,19 +566,11 @@ public class UserService
     }
 }
 
-internal sealed class UserCircuitHandler : CircuitHandler, IDisposable
-{
-    private readonly AuthenticationStateProvider authenticationStateProvider;
-    private readonly UserService userService;
-
-    public UserCircuitHandler(
+internal sealed class UserCircuitHandler(
         AuthenticationStateProvider authenticationStateProvider,
-        UserService userService)
-    {
-        this.authenticationStateProvider = authenticationStateProvider;
-        this.userService = userService;
-    }
-
+        UserService userService) 
+        : CircuitHandler, IDisposable
+{
     public override Task OnCircuitOpenedAsync(Circuit circuit, 
         CancellationToken cancellationToken)
     {
@@ -728,7 +759,13 @@ public class UserServiceMiddleware
 }
 ```
 
-:::moniker range=">= aspnetcore-6.0"
+:::moniker range=">= aspnetcore-8.0"
+
+Immediately before the call to `app.MapRazorComponents<App>()` in the `Program` file, call the middleware:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
 
 Immediately before the call to `app.MapBlazorHub()` in the `Program` file, call the middleware:
 
@@ -767,16 +804,10 @@ Use the `CircuitServicesAccessor` to access the <xref:Microsoft.AspNetCore.Compo
 `AuthenticationStateHandler.cs`:
 
 ```csharp
-public class AuthenticationStateHandler : DelegatingHandler
+public class AuthenticationStateHandler(
+    CircuitServicesAccessor circuitServicesAccessor) 
+    : DelegatingHandler
 {
-    readonly CircuitServicesAccessor circuitServicesAccessor;
-
-    public AuthenticationStateHandler(
-        CircuitServicesAccessor circuitServicesAccessor)
-    {
-        this.circuitServicesAccessor = circuitServicesAccessor;
-    }
-
     protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request, CancellationToken cancellationToken)
     {
