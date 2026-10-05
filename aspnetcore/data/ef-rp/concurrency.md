@@ -3,8 +3,7 @@ title: Part 8, Razor Pages with EF Core in ASP.NET Core - Concurrency
 author: tdykstra
 description: Part 8 of Razor Pages and Entity Framework tutorial series.
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 07/22/2019
+ms.date: 01/29/2025
 uid: data/ef-rp/concurrency
 ---
 # Part 8, Razor Pages with EF Core in ASP.NET Core - Concurrency
@@ -445,6 +444,8 @@ The browser shows the Index page with the changed value and updated `Concurrency
 
 Delete the test department from the second tab. A concurrency error is display with the current values from the database. Clicking **Delete** deletes the entity, unless `ConcurrencyToken` has been updated.
 
+[!INCLUDE[](~/includes/reliableWAP_H2.md)]
+
 ## Additional resources
 
 * [Concurrency Tokens in EF Core](/ef/core/modeling/concurrency)
@@ -800,6 +801,8 @@ The browser shows the Index page with the changed value and updated rowVersion i
 
 Delete the test department from the second tab. A concurrency error is display with the current values from the database. Clicking **Delete** deletes the entity, unless `RowVersion` has been updated.
 
+[!INCLUDE[](~/includes/reliableWAP.md)]
+
 ## Additional resources
 
 * [Concurrency Tokens in EF Core](/ef/core/modeling/concurrency)
@@ -817,7 +820,7 @@ This is the last tutorial in the series. Additional topics are covered in the [M
 
 :::moniker range="< aspnetcore-3.0"
 
-This tutorial shows how to handle conflicts when multiple users update an entity concurrently (at the same time). If you run into problems you can't solve, [download or view the completed app.](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/data/ef-rp/intro/samples) [Download instructions](xref:index#how-to-download-a-sample).
+This tutorial shows how to handle conflicts when multiple users update an entity concurrently (at the same time). If you run into problems you can't solve, [download or view the completed app.](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/data/ef-rp/intro/samples) [Download instructions](xref:fundamentals/index#how-to-download-a-sample).
 
 ## Concurrency conflicts
 
@@ -1100,7 +1103,9 @@ Delete the test department from the second tab. A concurrency error is display w
 
 See [Inheritance](xref:data/ef-mvc/inheritance) on how to inherit a data model.
 
-### Additional resources
+[!INCLUDE[](~/includes/reliableWAP_H2.md)]
+
+## Additional resources
 
 * [Concurrency Tokens in EF Core](/ef/core/modeling/concurrency)
 * [Handle concurrency in EF Core](/ef/core/saving/concurrency)

@@ -4,7 +4,7 @@ author: jamesnk
 description: Learn how to call gRPC services with the .NET gRPC client.
 monikerRange: '>= aspnetcore-3.0'
 ms.author: wpickett
-ms.date: 6/5/2024
+ms.date: 03/06/2025
 uid: grpc/client
 ---
 # Call gRPC services with the .NET client
@@ -47,7 +47,7 @@ To configure a gRPC channel to use TLS, ensure the server address starts with `h
 > [!TIP]
 > gRPC supports client certificate authentication over TLS. For information on configuring client certificates with a gRPC channel, see <xref:grpc/authn-and-authz#client-certificate-authentication>.
 
-To call unsecured gRPC services, ensure the server address starts with `http`. For example, `GrpcChannel.ForAddress("http://localhost:5000")` uses HTTP protocol. In .NET Core 3.1, additional configuration is required to [call insecure gRPC services with the .NET client](xref:grpc/troubleshoot#call-insecure-grpc-services-with-net-core-client).
+To call unsecured gRPC services, ensure the server address starts with `http`. For example, `GrpcChannel.ForAddress("http://localhost:5000")` uses HTTP protocol. In .NET Core 3.1, additional configuration is required to [call insecure gRPC services with the .NET client](xref:grpc/troubleshoot#call-insecure-grpc-services-with-net-client).
 
 ### Client performance
 
@@ -62,8 +62,7 @@ Channel and client performance and usage:
 
 `GrpcChannel.ForAddress` isn't the only option for creating a gRPC client. If calling gRPC services from an ASP.NET Core app, consider [gRPC client factory integration](xref:grpc/clientfactory). gRPC integration with `HttpClientFactory` offers a centralized alternative to creating gRPC clients.
 
-> [!NOTE]
-> Calling gRPC over HTTP/2 with `Grpc.Net.Client` is currently not supported on Xamarin. We are working to improve HTTP/2 support in a future Xamarin release. [Grpc.Core](https://www.nuget.org/packages/Grpc.Core) and [gRPC-Web](xref:grpc/browser) are viable alternatives that work today.
+When calling gRPC methods, prefer using [asynchronous programming with async and await](/dotnet/csharp/asynchronous-programming/). Making gRPC calls with blocking, such as using `Task.Result` or `Task.Wait()`, prevents other tasks from using a thread. This can lead to thread pool starvation and poor performance. It could cause the app to hang with a deadlock. For more information, see [Asynchronous calls in client apps](xref:grpc/performance#asynchronous-calls-in-client-apps).
 
 ## Make gRPC calls
 
@@ -90,8 +89,10 @@ Console.WriteLine("Greeting: " + response.Message);
 
 Each unary service method in the `.proto` file will result in two .NET methods on the concrete gRPC client type for calling the method: an asynchronous method and a blocking method. For example, on `GreeterClient` there are two ways of calling `SayHello`:
 
-* `GreeterClient.SayHelloAsync` - calls `Greeter.SayHello` service asynchronously. Can be awaited.
-* `GreeterClient.SayHello` - calls `Greeter.SayHello` service and blocks until complete. Don't use in asynchronous code.
+* `GreeterClient.SayHelloAsync` - calls the `Greeter.SayHello` service asynchronously. Can be awaited.
+* `GreeterClient.SayHello` - calls the `Greeter.SayHello` service and blocks until complete. Don't use in asynchronous code. Can cause performance and reliability issues.
+
+For more information, see [Asynchronous calls in client apps](xref:grpc/performance#asynchronous-calls-in-client-apps).
 
 ### Server streaming call
 

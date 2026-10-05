@@ -3,9 +3,8 @@ title: Build a Windows Forms Blazor app
 author: guardrex
 description: Build a Windows Forms Blazor app step-by-step.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/hybrid/tutorials/windows-forms
 ---
 # Build a Windows Forms Blazor app
@@ -65,7 +64,7 @@ At the top of the project file, change the SDK to `Microsoft.NET.Sdk.Razor`:
 
 Save the changes to the project file (`WinFormsBlazor.csproj`).
 
-Add an `_Imports.razor` file to the root of the project with an [`@using`](xref:mvc/views/razor#using) directive for <xref:Microsoft.AspNetCore.Components.Web?displayProperty=fullName>.
+Add an imports file to the root of the project with an [`@using`](xref:mvc/views/razor#using) directive for <xref:Microsoft.AspNetCore.Components.Web?displayProperty=fullName>.
 
 `_Imports.razor`:
 
@@ -73,7 +72,7 @@ Add an `_Imports.razor` file to the root of the project with an [`@using`](xref:
 @using Microsoft.AspNetCore.Components.Web
 ```
 
-Save the `_Imports.razor` file.
+Save the imports file.
 
 Add a `wwwroot` folder to the project.
 

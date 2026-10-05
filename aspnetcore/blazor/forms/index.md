@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor forms overview
 author: guardrex
 description: Learn how to use forms in Blazor.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 09/22/2026
 uid: blazor/forms/index
 ---
 # ASP.NET Core Blazor forms overview
@@ -34,6 +33,12 @@ The Blazor framework supports forms and provides built-in input components:
 
 :::moniker-end
 
+:::moniker range=">= aspnetcore-11.0"
+
+In Blazor Web Apps that use static server-side rendering (static SSR), input components automatically participate in client-side validation when the form contains a <xref:Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator> component. For details, see <xref:blazor/forms/validation-client-side>.
+
+:::moniker-end
+
 > [!NOTE]
 > Unsupported ASP.NET Core validation features are covered in the [Unsupported validation features](#unsupported-validation-features) section.
 
@@ -42,7 +47,7 @@ The <xref:Microsoft.AspNetCore.Components.Forms?displayProperty=fullName> namesp
 * Classes for managing form elements, state, and validation.
 * Access to built-in :::no-loc text="Input*"::: components.
 
-A project created from the Blazor project template includes the namespace in the app's `_Imports.razor` file, which makes the namespace available to the app's Razor components.
+A project created from the Blazor project template includes the namespace in the app's imports file (`_Imports.razor`), which makes the namespace available to the app's Razor components.
 
 :::moniker range=">= aspnetcore-8.0"
 
@@ -69,22 +74,24 @@ Standard HTML forms are supported. Create a form using the normal HTML `<form>` 
 In the preceding `StarshipPlainForm` component:
 
 * The form is rendered where the `<form>` element appears. The form is named with the [`@formname`](xref:mvc/views/razor#formname) directive attribute, which uniquely identifies the form to the Blazor framework.
-* The model is created in the component's `@code` block and held in a public property (`Model`). The `[SupplyParameterFromForm]` attribute indicates that the value of the associated property should be supplied from the form data. Data in the request that matches the property's name is bound to the property.
+* The model is created in the component's `@code` block and held in a `public` property (`Model`). The `[SupplyParameterFromForm]` attribute indicates that the value of the associated property should be supplied from the form data. Data in the request that matches the property's name is bound to the property.
 * The <xref:Microsoft.AspNetCore.Components.Forms.InputText> component is an input component for editing string values. The `@bind-Value` directive attribute binds the `Model.Id` model property to the <xref:Microsoft.AspNetCore.Components.Forms.InputText> component's <xref:Microsoft.AspNetCore.Components.Forms.InputBase%601.Value%2A> property.
 * The `Submit` method is registered as a handler for the <!-- <xref:Microsoft.AspNetCore.Components.Forms.EditForm.OnSubmit> --> `@onsubmit` callback. The handler is called when the form is submitted by the user.
 
 > [!IMPORTANT]
 > Always use the [`@formname`](xref:mvc/views/razor#formname) directive attribute with a unique form name.
 
-Blazor enhances page navigation and form handling by intercepting the request in order to apply the response to the existing DOM, preserving as much of the rendered form as possible. The enhancement avoids the need to fully load the page and provides a much smoother user experience, similar to a single-page app (SPA), although the component is rendered on the server. For more information, see <xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling>.
+Blazor enhances page navigation and form handling by intercepting the request in order to apply the response to the existing DOM, preserving as much of the rendered form as possible. The enhancement avoids the need to fully load the page and provides a much smoother user experience, similar to a single-page app (SPA), although the component is rendered on the server. For more information, see <xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling>.
 
-[Streaming rendering](xref:blazor/components/rendering#streaming-rendering) is supported for plain HTML forms.
+<!-- UPDATE 11.0 - Check the PU issue (backlogged as of 2/27/25 -->
+
+[Streaming rendering](xref:blazor/components/rendering#streaming-rendering) is supported for plain HTML forms. Note that when `POST`ing a form, only DOM updates inside the form's handlers are streamed (for example, `@onsubmit`). Updates inside `OnInitializedAsync` are only streamed for `GET` requests. For more information, see [Allow streaming the loading phase of POST responses (`dotnet/aspnetcore` #50994)](https://github.com/dotnet/aspnetcore/issues/50994).
 
 [!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
 
 The preceding example includes antiforgery support by including an <xref:Microsoft.AspNetCore.Components.Forms.AntiforgeryToken> component in the form. Antiforgery support is explained further in the [Antiforgery support](#antiforgery-support) section of this article.
 
-To submit a form based on another element's DOM events, for example `oninput` or `onblur`, use JavaScript to submit the form ([`submit` (MDN documentation)](https://developer.mozilla.org/docs/Web/API/HTMLFormElement/submit)).
+To submit a form based on another element's DOM events, for example `oninput` or `onblur`, use JavaScript to submit the form ([`submit`](https://developer.mozilla.org/docs/Web/API/HTMLFormElement/submit)).
 
 Instead of using plain forms in Blazor apps, a form is typically defined with Blazor's built-in form support using the framework's <xref:Microsoft.AspNetCore.Components.Forms.EditForm> component. The following Razor component demonstrates typical elements, components, and Razor code to render a webform using an <xref:Microsoft.AspNetCore.Components.Forms.EditForm> component.
 
@@ -114,17 +121,19 @@ A form is defined using the Blazor framework's <xref:Microsoft.AspNetCore.Compon
 
 In the preceding `Starship1` component:
 
-* The <xref:Microsoft.AspNetCore.Components.Forms.EditForm> component is rendered where the `<EditForm>` element appears. The form is named with the [`@formname`](xref:mvc/views/razor#formname) directive attribute, which uniquely identifies the form to the Blazor framework.
-* The model is created in the component's `@code` block and held in a public property (`Model`). The property is assigned to the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Model?displayProperty=nameWithType> parameter. The `[SupplyParameterFromForm]` attribute indicates that the value of the associated property should be supplied from the form data. Data in the request that matches the property's name is bound to the property.
+* The <xref:Microsoft.AspNetCore.Components.Forms.EditForm> component is rendered where the `<EditForm>` element appears. The form is named with the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.FormName> property, which uniquely identifies the form to the Blazor framework.
+* The model is created in the component's `@code` block and held in a `public` property (`Model`). The property is assigned to the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Model?displayProperty=nameWithType> parameter. The `[SupplyParameterFromForm]` attribute indicates that the value of the associated property should be supplied from the form data. Data in the request that matches the property's name is bound to the property.
 * The <xref:Microsoft.AspNetCore.Components.Forms.InputText> component is an [input component](xref:blazor/forms/input-components) for editing string values. The `@bind-Value` directive attribute binds the `Model.Id` model property to the <xref:Microsoft.AspNetCore.Components.Forms.InputText> component's <xref:Microsoft.AspNetCore.Components.Forms.InputBase%601.Value%2A> property.
 * The `Submit` method is registered as a handler for the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.OnSubmit> callback. The handler is called when the form is submitted by the user.
 
 > [!IMPORTANT]
-> Always use the [`@formname`](xref:mvc/views/razor#formname) directive attribute with a unique form name.
+> Always use the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.FormName> property with a unique form name.
 
-Blazor enhances page navigation and form handling for <xref:Microsoft.AspNetCore.Components.Forms.EditForm> components. For more information, see <xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling>.
+Blazor enhances page navigation and form handling for <xref:Microsoft.AspNetCore.Components.Forms.EditForm> components. For more information, see <xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling>.
 
-[Streaming rendering](xref:blazor/components/rendering#streaming-rendering) is supported for <xref:Microsoft.AspNetCore.Components.Forms.EditForm>.
+<!-- UPDATE 11.0 - Check the PU issue (backlogged as of 2/27/25 -->
+
+[Streaming rendering](xref:blazor/components/rendering#streaming-rendering) is supported for <xref:Microsoft.AspNetCore.Components.Forms.EditForm>. Note that when `POST`ing a form, only DOM updates inside the form's handlers are streamed (for example, `OnValidSubmit`). Updates inside `OnInitializedAsync` are only streamed for `GET` requests. For more information, see [Allow streaming the loading phase of POST responses (`dotnet/aspnetcore` #50994)](https://github.com/dotnet/aspnetcore/issues/50994).
 
 [!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
 
@@ -178,7 +187,7 @@ In the next example, the preceding component is modified to create the form in t
   * If the `<input>` form field contains more than ten characters when the **`Submit`** button is selected, an error appears in the validation summary ("`Id is too long.`"). `Submit` is **not** called.
   * If the `<input>` form field contains a valid value when the **`Submit`** button is selected, `Submit` is called.
 
-&dagger;The <xref:Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator> component is covered in the [Validator component](xref:blazor/forms/validation#validator-components) section. &Dagger;The <xref:Microsoft.AspNetCore.Components.Forms.ValidationSummary> component is covered in the [Validation Summary and Validation Message components](xref:blazor/forms/validation#validation-summary-and-validation-message-components) section.
+&dagger;The <xref:Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator> component is covered in the [Data Annotations Validator component and custom validation](xref:blazor/forms/validation#data-annotations-validator-component-and-custom-validation) section. &Dagger;The <xref:Microsoft.AspNetCore.Components.Forms.ValidationSummary> component is covered in the [Validation Summary and Validation Message components](xref:blazor/forms/validation#validation-summary-and-validation-message-components) section.
 
 `Starship2.razor`:
 
@@ -239,7 +248,7 @@ The <xref:Microsoft.AspNetCore.Components.Forms.EditForm> provides the following
 
 ## Clear a form or field
 
-Reset a form by clearing its model back its default state, which can be performed inside or outside of an <xref:Microsoft.AspNetCore.Components.Forms.EditForm>'s markup:
+Reset a form by clearing its model back to its default state, which can be performed inside or outside of an <xref:Microsoft.AspNetCore.Components.Forms.EditForm>'s markup:
 
 ```razor
 <button @onclick="ClearForm">Clear form</button>
@@ -279,7 +288,50 @@ There's no need to call <xref:Microsoft.AspNetCore.Components.ComponentBase.Stat
 
 Antiforgery services are automatically added to Blazor apps when <xref:Microsoft.Extensions.DependencyInjection.RazorComponentsServiceCollectionExtensions.AddRazorComponents%2A> is called in the `Program` file.
 
-The app uses Antiforgery Middleware by calling <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> in its request processing pipeline in the `Program` file. <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> is called after the call to <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseRouting%2A>. If there are calls to <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseRouting%2A> and <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseEndpoints%2A>, the call to <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> must go between them. A call to <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> must be placed after calls to <xref:Microsoft.AspNetCore.Builder.AuthAppBuilderExtensions.UseAuthentication%2A> and <xref:Microsoft.AspNetCore.Builder.AuthorizationAppBuilderExtensions.UseAuthorization%2A>.
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+Automatic Cross-Site Request Forgery (CSRF) protection middleware is enabled by default in apps built with `WebApplication.CreateBuilder`. The middleware inspects the `Sec-Fetch-Site` and `Origin` headers on unsafe HTTP methods and records a validation verdict on the request. Blazor server-side rendering (SSR) form posts enforce that verdict and return `400 Bad Request` for cross-origin form posts that aren't trusted.
+
+Token-based antiforgery services are added to the app when <xref:Microsoft.Extensions.DependencyInjection.RazorComponentsServiceCollectionExtensions.AddRazorComponents%2A> is called in the `Program` file. However, token validation only runs when antiforgery middleware is explicitly added to the request processing pipeline by calling <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A>.
+
+Adding token-based antiforgery middleware doesn't replace the automatic header-based CSRF protection middleware. When an app calls <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A>, both defense mechanisms run for a form post:
+
+* The header-based CSRF protection middleware runs first and records its verdict.
+* Antiforgery middleware performs token-based validation.
+
+The token-based result from antiforgery middleware is authoritative and overrides the earlier header-based CSRF middleware verdict.
+
+To explicitly add antiforgery middleware, call <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> after the call to <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseRouting%2A>. If there are calls to <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseRouting%2A> and <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseEndpoints%2A>, the call to <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> must go between them. A call to <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> must be placed after calls to <xref:Microsoft.AspNetCore.Builder.AuthAppBuilderExtensions.UseAuthentication%2A> and <xref:Microsoft.AspNetCore.Builder.AuthorizationAppBuilderExtensions.UseAuthorization%2A>.
+
+To disable the automatic header-based CSRF protection middleware, set the `DisableCsrfProtection` configuration key to true. For example, use the app settings file (`appsettings.json`) to disable the middleware:
+
+```json
+{
+  "DisableCsrfProtection": true
+}
+```
+
+The `DisableCsrfProtection` configuration setting can be supplied by any configuration source, including via an environment variable (`DisableCsrfProtection=true`).
+
+> [!WARNING]
+> Disabling the automatic CSRF protection middleware removes the default header-based (`Sec-Fetch-Site`/`Origin`) protection for the entire app. Only disable it if you provide an alternative CSRF defense, such as explicitly adopting token-based antiforgery middleware by calling <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A>.
+
+For more information, see [Automatic CSRF protection](xref:security/anti-request-forgery#automatic-csrf-protection-in-aspnet-core).
+
+> [!IMPORTANT]
+> The following guidance on the <xref:Microsoft.AspNetCore.Components.Forms.AntiforgeryToken> component and the <xref:Microsoft.AspNetCore.Components.Forms.AntiforgeryStateProvider> service only apply to an app that explicitly adopts token-based antiforgery middleware by calling <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> in its request processing pipeline.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+The app uses antiforgery middleware by calling <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> in its request processing pipeline in the `Program` file. <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> is called after the call to <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseRouting%2A>. If there are calls to <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseRouting%2A> and <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseEndpoints%2A>, the call to <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> must go between them. A call to <xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A> must be placed after calls to <xref:Microsoft.AspNetCore.Builder.AuthAppBuilderExtensions.UseAuthentication%2A> and <xref:Microsoft.AspNetCore.Builder.AuthorizationAppBuilderExtensions.UseAuthorization%2A>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 The <xref:Microsoft.AspNetCore.Components.Forms.AntiforgeryToken> component renders an antiforgery token as a hidden field, and the `[RequireAntiforgeryToken]` attribute enables antiforgery protection. If an antiforgery check fails, a [`400 - Bad Request`](https://developer.mozilla.org/docs/Web/HTTP/Status/400) response is thrown and the form isn't processed.
 
@@ -333,7 +385,7 @@ To mitigate overposting, we recommend using a separate view model/data transfer 
 
 ## Enhanced form handling
 
-[Enhance navigation](xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling) for form POST requests with the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Enhance%2A> parameter for <xref:Microsoft.AspNetCore.Components.Forms.EditForm> forms or the `data-enhance` attribute for HTML forms (`<form>`):
+[Enhance navigation](xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling) for form POST requests with the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Enhance%2A> parameter for <xref:Microsoft.AspNetCore.Components.Forms.EditForm> forms or the `data-enhance` attribute for HTML forms (`<form>`):
 
 ```razor
 <EditForm ... Enhance ...>
@@ -364,7 +416,7 @@ To disable enhanced form handling:
 * For an <xref:Microsoft.AspNetCore.Components.Forms.EditForm>, remove the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Enhance%2A> parameter from the form element (or set it to `false`: `Enhance="false"`).
 * For an HTML `<form>`, remove the `data-enhance` attribute from form element (or set it to `false`: `data-enhance="false"`).
 
-Blazor's enhanced navigation and form handing may undo dynamic changes to the DOM if the updated content isn't part of the server rendering. To preserve the content of an element, use the `data-permanent` attribute.
+Blazor's enhanced navigation and form handling may undo dynamic changes to the DOM if the updated content isn't part of the server rendering. To preserve the content of an element, use the `data-permanent` attribute.
 
 In the following example, the content of the `<div>` element is updated dynamically by a script when the page loads:
 
@@ -376,7 +428,7 @@ In the following example, the content of the `<div>` element is updated dynamica
 
 To disable enhanced navigation and form handling globally, see <xref:blazor/fundamentals/startup#enhanced-navigation-and-form-handling>.
 
-For guidance on using the `enhancedload` event to listen for enhanced page updates, see <xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling>.
+For guidance on using the `enhancedload` event to listen for enhanced page updates, see <xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling>.
 
 :::moniker-end
 
@@ -390,13 +442,13 @@ Examples don't adopt enhanced form handling for form POST requests, but all of t
 
 :::moniker range="< aspnetcore-5.0"
 
-Examples use the [target-typed `new` operator](/dotnet/csharp/language-reference/operators/new-operator#target-typed-new), which was introduced with C# 9.0 and .NET 5. In the following example, the type isn't explicitly stated for the `new` operator:
+Examples use the [target-typed `new` operator](/dotnet/csharp/language-reference/operators/new-operator#target-typed-new), which was introduced with C# 9 and .NET 5. In the following example, the type isn't explicitly stated for the `new` operator:
 
 ```csharp
 public ShipDescription ShipDescription { get; set; } = new();
 ```
 
-If using C# 8.0 or earlier (ASP.NET Core 3.1), modify the example code to state the type to the `new` operator:
+If using C# 8 or earlier (ASP.NET Core 3.1), modify the example code to state the type to the `new` operator:
 
 ```csharp
 public ShipDescription ShipDescription { get; set; } = new ShipDescription();
@@ -408,11 +460,11 @@ public ShipDescription ShipDescription { get; set; } = new ShipDescription();
 
 Components use nullable reference types (NRTs), and the .NET compiler performs null-state static analysis, both of which are supported in .NET 6 or later. For more information, see <xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis>.
 
-If using C# 9.0 or earlier (.NET 5 or earlier), remove the NRTs from the examples. Usually, this merely involves removing the question marks (`?`) and exclamation points (`!`) from the types in the example code.
+If using C# 9 or earlier (.NET 5 or earlier), remove the NRTs from the examples. Usually, this merely involves removing the question marks (`?`) and exclamation points (`!`) from the types in the example code.
 
 The .NET SDK applies implicit global `using` directives to projects when targeting .NET 6 or later. The examples use a logger to log information about form processing, but it isn't necessary to specify an `@using` directive for the <xref:Microsoft.Extensions.Logging?displayProperty=nameWithType> namespace in the component examples. For more information, see [.NET project SDKs: Implicit using directives](/dotnet/core/project-sdk/overview#implicit-using-directives).
 
-If using C# 9.0 or earlier (.NET 5 or earlier), add `@using` directives to the top of the component after the `@page` directive for any API required by the example. Find API namespaces through Visual Studio (right-click the object and select **Peek Definition**) or the [.NET API browser](/dotnet/api/).
+If using C# 9 or earlier (.NET 5 or earlier), add `@using` directives to the top of the component after the `@page` directive for any API required by the example. Find API namespaces through Visual Studio (right-click the object and select **Peek Definition**) or the [.NET API browser](/dotnet/api/).
 
 :::moniker-end
 
@@ -424,11 +476,19 @@ To demonstrate how forms work with [data annotations](xref:mvc/models/validation
 
 Form examples reference aspects of the [Star Trek](http://www.startrek.com/) universe. Star Trek is a copyright &copy;1966-2023 of [CBS Studios](https://www.paramount.com/brand/cbs-studios) and [Paramount](https://www.paramount.com).
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
 
 ## Client-side validation requires a circuit
 
 In Blazor Web Apps, client-side validation requires an active Blazor SignalR circuit. Client-side validation isn't available to forms in components that have adopted static server-side rendering (static SSR). Forms that adopt static SSR are validated on the server after the form is submitted.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+## Client-side validation in static SSR forms
+
+In Blazor Web Apps, forms in components that adopt static server-side rendering (static SSR) gain client-side validation automatically when a <xref:Microsoft.AspNetCore.Components.Forms.DataAnnotationsValidator> component is present in the form. For details, see <xref:blazor/forms/validation-client-side>.
 
 :::moniker-end
 
@@ -438,15 +498,26 @@ All of the [data annotation built-in validators](xref:mvc/models/validation#buil
 
 jQuery validation isn't supported in Razor components. We recommend any of the following approaches:
 
-* Follow the guidance in <xref:blazor/forms/validation> for either:
+:::moniker range=">= aspnetcore-11.0"
+
+* Follow the guidance in <xref:blazor/forms/validation> for any of the following scenarios:
   * Server-side validation in a Blazor Web App that adopts an interactive render mode.
-  * Client-side validation in a standalone Blazor Web Assembly app.
-* Use native HTML validation attributes (see [Client-side form validation (MDN documentation)](https://developer.mozilla.org/docs/Learn/Forms/Form_validation)).
+  * Client-side validation in [static SSR forms](xref:blazor/forms/validation-client-side).
+  * Client-side validation in a standalone Blazor WebAssembly app.
+* Use native HTML validation attributes (see [Client-side form validation](https://developer.mozilla.org/docs/Learn/Forms/Form_validation)).
 * Adopt a third-party validation JavaScript library.
 
-<!-- UPDATE 10.0 - Remove if the feature is realized. -->
+:::moniker-end
 
-For statically-rendered forms on the server, a new mechanism for client-side validation is under consideration for .NET 10 in late 2025. For more information, see [Create server rendered forms with client validation using Blazor without a circuit (`dotnet/aspnetcore` #51040)](https://github.com/dotnet/aspnetcore/issues/51040).
+:::moniker range="< aspnetcore-11.0"
+
+* Follow the guidance in <xref:blazor/forms/validation> for either:
+  * Server-side validation in a Blazor Web App that adopts an interactive render mode.
+  * Client-side validation in a standalone Blazor WebAssembly app.
+* Use native HTML validation attributes (see [Client-side form validation](https://developer.mozilla.org/docs/Learn/Forms/Form_validation)).
+* Adopt a third-party validation JavaScript library.
+
+:::moniker-end
 
 ## Additional resources
 

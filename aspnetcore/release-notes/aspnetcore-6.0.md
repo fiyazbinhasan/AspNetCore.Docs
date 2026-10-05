@@ -1,15 +1,14 @@
 ---
-title: What's new in ASP.NET Core 6.0
-author: rick-anderson
-description: Learn about the new features in ASP.NET Core 6.0.
-ms.author: riande
-ms.custom: mvc
+title: What's new in ASP.NET Core in .NET 6
+author: tdykstra
+description: Learn about the new features in ASP.NET Core in .NET 6.
+ms.author: tdykstra
 ms.date: 10/29/2021
 uid: aspnetcore-6.0
 ---
-# What's new in ASP.NET Core 6.0
+# What's new in ASP.NET Core in .NET 6
 
-This article highlights the most significant changes in ASP.NET Core 6.0 with links to relevant documentation.
+This article highlights the most significant changes in ASP.NET Core in .NET 6 with links to relevant documentation.
 
 ## ASP.NET Core MVC and Razor improvements
 
@@ -18,7 +17,7 @@ This article highlights the most significant changes in ASP.NET Core 6.0 with li
 Minimal APIs are architected to create HTTP APIs with minimal dependencies. They are ideal for microservices and apps that want to include only the minimum files, features, and dependencies in ASP.NET Core. For more information, see:
 
 * <xref:tutorials/min-web-api>
-* [Differences between minimal APIs and APIs with controllers](xref:tutorials/min-web-api?view=aspnetcore-6.0#differences-between-minimal-apis-and-apis-with-controllers)
+* [Differences between Minimal APIs and APIs with controllers](xref:tutorials/min-web-api?view=aspnetcore-6.0#differences-between-minimal-apis-and-apis-with-controllers)
 * <xref:fundamentals/minimal-apis>
 * <xref:migration/50-to-60-samples>
 
@@ -61,12 +60,12 @@ Many changes were made to reduce allocations and improve performance across the 
 * Reduce allocations by removing logging delegates in generic types. For more information, see [this GitHub pull request](https://github.com/dotnet/aspnetcore/issues/31340).
 * Faster GET access (about 50%) to commonly-used features such as  <xref:Microsoft.AspNetCore.Http.Features.IHttpRequestFeature>, <xref:Microsoft.AspNetCore.Http.Features.IHttpResponseFeature>, <xref:Microsoft.AspNetCore.Http.Features.IHttpResponseBodyFeature>, <xref:Microsoft.AspNetCore.Http.Features.IRouteValuesFeature>, and <xref:Microsoft.AspNetCore.Http.Features.IEndpointFeature>. For more information, see [this GitHub pull request](https://github.com/dotnet/aspnetcore/pull/31322).
 * Use single instance strings for known header names, even if they aren't in the preserved header block. Using single instance string helps prevent multiple duplicates of the same string in long lived connections, for example, in <xref:Microsoft.AspNetCore.WebSockets>. For more information, see [this GitHub issue](https://github.com/dotnet/aspnetcore/issues/31305).
-* Reuse [HttpProtocol CancellationTokenSource](https://github.com/dotnet/aspnetcore/blob/v6.0.0/src/Servers/Kestrel/Core/src/Internal/Http/HttpProtocol.cs#L401-L409) in Kestrel. Use the new [CancellationTokenSource.TryReset](xref:System.Threading.CancellationTokenSource.TryReset%2A) method on `CancellationTokenSource` to reuse tokens if they haven’t been canceled. For more information, see [this GitHub issue](https://github.com/dotnet/runtime/issues/48492) and this [video](https://www.youtube.com/watch?v=vNPybpatlUU&t=1h38m28s).
+* Reuse [HttpProtocol CancellationTokenSource](https://github.com/dotnet/aspnetcore/blob/v6.0.0/src/Servers/Kestrel/Core/src/Internal/Http/HttpProtocol.cs#L401-L409) in Kestrel. Use the new [CancellationTokenSource.TryReset](xref:System.Threading.CancellationTokenSource.TryReset%2A) method on `CancellationTokenSource` to reuse tokens if they haven't been canceled. For more information, see [this GitHub issue](https://github.com/dotnet/runtime/issues/48492) and this [video](https://www.youtube.com/watch?v=vNPybpatlUU&t=1h38m28s).
 * Implement and use an [AdaptiveCapacityDictionary](https://github.com/dotnet/aspnetcore/blob/v6.0.0/src/Http/Http/src/Internal/RequestCookieCollection.cs#L24) in <xref:Microsoft.AspNetCore.Http> [RequestCookieCollection](https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/Internal/RequestCookieCollection.cs) for more efficient access to dictionaries. For more information, see [this GitHub pull request](https://github.com/dotnet/aspnetcore/pull/31360).
 
 ### Reduced memory footprint for idle TLS connections
 
-For long running TLS connections where data is only occasionally sent back and forth, we’ve significantly reduced the memory footprint of ASP.NET Core apps in .NET 6. This should help improve the scalability of scenarios such as WebSocket servers. This was possible due to numerous improvements in <xref:System.IO.Pipelines>, <xref:System.Net.Security.SslStream>, and Kestrel. The following sections detail some of the improvements that have contributed to the reduced memory footprint:
+For long running TLS connections where data is only occasionally sent back and forth, we've significantly reduced the memory footprint of ASP.NET Core apps in .NET 6. This should help improve the scalability of scenarios such as WebSocket servers. This was possible due to numerous improvements in <xref:System.IO.Pipelines>, <xref:System.Net.Security.SslStream>, and Kestrel. The following sections detail some of the improvements that have contributed to the reduced memory footprint:
 
 #### Reduce the size of `System.IO.Pipelines.Pipe`
 
@@ -83,7 +82,7 @@ By shrinking the size of <xref:System.IO.Pipelines.Pipe?displayProperty=fullName
 
 #### Zero bytes reads with SslStream
 
-Bufferless reads are a technique employed in ASP.NET Core to avoid renting memory from the memory pool if there’s no data available on the socket. Prior to this change, our WebSocket server with 5000 idle connections required ~200 MB without TLS compared to ~800 MB with TLS. Some of these allocations (4k per connection) were from Kestrel having to hold on to an <xref:System.Buffers.ArrayPool%601> buffer while waiting for the reads on <xref:System.Net.Security.SslStream> to complete. Given that these connections were idle, none of reads completed and returned their buffers to the `ArrayPool`, forcing the `ArrayPool` to allocate more memory. The remaining allocations were in `SslStream` itself: 4k buffer for TLS handshakes and 32k buffer for normal reads. In .NET 6, when the user performs a zero byte read on `SslStream` and it has no data available, `SslStream` internally performs a zero-byte read on the underlying wrapped stream. In the best case (idle connection), these changes result in a savings of 40 Kb per connection while still allowing the consumer (Kestrel) to be notified when data is available without holding on to any unused buffers.
+Bufferless reads are a technique employed in ASP.NET Core to avoid renting memory from the memory pool if there's no data available on the socket. Prior to this change, our WebSocket server with 5000 idle connections required ~200 MB without TLS compared to ~800 MB with TLS. Some of these allocations (4k per connection) were from Kestrel having to hold on to an <xref:System.Buffers.ArrayPool%601> buffer while waiting for the reads on <xref:System.Net.Security.SslStream> to complete. Given that these connections were idle, none of reads completed and returned their buffers to the `ArrayPool`, forcing the `ArrayPool` to allocate more memory. The remaining allocations were in `SslStream` itself: 4k buffer for TLS handshakes and 32k buffer for normal reads. In .NET 6, when the user performs a zero byte read on `SslStream` and it has no data available, `SslStream` internally performs a zero-byte read on the underlying wrapped stream. In the best case (idle connection), these changes result in a savings of 40 Kb per connection while still allowing the consumer (Kestrel) to be notified when data is available without holding on to any unused buffers.
 
 #### Zero byte reads with PipeReader
 
@@ -128,7 +127,7 @@ Consider a controller that creates and uses a <xref:System.Text.Json.Utf8JsonWri
 
 ### Vcpkg port for SignalR C++ client
 
-[Vcpkg](https://github.com/microsoft/vcpkg) is a cross-platform command-line package manager for C and C++ libraries. We’ve recently added a port to `vcpkg` to add `CMake` native support for the SignalR C++ client. `vcpkg` also works with MSBuild.
+[Vcpkg](https://github.com/microsoft/vcpkg) is a cross-platform command-line package manager for C and C++ libraries. We've recently added a port to `vcpkg` to add `CMake` native support for the SignalR C++ client. `vcpkg` also works with MSBuild.
 
 The SignalR client can be added to a CMake project with the following snippet when the vcpkg is included in the toolchain file:
 
@@ -156,11 +155,11 @@ Blazor WebAssembly apps can use native dependencies built to run on WebAssembly.
 
 ### WebAssembly Ahead-of-time (AOT) compilation and runtime relinking
 
-Blazor WebAssembly supports ahead-of-time (AOT) compilation, where you can compile your .NET code directly into WebAssembly. AOT compilation results in runtime performance improvements at the expense of a larger app size. Relinking the .NET WebAssembly runtime trims unused runtime code and thus improves download speed. For more information, see [Ahead-of-time (AOT) compilation](xref:blazor/host-and-deploy/webassembly?view=aspnetcore-6.0#ahead-of-time-aot-compilation) and [Runtime relinking](xref:blazor/tooling/webassembly?view=aspnetcore-6.0#runtime-relinking).
+Blazor WebAssembly supports ahead-of-time (AOT) compilation, where you can compile your .NET code directly into WebAssembly. AOT compilation results in runtime performance improvements at the expense of a larger app size. Relinking the .NET WebAssembly runtime trims unused runtime code and thus improves download speed. For more information, see [Ahead-of-time (AOT) compilation](xref:blazor/host-and-deploy/webassembly/index?view=aspnetcore-6.0#ahead-of-time-aot-compilation) and [Runtime relinking](xref:blazor/tooling/webassembly?view=aspnetcore-6.0#runtime-relinking).
 
 ### Persist prerendered state
 
-Blazor supports persisting state in a prerendered page so that the state doesn't need to be recreated when the app is fully loaded. For more information, see <xref:blazor/components/prerendering-and-integration?view=aspnetcore-6.0&pivots=server#persist-prerendered-state>.
+Blazor supports persisting state in a prerendered page so that the state doesn't need to be recreated when the app is fully loaded. For more information, see <xref:blazor/components/integration?view=aspnetcore-6.0&pivots=server#persist-prerendered-state>.
 
 ### Error boundaries
 
@@ -179,7 +178,7 @@ Blazor supports optimized byte array JS interop that avoids encoding and decodin
 
 ### Query string enhancements
 
-Support for working with query strings is improved. For more information, see <xref:blazor/fundamentals/routing?view=aspnetcore-6.0#query-strings>.
+Support for working with query strings is improved. For more information, see <xref:blazor/fundamentals/navigation?view=aspnetcore-6.0#query-strings>.
 
 ### Binding to select multiple
 
@@ -245,7 +244,7 @@ Generic type parameters are now supported. For more information, see <xref:blazo
 
 ### WebAssembly deployment layout
 
-Use a deployment layout to enable Blazor WebAssembly app downloads in restricted security environments. For more information, see <xref:blazor/host-and-deploy/webassembly-deployment-layout?view=aspnetcore-6.0>.
+Use a deployment layout to enable Blazor WebAssembly app downloads in restricted security environments. For more information, see <xref:blazor/host-and-deploy/webassembly/deployment-layout?view=aspnetcore-6.0>.
 
 ### New Blazor articles
 
@@ -434,7 +433,7 @@ See the blog entry [HTTP/3 support in .NET 6](https://devblogs.microsoft.com/dot
 
 ### Nullable Reference Type Annotations
 
-Portions of the [ASP.NET Core 6.0 source code](https://github.com/dotnet/aspnetcore/tree/v6.0.0/src) has had [nullability annotations](/dotnet/csharp/nullable-migration-strategies) applied.
+Portions of the [ASP.NET Core in .NET 6 source code](https://github.com/dotnet/aspnetcore/tree/v6.0.0/src) has had [nullability annotations](/dotnet/csharp/nullable-migration-strategies) applied.
 
 By utilizing the new [Nullable feature in C# 8](/dotnet/csharp/whats-new/csharp-8#nullable-reference-types), ASP.NET Core can provide additional compile-time safety in the handling of reference types. For example, protecting against `null` reference exceptions. Projects that have opted in to using nullable annotations may see new build-time warnings from ASP.NET Core APIs.
 
@@ -488,7 +487,7 @@ The following changes were made to both `appsettings.json` and `appsettings.Deve
 The change from `"Microsoft": "Warning"` to `"Microsoft.AspNetCore": "Warning"` results in logging all informational messages from the `Microsoft` namespace ***except*** `Microsoft.AspNetCore`. For example, `Microsoft.EntityFrameworkCore` is now logged at the informational level.
 
 <!-- TODO add and routing -->
-### Developer exception page Middleware added automatically
+### Developer exception page middleware added automatically
 
 In the [development environment](xref:fundamentals/environments), the <xref:Microsoft.AspNetCore.Diagnostics.DeveloperExceptionPageMiddleware> is added by default. It's no longer necessary to add the following code to web UI apps:
 
@@ -521,7 +520,7 @@ The resulting logs now resemble the sample output show below:
 
 The IIS server previously only buffered 64 KiB of unconsumed request bodies. The 64 KiB buffering resulted in reads being constrained to that maximum size, which impacts the performance with large incoming bodies such as uploads. In .NET 6 , the default buffer size changes from 64 KiB to 1 MiB which should improve throughput for large uploads. In our tests, a 700 MiB upload that used to take 9 seconds now only takes 2.5 seconds.
 
-The downside of a larger buffer size is an increased per-request memory consumption when the app isn’t quickly reading from the request body. So, in addition to changing the default buffer size, the buffer size configurable, allowing apps to configure the buffer size based on workload.
+The downside of a larger buffer size is an increased per-request memory consumption when the app isn't quickly reading from the request body. So, in addition to changing the default buffer size, the buffer size configurable, allowing apps to configure the buffer size based on workload.
 
 ### View Components Tag Helpers
 
@@ -534,7 +533,7 @@ class MyViewComponent
 }
 ```
 
-With ASP.NET Core 6, the tag helper can be invoked without having to specify a value for the `showSomething` parameter:
+With ASP.NET Core in .NET 6, the tag helper can be invoked without having to specify a value for the `showSomething` parameter:
 
 ```razor
 <vc:my />
@@ -542,7 +541,7 @@ With ASP.NET Core 6, the tag helper can be invoked without having to specify a v
 
 ### Angular template updated to Angular 12
 
-The ASP.NET Core 6.0 template for Angular now uses Angular 12.
+The ASP.NET Core in .NET 6 template for Angular now uses Angular 12.
 
 The React template has been updated to [React 17](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -672,7 +671,7 @@ For more information, see [StackExchange.Redis Profiling](https://stackexchange.
 
 ### Shadow copying in IIS
 
-An experimental feature has been added to the <xref:host-and-deploy/aspnet-core-module> to add support for [shadow copying application assemblies](/dotnet/framework/app-domains/shadow-copy-assemblies). Currently .NET locks application binaries when running on Windows making it impossible to replace binaries when the app is running. While our recommendation remains to use an [app offline file](xref:host-and-deploy/iis/app-offline), we recognize there are certain scenarios (for example FTP deployments) where it isn’t possible to do so.
+An experimental feature has been added to the <xref:host-and-deploy/aspnet-core-module> to add support for [shadow copying application assemblies](/dotnet/framework/app-domains/shadow-copy-assemblies). Currently .NET locks application binaries when running on Windows making it impossible to replace binaries when the app is running. While our recommendation remains to use an [app offline file](xref:host-and-deploy/iis/app-offline), we recognize there are certain scenarios (for example FTP deployments) where it isn't possible to do so.
 
 In such scenarios, enable shadow copying by customizing the ASP.NET Core module handler settings. In most cases, ASP.NET Core apps do not have a `web.config` checked into source control that you can modify. In ASP.NET Core, `web.config` is ordinarily generated by the SDK. The following sample `web.config` can be used to get started:
 
@@ -701,6 +700,10 @@ In such scenarios, enable shadow copying by customizing the ASP.NET Core module 
 ```
 
 Shadow copying in IIS is an experimental feature that is not guaranteed to be part of ASP.NET Core. Please leave feedback on IIS Shadow copying in [this GitHub issue](https://github.com/dotnet/AspNetCore.Docs/issues/23733).
+
+## Breaking changes
+
+Use the articles in [Breaking changes in .NET](/dotnet/core/compatibility/breaking-changes) to find breaking changes that might apply when upgrading an app to a newer version of .NET.
 
 ## Additional resources
 

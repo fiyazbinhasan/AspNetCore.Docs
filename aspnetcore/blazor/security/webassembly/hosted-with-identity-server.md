@@ -3,12 +3,14 @@ title: Secure a hosted ASP.NET Core Blazor WebAssembly app with Identity Server
 author: guardrex
 description: Learn how to secure a hosted ASP.NET Core Blazor WebAssembly app with Identity Server.
 monikerRange: '>= aspnetcore-3.1 < aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc, linux-related-content
-ms.date: 06/07/2024
+ms.author: wpickett
+ms.custom: linux-related-content
+ms.date: 11/11/2025
 uid: blazor/security/webassembly/hosted-with-identity-server
 ---
 # Secure a hosted ASP.NET Core Blazor WebAssembly app with Identity Server
+
+[!INCLUDE[](~/blazor/security/includes/hosted-blazor-webassembly-notice.md)]
 
 This article explains how to create a [hosted Blazor WebAssembly solution](xref:blazor/hosting-models#blazor-webassembly) that uses [Duende Identity Server](https://docs.duendesoftware.com) to authenticate users and API calls.
 
@@ -67,13 +69,19 @@ The output location specified with the optional `-o|--output` option creates a p
 
 Avoid using dashes (`-`) in the project name that break the formation of the OIDC app identifier. Logic in the Blazor WebAssembly project template uses the project name for an OIDC app identifier in the solution's configuration, and dashes aren't permitted in an OIDC app identifier. Pascal case (`BlazorSample`) or underscores (`Blazor_Sample`) are acceptable alternatives.
 
-For more information, see the [`dotnet new`](/dotnet/core/tools/dotnet-new) command in the .NET Core Guide.
+For more information, see the [`dotnet new`](/dotnet/core/tools/dotnet-new) command in the .NET Guide.
 
 ---
 
 ### Run the app
 
 [!INCLUDE[](~/blazor/security/includes/run-the-app.md)]
+
+## Remote authentication paths
+
+*This section pertains to the solution's **:::no-loc text="Client":::** app.*
+
+[!INCLUDE[](~/blazor/security/includes/remote-authentication-paths.md)]
 
 ## Parts of the solution
 
@@ -169,7 +177,7 @@ The following services are registered.
 
 :::moniker-end
 
-  * The Identity Server Middleware exposes the OpenID Connect (OIDC) endpoints:
+  * The Identity Server middleware exposes the OpenID Connect (OIDC) endpoints:
 
     ```csharp
     app.UseIdentityServer();
@@ -177,7 +185,7 @@ The following services are registered.
 
 :::moniker range="< aspnetcore-7.0"
 
-  * The Authentication Middleware is responsible for validating request credentials and setting the user on the request context:
+  * The authentication middleware is responsible for validating request credentials and setting the user on the request context:
 
     ```csharp
     app.UseAuthentication();
@@ -185,7 +193,7 @@ The following services are registered.
 
 :::moniker-end
 
-  * Authorization Middleware enables authorization capabilities:
+  * Authorization middleware enables authorization capabilities:
 
     ```csharp
     app.UseAuthorization();
@@ -204,7 +212,7 @@ The <xref:Microsoft.Extensions.DependencyInjection.IdentityServerBuilderConfigur
 The <xref:Microsoft.AspNetCore.Authentication.AuthenticationBuilderExtensions.AddIdentityServerJwt%2A> helper method configures a policy scheme for the app as the default authentication handler. The policy is configured to allow Identity to handle all requests routed to any subpath in the Identity URL space under `/Identity`. The <xref:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerHandler> handles all other requests. Additionally, this method:
 
 * Registers an API resource with Identity Server with a default scope of `{PROJECT NAME}API`, where the `{PROJECT NAME}` placeholder is the project's name at app creation.
-* Configures the JWT Bearer Token Middleware to validate tokens issued by Identity Server for the app.
+* Configures the JWT bearer token middleware to validate tokens issued by Identity Server for the app.
 
 ### Weather forecast controller
 
@@ -248,9 +256,9 @@ The `{ASSEMBLY NAME}` placeholder is the **:::no-loc text="Client":::** app's as
 
 *This section pertains to the solution's **:::no-loc text="Client":::** app.*
 
-When an app is created to use Individual User Accounts (`Individual`), the app automatically receives a package reference for the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) package. The package provides a set of primitives that help the app authenticate users and obtain tokens to call protected APIs.
+When an app is created to use Individual Accounts (`Individual`), the app automatically receives a package reference for the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication` package](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication). The package provides a set of primitives that help the app authenticate users and obtain tokens to call protected APIs.
 
-If adding authentication to an app, manually add the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) package to the app.
+If adding authentication to an app, manually add the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication` package](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) to the app.
 
 [!INCLUDE[](~/includes/package-reference.md)]
 
@@ -278,7 +286,7 @@ The `{PROJECT NAME}` placeholder is the project name at solution creation. For e
 
 *This section pertains to the solution's **:::no-loc text="Client":::** app.*
 
-The support for authenticating users is plugged into the service container by the extension method provided inside the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) package. This method sets up the services required by the app to interact with the existing authorization system.
+The support for authenticating users is plugged into the service container by the extension method provided inside the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication` package](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication). This method sets up the services required by the app to interact with the existing authorization system.
 
 ```csharp
 builder.Services.AddApiAuthorization();
@@ -290,7 +298,13 @@ Configuration for the app is loaded by convention from `_configuration/{client-i
 
 *This section pertains to the solution's **:::no-loc text="Client":::** app.*
 
-[!INCLUDE[](~/blazor/security/includes/imports-file-hosted.md)]
+The <xref:Microsoft.AspNetCore.Components.Authorization?displayProperty=fullName> namespace is made available throughout the app via the imports file (`_Imports.razor`):
+
+```razor
+...
+@using Microsoft.AspNetCore.Components.Authorization
+...
+```
 
 ### `Index` page
 
@@ -720,6 +734,6 @@ Get-ChildItem -path Cert:\CurrentUser\My -Recurse | Format-List DnsNameList, Sub
 * <xref:blazor/security/webassembly/additional-scenarios>
 * [Unauthenticated or unauthorized web API requests in an app with a secure default client](xref:blazor/security/webassembly/additional-scenarios#unauthenticated-or-unauthorized-web-api-requests-in-an-app-with-a-secure-default-client)
 * <xref:host-and-deploy/proxy-load-balancer>: Includes guidance on:
-  * Using Forwarded Headers Middleware to preserve HTTPS scheme information across proxy servers and internal networks.
+  * Using forwarded headers middleware to preserve HTTPS scheme information across proxy servers and internal networks.
   * Additional scenarios and use cases, including manual scheme configuration, request path changes for correct request routing, and forwarding the request scheme for Linux and non-IIS reverse proxies.
 * [Duende Identity Server](https://docs.duendesoftware.com)

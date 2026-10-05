@@ -46,7 +46,7 @@ MessagePack serialization can be configured by providing a delegate to the <xref
 
 ## Configure server options
 
-The following table describes options for configuring SignalR hubs:
+The following table describes options for configuring SignalR hubs.
 
 | Option | Default Value | Description |
 | ------ | ------------- | ----------- |
@@ -58,6 +58,9 @@ The following table describes options for configuring SignalR hubs:
 | `StreamBufferCapacity` | `10` | The maximum number of items that can be buffered for client upload streams. If this limit is reached, the processing of invocations is blocked until the server processes stream items.|
 | `MaximumReceiveMessageSize` | 32 KB | Maximum size of a single incoming hub message. Increasing the value may increase the risk of [Denial of service (DoS) attacks](https://developer.mozilla.org/docs/Glossary/DOS_attack). |
 | `MaximumParallelInvocationsPerClient` | 1 | The maximum number of hub methods that each client can call in parallel before queueing. |
+
+> [!NOTE]
+> `MaximumParallelInvocationsPerClient` does not apply to streaming hub invocations. Streaming invocations are expected to be long-running and can run concurrently. Use [hub filters](xref:signalr/hub-filters) to enforce per-connection streaming concurrency limits.
 
 Options can be configured for all hubs by providing an options delegate to the `AddSignalR` call in `Startup.ConfigureServices`.
 
@@ -102,7 +105,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 }
 ```
 
-The following table describes options for configuring ASP.NET Core SignalR's advanced HTTP options:
+The following table describes options for configuring ASP.NET Core SignalR's advanced HTTP options.
 
 | Option | Default Value | Description |
 | ------ | ------------- | ----------- |

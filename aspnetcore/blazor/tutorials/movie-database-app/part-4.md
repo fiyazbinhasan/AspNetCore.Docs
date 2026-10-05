@@ -1,21 +1,17 @@
 ---
 title: Build a Blazor movie database app (Part 4 - Work with a database)
+ai-usage: ai-assisted
 author: guardrex
 description: This part of the Blazor movie database app tutorial explains the database context and directly working with the database's schema and data. Seeding the database with data is also covered.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 09/15/2026
 uid: blazor/tutorials/movie-database-app/part-4
 zone_pivot_groups: tooling
 ---
 # Build a Blazor movie database app (Part 4 - Work with a database)
 
-<!-- UPDATE 9.0 Activate after release
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article is the fourth part of the Blazor movie database app tutorial that teaches you the basics of building an ASP.NET Core Blazor Web App with features to manage a movie database.
 
@@ -26,7 +22,7 @@ This part of the tutorial series focuses on the database context and directly wo
 This tutorial uses a local database that doesn't require user authentication. Production apps should use the most secure authentication flow available. For more information on authentication for deployed test and production Blazor Web Apps, see the following resources:
 
 * <xref:blazor/security/index>
-* <xref:blazor/security/server/index> and the following articles in the *Server* security node
+* <xref:blazor/security/index> and the following articles in the *Server* security node
 * <xref:blazor/security/blazor-web-app-oidc>
 * <xref:blazor/security/blazor-web-app-entra>
 
@@ -159,7 +155,7 @@ In this tutorial, EF Core migrations are used. A migration updates the database 
 
 Seeding code can create a set of records for development testing or even be used to create the initial data for a new production database.
 
-Create a new class named `SeedData` in the `Data` folder with the following code.
+In the `Data` folder, create a new class named `SeedData` with the following code.
 
 `Data/SeedData.cs`:
 
@@ -257,7 +253,7 @@ If the database contains records from earlier testing, run the app and delete th
 
 :::zone pivot="cli"
 
-If the database contains records from earlier testing, run the app and delete the entities that you created in the database. Stop the app by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) in the command shell.
+If the database contains records from earlier testing, run the app and delete the entities that you created in the database. Stop the app by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) in the command shell.
 
 :::zone-end
 
@@ -269,7 +265,7 @@ Navigate to the movies `Index` page to see the seeded movies:
 
 ## Bind a form to a model
 
-Review the the `Edit` component (`Components/Pages/MoviePages/Edit.razor`).
+Review the `Edit` component (`Components/Pages/MoviePages/Edit.razor`).
 
 When an HTTP GET request is made for the `Edit` component page (for example at the relative URL: `/movies/edit?id=6`):
 
@@ -288,7 +284,81 @@ If the model state has errors when the form is posted, for example if `ReleaseDa
 
 ## Concurrency exception handling
 
-Review the `UpdateMovie` method of the `Edit` component (`Components/Pages/MoviePages/Edit.razor`):
+Examine the `UpdateMovie` method of the `Edit` component (`Components/Pages/MoviePages/Edit.razor`):
+
+:::moniker range=">= aspnetcore-10.0"
+
+```csharp
+private async Task UpdateMovie()
+{
+    using var context = DbFactory.CreateDbContext();
+    context.Attach(Movie!).State = EntityState.Modified;
+
+    try
+    {
+        await context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!MovieExists(Movie!.Id))
+        {
+            NavigationManager.NotFound();
+        }
+        else
+        {
+            throw;
+        }
+    }
+
+    NavigationManager.NavigateTo("/movies");
+}
+```
+
+<!-- UPDATE 11.0 - Delete the following IMPORTANT note and add the 
+                   return statement to the example code above after
+                   scaffolder updates go public per 
+                   https://github.com/dotnet/Scaffolding/issues/3828.
+-->
+
+> [!IMPORTANT]
+> Due to a bug in the Blazor CRUD template, a `return` statement is missing from the `UpdateMovie` method after <xref:Microsoft.AspNetCore.Components.NavigationManager.NotFound%2A> is called. The purpose of calling `return` is to ensure the handler (the `UpdateMovie` method) selects only the Not Found outcome, independently of a given database provider synchronously or asynchronously executing <xref:Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync%2A>. We're in the process of updating the `Edit` component template, and this article will be updated when the scaffolder generates the correct code.
+>
+> After the line that calls <xref:Microsoft.AspNetCore.Components.NavigationManager.NotFound%2A>, add a `return` statement:
+>
+> ```csharp
+> return;
+> ```
+>
+> The `catch` block should look like the following example after the `return` statement is added:
+>
+> ```csharp
+> catch (DbUpdateConcurrencyException)
+> {
+>     if (!MovieExists(Movie!.Id))
+>     {
+>         NavigationManager.NotFound();
+> 
+>         return;
+>     }
+>     else
+>     {
+>         throw;
+>     }
+> }
+> ```
+
+Concurrency exceptions are detected when one client deletes the movie and a different client posts changes to the movie.
+
+To test how concurrency is handled by the preceding code:
+
+1. Select **:::no-loc text="Edit":::** for a movie, make changes, but don't select **:::no-loc text="Save":::**.
+1. In a different browser window, open the app to the movie `Index` page and select the **:::no-loc text="Delete":::** link for the same movie to delete the movie.
+1. In the previous browser window, post changes to the movie by selecting the **:::no-loc text="Save":::** button.
+1. The browser is navigated to the Not Found page with a 404 (Not Found) status code.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
 
 ```csharp
 private async Task UpdateMovie()
@@ -325,6 +395,8 @@ To test how concurrency is handled by the preceding code:
 1. In the previous browser window, post changes to the movie by selecting the **:::no-loc text="Save":::** button.
 1. The browser is navigated to the `notfound` endpoint, which doesn't exist and yields a 404 (Not Found) result.
 
+:::moniker-end
+
 Additional guidance on handling concurrency with EF Core in Blazor apps is available in the Blazor documentation.
 
 ## Stop the app
@@ -343,7 +415,7 @@ If the app is running, shut the app down by closing the browser's window and pre
 
 :::zone pivot="cli"
 
-If the app is running, shut the app down by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) in the command shell.
+If the app is running, shut the app down by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> in the command shell.
 
 :::zone-end
 
@@ -365,7 +437,7 @@ If the app is running, shut the app down by closing the browser's window and pre
   * [SQLite ALTER TABLE statement (SQLite documentation)](https://sqlite.org/lang_altertable.html)
 * Blazor Web App security
   * <xref:blazor/security/index>
-  * <xref:blazor/security/server/index> and the following articles in the *Server* security node
+  * <xref:blazor/security/index> and the following articles in the *Server* security node
   * <xref:blazor/security/blazor-web-app-oidc>
   * <xref:blazor/security/blazor-web-app-entra>
 

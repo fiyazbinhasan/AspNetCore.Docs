@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor cascading values and parameters
 author: guardrex
 description: Learn how to flow data from an ancestor Razor component to descendent components.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 07/19/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/cascading-values-and-parameters
 ---
 # ASP.NET Core Blazor cascading values and parameters
@@ -17,7 +16,7 @@ This article explains how to flow data from an ancestor Razor component to desce
 *Cascading values and parameters* provide a convenient way to flow data down a component hierarchy from an ancestor component to any number of descendent components. Unlike [Component parameters](xref:blazor/components/index#component-parameters), cascading values and parameters don't require an attribute assignment for each descendent component where the data is consumed. Cascading values and parameters also allow components to coordinate with each other across a component hierarchy.
 
 > [!NOTE]
-> The code examples in this article adopt [nullable reference types (NRTs) and .NET compiler null-state static analysis](xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis), which are supported in ASP.NET Core in .NET 6 or later. When targeting ASP.NET Core 5.0 or earlier, remove the null type designation (`?`) from the `CascadingType?`, `@ActiveTab?`, `RenderFragment?`, `ITab?`, `TabSet?`, and `string?` types in the article's examples.
+> The code examples in this article adopt [nullable reference types (NRTs) and .NET compiler null-state static analysis](xref:migration/50-to-60#nullable-reference-types-nrts-and-net-compiler-null-state-static-analysis), which are supported in ASP.NET Core in .NET 6 or later. When targeting .NET 5 or earlier, remove the null type designation (`?`) from the `CascadingType?`, `@ActiveTab?`, `RenderFragment?`, `ITab?`, `TabSet?`, and `string?` types in the article's examples.
 
 :::moniker range=">= aspnetcore-8.0"
 
@@ -75,7 +74,7 @@ The following `Daleks` component displays the cascaded values.
 
 :::moniker range=">= aspnetcore-8.0"
 
-In the following example, `Dalek` is registered as a cascading value using [`CascadingValueSource<T>`](xref:Microsoft.AspNetCore.Components.CascadingValueSource%601), where `<T>` is the type. The `isFixed` flag indicates whether the value is fixed. If false, all recipients are subscribed for update notifications, which are issued by calling <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601.NotifyChangedAsync%2A>. Subscriptions create overhead and reduce performance, so set `isFixed` to `true` if the value doesn't change.
+In the following example, `Dalek` is registered as a cascading value using [`CascadingValueSource<T>`](xref:Microsoft.AspNetCore.Components.CascadingValueSource%601), where `<T>` is the type. The `isFixed` flag indicates whether the value is fixed. If `false`, all recipients are subscribed for update notifications. Subscriptions create overhead and reduce performance, so set `isFixed` to `true` if the value doesn't change.
 
 ```csharp
 builder.Services.AddCascadingValue(sp =>
@@ -93,6 +92,206 @@ builder.Services.AddCascadingValue(sp =>
 > Treat required services separately from cascading values, registering them separately from the cascaded type.
 >
 > Avoid using <xref:Microsoft.Extensions.DependencyInjection.CascadingValueServiceCollectionExtensions.AddCascadingValue%2A> to register a component type as a cascading value. Instead, wrap the `<Router>...</Router>` in the `Routes` component (`Components/Routes.razor`) with the component and adopt global interactive server-side rendering (interactive SSR). For an example, see the [`CascadingValue` component](#cascadingvalue-component) section.
+
+## Root-level cascading values with notifications
+
+Calling <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601.NotifyChangedAsync%2A> to issue update notifications can be used to signal multiple Razor component subscribers that a cascading value has changed. Notifications aren't possible for subscribers that adopt static server-side rendering (static SSR), so subscribers must adopt an interactive render mode. 
+
+In the following example:
+
+* `NotifyingDalek` implements <xref:System.ComponentModel.INotifyPropertyChanged> to notify clients that a property value has changed. When the `Units` property is set, the <xref:System.ComponentModel.PropertyChangedEventHandler> (`PropertyChanged`) is invoked.
+* The `SetUnitsToOneThousandAsync` method can be triggered by subscribers to set `Units` to 1,000 with a simulated processing delay.
+
+Keep in mind for production code that any change in state (any property value change of the class) causes all subscribed components to rerender, regardless of which part of the state they use. We recommend creating granular classes, cascading them separately with specific subscriptions to ensure that only components subscribed to a specific portion of the application state are affected by changes.
+
+> [!NOTE]
+> For a Blazor Web App solution consisting of server and client (`.Client`) projects, the following `NotifyingDalek.cs` file is placed in the `.Client` project.
+
+`NotifyingDalek.cs`:
+
+```csharp
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+
+public class NotifyingDalek : INotifyPropertyChanged
+{
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private int units;
+
+    public int Units
+    {
+        get => units;
+        set
+        {
+            if (units != value)
+            {
+                units = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    protected virtual void OnPropertyChanged(
+        [CallerMemberName] string? propertyName = default)
+            => PropertyChanged?.Invoke(this, new(propertyName));
+
+    public async Task SetUnitsToOneThousandAsync()
+    {
+        // Simulate a three second delay in processing
+        await Task.Delay(3000);
+
+        Units = 1000;
+    }
+}
+```
+
+The following `CascadingStateServiceCollectionExtensions` creates a <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601> from a type that implements <xref:System.ComponentModel.INotifyPropertyChanged>.
+
+> [!NOTE]
+> For a Blazor Web App solution consisting of server and client (`.Client`) projects, the following `CascadingStateServiceCollectionExtensions.cs` file is placed in the `.Client` project.
+
+`CascadingStateServiceCollectionExtensions.cs`:
+
+```csharp
+using System.ComponentModel;
+using Microsoft.AspNetCore.Components;
+
+namespace Microsoft.Extensions.DependencyInjection;
+
+public static class CascadingStateServiceCollectionExtensions
+{
+    public static IServiceCollection AddNotifyingCascadingValue<T>(
+        this IServiceCollection services, T state, bool isFixed = false)
+        where T : INotifyPropertyChanged
+    {
+        return services.AddCascadingValue<T>(sp =>
+        {
+            return new CascadingStateValueSource<T>(state, isFixed);
+        });
+    }
+
+    private sealed class CascadingStateValueSource<T>
+        : CascadingValueSource<T>, IDisposable where T : INotifyPropertyChanged
+    {
+        private readonly T state;
+        private readonly CascadingValueSource<T> source;
+
+        public CascadingStateValueSource(T state, bool isFixed = false)
+            : base(state, isFixed = false)
+        {
+            this.state = state;
+            source = new CascadingValueSource<T>(state, isFixed);
+            this.state.PropertyChanged += HandlePropertyChanged;
+        }
+
+        private void HandlePropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            _ = NotifyChangedAsync();
+        }
+
+        public void Dispose()
+        {
+            state.PropertyChanged -= HandlePropertyChanged;
+        }
+    }
+}
+```
+
+The type's <xref:System.ComponentModel.PropertyChangedEventHandler> (`HandlePropertyChanged`) calls the <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601>'s <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601.NotifyChangedAsync%2A> method to notify subscribers that the cascading value has changed. The <xref:System.Threading.Tasks.Task> is discarded when calling <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601.NotifyChangedAsync%2A> because the call only represents the duration of the dispatch to the synchronous context. Exceptions are handled internally by dispatching them to the renderer within the context of whichever component threw when receiving the update. This is the same way that exceptions are processed with a <xref:Microsoft.AspNetCore.Components.CascadingValue%601>, which isn't notified about exceptions that happen inside notification recipients. The event handler is disconnected in the `Dispose` method to prevent a memory leak.
+
+In the `Program` file, `NotifyingDalek` is passed to create a <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601> with an initial `Unit` value of 888 units:
+
+```csharp
+builder.Services.AddNotifyingCascadingValue(new NotifyingDalek() { Units = 888 });
+```
+
+> [!NOTE]
+> For a Blazor Web App solution consisting of server and client (`.Client`) projects, the preceding code is placed into each project's `Program` file.
+
+The following component is used to demonstrate how changing the value of `NotifyingDalek.Units` notifies subscribers.
+
+`Daleks.razor`:
+
+```razor
+<h2>Daleks component</h2>
+
+<div>
+    <b>Dalek Units:</b> @Dalek?.Units
+</div>
+
+<div>
+    <label>
+        <span style="font-weight:bold">New Unit Count:</span>
+        <input @bind="dalekCount" />
+    </label>
+    <button @onclick="Update">Update</button>
+</div>
+
+<div>
+    <button @onclick="SetOneThousandUnits">Set Units to 1,000</button>
+</div>
+
+<p>
+    Dalek© <a href="https://www.imdb.com/name/nm0622334/">Terry Nation</a><br>
+    Doctor Who© <a href="https://www.bbc.co.uk/programmes/b006q2x0">BBC</a>
+</p>
+
+@code {
+    private int dalekCount;
+
+    [CascadingParameter]
+    private NotifyingDalek? Dalek { get; set; }
+
+    private void Update()
+    {
+        if (Dalek is not null)
+        {
+            Dalek.Units = dalekCount;
+            dalekCount = 0;
+        }
+    }
+
+    private async Task SetOneThousandUnits()
+    {
+        if (Dalek is not null)
+        {
+            await Dalek.SetUnitsToOneThousandAsync();
+        }
+    }
+}
+```
+
+To demonstrate multiple subscriber notifications, the following `DaleksMain` component renders three `Daleks` components. When the unit count (`Units`) of one `Dalek` component is updated, the other two `Dalek` component subscribers are updated.
+
+`DaleksMain.razor`:
+
+```razor
+@page "/daleks-main"
+
+<PageTitle>Daleks Main</PageTitle>
+
+<h1>Daleks Main</h1>
+
+<Daleks />
+
+<Daleks />
+
+<Daleks />
+```
+
+Add a navigation link to the `DaleksMain` component in `NavMenu.razor`:
+
+```razor
+<div class="nav-item px-3">
+    <NavLink class="nav-link" href="daleks-main">
+        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Daleks
+    </NavLink>
+</div>
+```
+
+Because the <xref:Microsoft.AspNetCore.Components.CascadingValueSource%601>'s type in this example (`NotifyingDalek`) is a class type, you can meet virtually any state management feature specification requirement. However, subscriptions create overhead and reduce performance, so benchmark the performance of this approach in your app and compare it to other [state management approaches](xref:blazor/state-management/index) before adopting it in a production app with constrained processing and memory resources.
+
+Any change in state (any property value change of the class) causes all subscribed components to rerender, regardless of which part of the state they use. **Avoid creating a single large class representing the entire global application state.** Instead, create granular classes and cascade them separately with specific subscriptions to cascading parameters, ensuring that only components subscribed to a specific portion of the application state are affected by changes.
 
 :::moniker-end
 
@@ -224,6 +423,7 @@ Blazor Web Apps provide alternative approaches for cascading values that apply m
 For more information, see the following sections of this article:
 
 * [Root-level cascading values](#root-level-cascading-values)
+* [Root-level cascading values with notifications](#root-level-cascading-values-with-notifications)
 * [Cascading values/parameters and render mode boundaries](#cascading-valuesparameters-and-render-mode-boundaries)
 
 :::moniker-end
@@ -231,6 +431,8 @@ For more information, see the following sections of this article:
 ## `[CascadingParameter]` attribute
 
 To make use of cascading values, descendent components declare cascading parameters using the [`[CascadingParameter]` attribute](xref:Microsoft.AspNetCore.Components.CascadingParameterAttribute). Cascading values are bound to cascading parameters **by type**. Cascading multiple values of the same type is covered in the [Cascade multiple values](#cascade-multiple-values) section later in this article.
+
+The `private` access modifier is recommended for cascading parameters because the parameter should be scoped for use only within the component's class in most cases. When subclassing is required, use the `protected` access modifier.
 
 The following component binds the `ThemeInfo` cascading value to a cascading parameter, optionally using the same name of `ThemeInfo`. The parameter is used to set the CSS class for the **`Increment Counter (Themed)`** button.
 
@@ -316,13 +518,13 @@ Cascading parameters don't pass data across render mode boundaries:
 
 * State crossing the boundary between static and interactive rendering must be serializable. Components are arbitrary objects that reference a vast chain of other objects, including the renderer, the DI container, and every DI service instance. You must explicitly cause state to be serialized from static SSR to make it available in subsequent interactively-rendered components. Two approaches are adopted:
   * Via the Blazor framework, parameters passed across a static SSR to interactive rendering boundary are serialized automatically if they're JSON-serializable, or an error is thrown.
-  * State stored in [`PersistentComponentState`](xref:blazor/components/prerender#persist-prerendered-state) is serialized and recovered automatically if it's JSON-serializable, or an error is thrown.
+  * State stored in [Persistent Component State](xref:blazor/state-management/prerendered-state-persistence) is serialized and recovered automatically if it's JSON-serializable, or an error is thrown.
 
 Cascading parameters aren't JSON-serializable because the typical usage patterns for cascading parameters are somewhat like DI services. There are often platform-specific variants of cascading parameters, so it would be unhelpful to developers if the framework stopped developers from having server-interactive-specific versions or WebAssembly-specific versions. Also, many cascading parameter values in general aren't serializable, so it would be impractical to update existing apps if you had to stop using all nonserializable cascading parameter values.
 
 Recommendations:
 
-* If you need to make state available to all interactive components as a cascading parameter, we recommend using [root-level cascading values](#root-level-cascading-values). A factory pattern is available, and the app can emit updated values after app startup. Root-level cascading values are available to all components, including interactive components, since they're processed as DI services.
+* If you need to make state available to all interactive components as a cascading parameter, we recommend using [root-level cascading values](#root-level-cascading-values) or [root-level cascading values with notifications](#root-level-cascading-values-with-notifications). A factory pattern is available, and the app can emit updated values after app startup. Root-level cascading values are available to all components, including interactive components, since they're processed as DI services.
 
 * For component library authors, you can create an extension method for library consumers similar to the following:
 
@@ -394,7 +596,7 @@ public interface ITab
 
 The following `TabSet` component maintains a set of tabs. The tab set's `Tab` components, which are created later in this section, supply the list items (`<li>...</li>`) for the list (`<ul>...</ul>`).
 
-Child `Tab` components aren't explicitly passed as parameters to the `TabSet`. Instead, the child `Tab` components are part of the child content of the `TabSet`. However, the `TabSet` still needs a reference each `Tab` component so that it can render the headers and the active tab. To enable this coordination without requiring additional code, the `TabSet` component *can provide itself as a cascading value* that is then picked up by the descendent `Tab` components.
+Child `Tab` components aren't explicitly passed as parameters to the `TabSet`. Instead, the child `Tab` components are part of the child content of the `TabSet`. However, the `TabSet` still needs a reference to each `Tab` component so that it can render the headers and the active tab. To enable this coordination without requiring additional code, the `TabSet` component *can provide itself as a cascading value* that is then picked up by the descendent `Tab` components.
 
 `TabSet.razor`:
 
@@ -456,7 +658,7 @@ Descendent `Tab` components capture the containing `TabSet` as a cascading param
 
 @code {
     [CascadingParameter]
-    public TabSet? ContainerTabSet { get; set; }
+    private TabSet? ContainerTabSet { get; set; }
 
     [Parameter]
     public string? Title { get; set; }
@@ -517,4 +719,4 @@ The following `ExampleTabSet` component uses the `TabSet` component, which conta
 ## Additional resources
 
 * [Generic type support: Explicit generic types based on ancestor components](xref:blazor/components/generic-type-support#explicit-generic-types-based-on-ancestor-components)
-* [State management: Factor out the state preservation to a common location](xref:blazor/state-management?pivots=server#factor-out-the-state-preservation-to-a-common-location)
+* [State management: Protected browser storage: Factor out state preservation to a common provider](xref:blazor/state-management/protected-browser-storage#factor-out-state-preservation-to-a-common-provider)

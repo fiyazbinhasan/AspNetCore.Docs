@@ -1,15 +1,14 @@
 ---
-title: What's new in ASP.NET Core 9.0
-author: rick-anderson
-description: Learn about the new features in ASP.NET Core 9.0.
-ms.author: riande
-ms.custom: mvc
-ms.date: 10/07/2024
+title: What's new in ASP.NET Core in .NET 9
+author: wadepickett
+description: Learn about the new features in ASP.NET Core in .NET 9.
+ms.author: wpickett
+ms.date: 09/23/2026
 uid: aspnetcore-9
 ---
-# What's new in ASP.NET Core 9.0
+# What's new in ASP.NET Core in .NET 9
 
-This article highlights the most significant changes in ASP.NET Core 9.0 with links to relevant documentation.
+This article highlights the most significant changes in ASP.NET Core in .NET 9 with links to relevant documentation.
 
 ## Static asset delivery optimization
 
@@ -37,7 +36,7 @@ This section describes new features for SignalR.
 
 ## Minimal APIs
 
-This section describes new features for minimal APIs.
+This section describes new features for Minimal APIs.
 
 [!INCLUDE[](~/release-notes/aspnetcore-9/includes/status500.md)]
 
@@ -90,3 +89,7 @@ The following sections describe miscellaneous new features.
 [!INCLUDE[](~/release-notes/aspnetcore-9/includes/trust_dev_cert_linux.md)]
 
 [!INCLUDE[](~/release-notes/aspnetcore-9/includes/updated-versions.md)]
+
+## Breaking changes
+
+Use the articles in [Breaking changes in .NET](/dotnet/core/compatibility/breaking-changes) to find breaking changes that might apply when upgrading an app to a newer version of .NET.

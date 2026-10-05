@@ -1,10 +1,10 @@
 ---
 title: Strategies for selecting language and culture in a localized ASP.NET Core app
-author: rick-anderson
+author: wadepickett
 description: Learn how to select a language and culture when localizing content into different languages and cultures in an ASP.NET Core app.
-ms.author: riande
+ms.author: wpickett
 monikerRange: '>= aspnetcore-5.0'
-ms.date: 5/9/2023
+ms.date: 06/20/2025
 uid: fundamentals/localization/select-language-culture
 ---
 # Implement a strategy to select the language/culture for each request in a localized ASP.NET Core app
@@ -21,7 +21,7 @@ One task for localizing an app is to implement a strategy for selecting the appr
 
 The current culture on a request is set in the localization [Middleware](xref:fundamentals/middleware/index). The localization middleware is enabled in `Program.cs`. The localization middleware must be configured before any middleware that might check the request culture (for example, `app.UseMvcWithDefaultRoute()`).
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/Program.cs?name=snippet_RequestLocalizationOptionsConfiguration)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/Program.cs?name=snippet_RequestLocalizationOptionsConfiguration)]
 
 <xref:Microsoft.AspNetCore.Builder.ApplicationBuilderExtensions.UseRequestLocalization%2A> initializes a <xref:Microsoft.AspNetCore.Builder.RequestLocalizationOptions> object. On every request the list of <xref:Microsoft.AspNetCore.Localization.RequestCultureProvider> in the <xref:Microsoft.AspNetCore.Builder.RequestLocalizationOptions> is enumerated and the first provider that can successfully determine the request culture is used. The default providers come from the `RequestLocalizationOptions` class:
 
@@ -57,7 +57,7 @@ The cookie format is `c=%LANGCODE%|uic=%LANGCODE%`, where `c` is `Culture` and `
 c=en-UK|uic=en-US
 ```
 
-If only one of culture info or UI culture is provided, the provided culture is used for both culture info and UI culture.
+If only one of the cultures is provided and the other is empty, the provided culture is used for both culture and UI culture.
 
 ## The Accept-Language HTTP header
 
@@ -77,7 +77,7 @@ The [Accept-Language header](https://www.w3.org/International/questions/qa-accep
 
 The [Content-Language](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Language) entity header:
 
-* Is used to describe the language(s) intended for the audience.
+* Is used to describe the languages intended for the audience.
 * Allows a user to differentiate according to the users' own preferred language.
 
 Entity headers are used in both HTTP requests and responses.
@@ -166,15 +166,15 @@ The [RequestLocalizationOptions.CultureInfoUseUserOverride](xref:Microsoft.AspNe
 
 This sample **Localization.StarterWeb** project on [GitHub](https://github.com/aspnet/entropy) contains UI to set the `Culture`. The `Views/Shared/_SelectLanguagePartial.cshtml` file allows you to select the culture from the list of supported cultures:
 
-[!code-cshtml[](~/fundamentals/localization/sample/6.x/Localization/Views/Shared/_SelectLanguagePartial.cshtml)]
+[!code-cshtml[](~/fundamentals/localization/sample/8.x/Localization/Views/Shared/_SelectLanguagePartial.cshtml)]
 
 The `Views/Shared/_SelectLanguagePartial.cshtml` file is added to the `footer` section of the layout file so it will be available to all views:
 
-[!code-cshtml[](~/fundamentals/localization/sample/6.x/Localization/Views/Shared/_Layout.cshtml?range=43-56&highlight=10)]
+[!code-cshtml[](~/fundamentals/localization/sample/8.x/Localization/Views/Shared/_Layout.cshtml?range=43-56&highlight=10)]
 
 The `SetLanguage` method sets the culture cookie.
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/Controllers/HomeController.cs?range=57-67)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/Controllers/HomeController.cs?range=57-67)]
 
 You can't plug in the `_SelectLanguagePartial.cshtml` to sample code for this project. The **Localization.StarterWeb** project on [GitHub](https://github.com/aspnet/entropy) has code to flow the `RequestLocalizationOptions` to a Razor partial through the [Dependency Injection](~/fundamentals/dependency-injection.md) container.
 
@@ -200,7 +200,6 @@ Localizing an app also involves the following tasks:
 * [Globalizing and localizing .NET applications](/dotnet/standard/globalization-localization/index)
 * [Localization.StarterWeb project](https://github.com/aspnet/Entropy/tree/master/samples/Localization.StarterWeb) used in the article.
 * [Resources in .resx Files](/dotnet/framework/resources/working-with-resx-files-programmatically)
-* [Microsoft Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308)
 * [Localization & Generics](http://hishambinateya.com/localization-and-generics)
 
 :::moniker-end

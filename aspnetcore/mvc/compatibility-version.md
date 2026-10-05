@@ -1,11 +1,10 @@
 ---
 title: Compatibility version for ASP.NET Core MVC
-author: rick-anderson
+author: tdykstra
 description: Discover how the Startup class in ASP.NET Core configures services and the app's request pipeline.
 monikerRange: '>= aspnetcore-2.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 9/25/2019
+ms.author: tdykstra
+ms.date: 08/05/2026
 uid: mvc/compatibility-version
 ---
 # Compatibility version for ASP.NET Core MVC
@@ -18,6 +17,7 @@ The <xref:Microsoft.Extensions.DependencyInjection.MvcCoreMvcBuilderExtensions.S
 
 * The next minor version of ASP.NET Core may provide a new `CompatibilityVersion` value.
 * `CompatibilityVersion` values `Version_2_0` through `Version_2_2` are marked `[Obsolete(...)]`.
+* The compatibility version APIs are removed in ASP.NET Core 11. For more information, see [MVC compatibility options removed](/aspnet/core/breaking-changes/11/mvc-compatibility-options-removed).
 * See [Breaking API changes in Antiforgery, CORS, Diagnostics, Mvc, and Routing](https://github.com/aspnet/Announcements/issues/387). This list includes breaking changes for compatibility switches.
 
 To see how `SetCompatibilityVersion` works with ASP.NET Core 2.x apps, select the [ASP.NET Core 2.2 version of this article](?view=aspnetcore-2.2&preserve-view=true).
@@ -36,7 +36,7 @@ We recommend you test your app using the latest version (`CompatibilityVersion.L
 
 Apps that call `SetCompatibilityVersion(CompatibilityVersion.Version_2_0)` are protected from potentially breaking behavior changes introduced in the ASP.NET Core 2.1/2.2 MVC versions. This protection:
 
-* Does not apply to all 2.1 and later changes, it's targeted to potentially breaking ASP.NET Core runtime behavior changes in the MVC subsystem.
+* Does not apply to all 2.1 or later changes, it's targeted to potentially breaking ASP.NET Core runtime behavior changes in the MVC subsystem.
 * Does not extend to ASP.NET Core 3.0.
 
 The default compatibility for ASP.NET Core 2.1 and 2.2 apps that do **not** call `SetCompatibilityVersion` is 2.0 compatibility. That is, not calling `SetCompatibilityVersion` is the same as calling `SetCompatibilityVersion(CompatibilityVersion.Version_2_0)`.

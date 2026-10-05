@@ -2,9 +2,19 @@
 
 The server app is a standard ASP.NET Core app. See the [ASP.NET Core logging guidance](xref:fundamentals/logging/index) to enable a lower logging level in the server app.
 
-To enable debug or trace logging for Blazor WebAssembly authentication, see the *Client-side authentication logging* section of <xref:blazor/fundamentals/logging> with the article version selector set to ASP.NET Core 7.0 or later.
+To enable debug or trace logging for Blazor WebAssembly authentication, see the *Client-side authentication logging* section of <xref:blazor/fundamentals/logging> with the article version selector set to ASP.NET Core in .NET 7 or later.
 
 ### Common errors
+
+* Debugger breaks on an exception during logout with Microsoft Entra External ID
+
+  The following exception stops the Visual Studio debugger during logout with [Microsoft Entra External ID](/entra/external-id/external-identities-overview):
+
+  > :::no-loc text="Uncaught TypeError TypeError: Failed to execute 'postMessage' on 'Window': The provided value cannot be converted to a sequence.":::
+
+  ![Visual Studio Debugger breaking on JavaScript exception during logout](../_static/entra-external-id-logout-exception.png)
+
+  The exception is thrown from Entra JavaScript code, so this isn't a problem with ASP.NET Core. The exception doesn't impact app functionality in production, so the exception can be ignored during local development testing.
 
 * Misconfiguration of the app or Identity Provider (IP)
 
@@ -83,7 +93,7 @@ One approach to prevent lingering cookies and site data from interfering with te
 
 ### App upgrades
 
-A functioning app may fail immediately after upgrading either the .NET Core SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
+A functioning app may fail immediately after upgrading either the .NET SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
 
 1. Clear the local system's NuGet package caches by executing [`dotnet nuget locals all --clear`](/dotnet/core/tools/dotnet-nuget-locals) from a command shell.
 1. Delete the project's `bin` and `obj` folders.
@@ -91,11 +101,18 @@ A functioning app may fail immediately after upgrading either the .NET Core SDK 
 1. Delete all of the files in the deployment folder on the server prior to redeploying the app.
 
 > [!NOTE]
-> Use of package versions incompatible with the app's target framework isn't supported. For information on a package, use the [NuGet Gallery](https://www.nuget.org) or [FuGet Package Explorer](https://www.fuget.org).
+> Use of package versions incompatible with the app's target framework isn't supported. For information on a package, use the [NuGet Gallery](https://www.nuget.org).
 
-### Run the server app
+### Start the solution from the correct project
 
-When testing and troubleshooting Blazor Web App, make sure that you're running the app from the server project.
+Blazor Web Apps:
+
+* For one of the Backend-for-Frontend (BFF) pattern samples, start the solution from the ***`Aspire/Aspire.AppHost` project***.
+* For one of the non-BFF pattern samples, start the solution from the ***server project***.
+
+Blazor Server:
+
+Start the solution from the ***server project***.
 
 ### Inspect the user
 
@@ -140,4 +157,56 @@ The following `UserClaims` component can be used directly in apps or serve as th
         claims = authState.User.Claims;
     }
 }
+```
+
+### Inspect the access token
+
+Obtaining the access token during development is often helpful when troubleshooting app and Azure configuration problems. In the following example for a weather forecast endpoint, the bearer token and token details are logged only when the app is compiled with the `DEBUG` symbol, which is typically a Debug build. You can decode the token using an online JWT token decoder, such as the [Microsoft JWT token decoder](https://jwt.ms/), or log details from the token in C#, as the following example demonstrates.
+
+> [!CAUTION]
+> In production, avoid logging the token or its contents.
+
+```csharp
+app.MapGet("/weather-forecast", (HttpContext context, ILogger<Program> logger) =>
+{
+#if DEBUG
+    var authHeader = context.Request.Headers.Authorization.FirstOrDefault(v => 
+        v != null && 
+        v.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase));
+
+    if (authHeader is not null)
+    {
+        var token = authHeader["Bearer ".Length..].Trim();
+        logger.LogDebug("Token: {Token}", token);
+
+        try
+        {
+                var handler = 
+                    new Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler();
+                var jwtToken = handler.ReadJsonWebToken(token);
+                logger.LogDebug("Audience: {Audience}", 
+                    string.Join(", ", jwtToken.Audiences));
+                logger.LogDebug("Issuer: {Issuer}", jwtToken.Issuer);
+            var jwtToken = handler.ReadJwtToken(token);
+            logger.LogDebug("Audience: {Audience}", 
+                string.Join(", ", jwtToken.Audiences));
+            logger.LogDebug("Issuer: {Issuer}", jwtToken.Issuer);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to decode token.");
+        }
+    }
+#endif
+
+    var forecast = Enumerable.Range(1, 5).Select(index =>
+        new WeatherForecast
+        (
+            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
+            Random.Shared.Next(-20, 55),
+            summaries[Random.Shared.Next(summaries.Length)]
+        ))
+        .ToArray();
+    return forecast;
+}).RequireAuthorization();
 ```

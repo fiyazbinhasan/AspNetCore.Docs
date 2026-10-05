@@ -1,18 +1,18 @@
 ### Built-in support for OpenAPI document generation
 
-The [OpenAPI specification](https://www.openapis.org/) is a standard for describing HTTP APIs. The standard allows developers to define the shape of APIs that can be plugged into client generators, server generators, testing tools, documentation, and more. In .NET 9, ASP.NET Core provides built-in support for generating OpenAPI documents representing controller-based or minimal APIs via the [Microsoft.AspNetCore.OpenApi](https://nuget.org/packages/Microsoft.AspNetCore.OpenApi) package.
+The [OpenAPI specification](https://www.openapis.org/) is a standard for describing HTTP APIs. The standard allows developers to define the shape of APIs that can be plugged into client generators, server generators, testing tools, documentation, and more. In .NET 9, ASP.NET Core provides built-in support for generating OpenAPI documents representing controller-based or Minimal APIs via the [Microsoft.AspNetCore.OpenApi](https://nuget.org/packages/Microsoft.AspNetCore.OpenApi) package.
 
 The following highlighted code calls:
 
-- `AddOpenApi` to register the required dependencies into the app's DI container.
-- `MapOpenApi` to register the required OpenAPI endpoints in the app's routes.
+* `AddOpenApi` to register the required dependencies into the app's DI container.
+* `MapOpenApi` to register the required OpenAPI endpoints in the app's routes.
 
 :::code language="csharp" source="~/release-notes/aspnetcore-9/samples/OpenApiExample/Program.cs" highlight="3,7":::
 
 Install the [`Microsoft.AspNetCore.OpenApi`](https://www.nuget.org/packages/Microsoft.AspNetCore.OpenApi) package in the project using the following command:
 
 ```dotnetcli
-dotnet add package Microsoft.AspNetCore.OpenApi --prerelease
+dotnet add package Microsoft.AspNetCore.OpenApi
 ```
 
 Run the app and navigate to `openapi/v1.json` to view the generated OpenAPI document:
@@ -22,7 +22,7 @@ Run the app and navigate to `openapi/v1.json` to view the generated OpenAPI docu
 OpenAPI documents can also be generated at build-time by adding the [`Microsoft.Extensions.ApiDescription.Server`](https://www.nuget.org/packages/Microsoft.Extensions.ApiDescription.Server) package:
 
 ```dotnetcli
-dotnet add package Microsoft.Extensions.ApiDescription.Server --prerelease
+dotnet add package Microsoft.Extensions.ApiDescription.Server
 ```
 
 To modify the location of the emitted OpenAPI documents, set the target path in the OpenApiDocumentsDirectory property in the app's project file:

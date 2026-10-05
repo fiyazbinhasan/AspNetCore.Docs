@@ -1,14 +1,13 @@
 ---
 title: Routing in ASP.NET Core
+ai-usage: ai-assisted
 author: tdykstra
+content_well_notification: AI-contribution
 description: Discover how ASP.NET Core routing is responsible for matching HTTP requests and dispatching to executable endpoints.
 monikerRange: '>= aspnetcore-3.1'
-content_well_notification: AI-contribution
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 6/14/2023
+ms.date: 09/18/2026
 uid: fundamentals/routing
-ai-usage: ai-assisted
 ---
 # Routing in ASP.NET Core
 
@@ -33,7 +32,7 @@ This article covers low-level details of ASP.NET Core routing. For information o
 
 * For controllers, see <xref:mvc/controllers/routing>.
 * For Razor Pages conventions, see <xref:razor-pages/razor-pages-conventions>.
-* For Blazor routing guidance, which adds to or supersedes the guidance in this article, see <xref:blazor/fundamentals/routing>.
+* For Blazor routing and navigation guidance, which adds to or supersedes the guidance in this article, see <xref:blazor/fundamentals/routing> and <xref:blazor/fundamentals/navigation>.
 
 ## Routing basics
 
@@ -443,7 +442,7 @@ The constraint name and arguments are passed to the <xref:Microsoft.AspNetCore.R
 
 Route parameters may also have parameter transformers. Parameter transformers transform a parameter's value when generating links and matching actions and pages to URLs. Like constraints, parameter transformers can be added inline to a route parameter by adding a `:` and transformer name after the route parameter name. For example, the route template `blog/{article:slugify}` specifies a `slugify` transformer. For more information on parameter transformers, see the [Parameter transformers](#parameter-transformers) section.
 
-The following table demonstrates example route templates and their behavior:
+The following table demonstrates example route templates and their behavior.
 
 | Route Template                           | Example Matching URI    | The request URI&hellip;                                                      |
 |------------------------------------------|-------------------------|------------------------------------------------------------------------------|
@@ -499,28 +498,30 @@ Route constraints execute when a match has occurred to the incoming URL and the 
 > [!WARNING]
 > Don't use constraints for input validation. If constraints are used for input validation, invalid input results in a `404` Not Found response. Invalid input should produce a `400` Bad Request with an appropriate error message. Route constraints are used to disambiguate similar routes, not to validate the inputs for a particular route.
 
-The following table demonstrates example route constraints and their expected behavior:
+The following table demonstrates the default route constraints and their expected behavior:
 
-| constraint          | Example                                     | Example Matches                        | Notes                                                                                     |
-|---------------------|---------------------------------------------|----------------------------------------|-------------------------------------------------------------------------------------------|
-| `int`               | `{id:int}`                                  | `123456789`, `-123456789`              | Matches any integer                                                                       |
-| `bool`              | `{active:bool}`                             | `true`, `FALSE`                        | Matches `true` or `false`. Case-insensitive                                               |
-| `datetime`          | `{dob:datetime}`                            | `2016-12-31`, `2016-12-31 7:32pm`      | Matches a valid `DateTime` value in the invariant culture. See preceding warning.         |
-| `decimal`           | `{price:decimal}`                           | `49.99`, `-1,000.01`                   | Matches a valid `decimal` value in the invariant culture. See preceding warning.          |
-| `double`            | `{weight:double}`                           | `1.234`, `-1,001.01e8`                 | Matches a valid `double` value in the invariant culture. See preceding warning.           |
-| `float`             | `{weight:float}`                            | `1.234`, `-1,001.01e8`                 | Matches a valid `float` value in the invariant culture. See preceding warning.            |
-| `guid`              | `{id:guid}`                                 | `CD2C1638-1638-72D5-1638-DEADBEEF1638` | Matches a valid `Guid` value                                                              |
-| `long`              | `{ticks:long}`                              | `123456789`, `-123456789`              | Matches a valid `long` value                                                              |
-| `minlength(value)`  | `{username:minlength(4)}`                   | `Rick`                                 | String must be at least 4 characters                                                      |
-| `maxlength(value)`  | `{filename:maxlength(8)}`                   | `MyFile`                               | String must be no more than 8 characters                                                  |
-| `length(length)`    | `{filename:length(12)}`                     | `somefile.txt`                         | String must be exactly 12 characters long                                                 |
-| `length(min,max)`   | `{filename:length(8,16)}`                   | `somefile.txt`                         | String must be at least 8 and no more than 16 characters long                             |
-| `min(value)`        | `{age:min(18)}`                             | `19`                                   | Integer value must be at least 18                                                         |
-| `max(value)`        | `{age:max(120)}`                            | `91`                                   | Integer value must be no more than 120                                                    |
-| `range(min,max)`    | `{age:range(18,120)}`                       | `91`                                   | Integer value must be at least 18 but no more than 120                                    |
-| `alpha`             | `{name:alpha}`                              | `Rick`                                 | String must consist of one or more alphabetical characters, `a`-`z` and case-insensitive. |
-| `regex(expression)` | `{ssn:regex(^\\d{{3}}-\\d{{2}}-\\d{{4}}$)}` | `123-45-6789`                          | String must match the regular expression. See tips about defining a regular expression.   |
-| `required`          | `{name:required}`                           | `Rick`                                 | Used to enforce that a non-parameter value is present during URL generation               |
+| constraint          | Example                                     | Example Matches                        | Notes                                                                                                                           |
+|---------------------|---------------------------------------------|----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| `int`               | `{id:int}`                                  | `123456789`, `-123456789`              | Matches any integer                                                                                                             |
+| `bool`              | `{active:bool}`                             | `true`, `FALSE`                        | Matches `true` or `false`. Case-insensitive                                                                                     |
+| `datetime`          | `{dob:datetime}`                            | `2016-12-31`, `2016-12-31 7:32pm`      | Matches a valid `DateTime` value in the invariant culture. See preceding warning                                                |
+| `decimal`           | `{price:decimal}`                           | `49.99`, `-1,000.01`                   | Matches a valid `decimal` value in the invariant culture. See preceding warning                                                 |
+| `double`            | `{weight:double}`                           | `1.234`, `-1,001.01e8`                 | Matches a valid `double` value in the invariant culture. See preceding warning                                                  |
+| `float`             | `{weight:float}`                            | `1.234`, `-1,001.01e8`                 | Matches a valid `float` value in the invariant culture. See preceding warning                                                   |
+| `guid`              | `{id:guid}`                                 | `CD2C1638-1638-72D5-1638-DEADBEEF1638` | Matches a valid `Guid` value                                                                                                    |
+| `long`              | `{ticks:long}`                              | `123456789`, `-123456789`              | Matches a valid `long` value                                                                                                    |
+| `minlength(value)`  | `{username:minlength(4)}`                   | `Rick`                                 | String must be at least 4 characters                                                                                            |
+| `maxlength(value)`  | `{filename:maxlength(8)}`                   | `MyFile`                               | String must be no more than 8 characters                                                                                        |
+| `length(length)`    | `{filename:length(12)}`                     | `somefile.txt`                         | String must be exactly 12 characters long                                                                                       |
+| `length(min,max)`   | `{filename:length(8,16)}`                   | `somefile.txt`                         | String must be at least 8 and no more than 16 characters long                                                                   |
+| `min(value)`        | `{age:min(18)}`                             | `19`                                   | Integer value must be at least 18                                                                                               |
+| `max(value)`        | `{age:max(120)}`                            | `91`                                   | Integer value must be no more than 120                                                                                          |
+| `range(min,max)`    | `{age:range(18,120)}`                       | `91`                                   | Integer value must be at least 18 but no more than 120                                                                          |
+| `alpha`             | `{name:alpha}`                              | `Rick`                                 | String must consist of one or more alphabetical characters, `a`-`z` and case-insensitive                                        |
+| `regex(expression)` | `{ssn:regex(^\\d{{3}}-\\d{{2}}-\\d{{4}}$)}` | `123-45-6789`                          | String must match the regular expression. See tips about defining a regular expression                                          |
+| `required`          | `{name:required}`                           | `Rick`                                 | Enforces that an explicit value (not an ambient value) is present during URL generation.                                        |
+| `file`              | `{filename:file}`                           | `myfile.txt`                           | String can contain path segments, but its last segment must have a dot (`.`) and be followed by one or more non-dot characters  |
+| `nonfile`           | `{page:nonfile}`                            | `PageName`                             | String must not have a dot in its last path segment that is followed by one or more non-dot (`.`) characters                    |
 
 [!INCLUDE[](~/includes/regex.md)]
 
@@ -562,7 +563,7 @@ To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the 
 | `^\d{3}-\d{2}-\d{4}$` | `^\\d{{3}}-\\d{{2}}-\\d{{4}}$` |
 | `^[a-z]{2}$`          | `^[[a-z]]{{2}}$`               |
 
-Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match:
+Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match.
 
 | Expression   | String    | Match | Comment               |
 | ------------ | --------- | :---: |  -------------------- |
@@ -796,6 +797,20 @@ Next, the **accepted values** can be used to expand the route template. The rout
   * If any route parameter to the right of a missing optional parameter has a value, the operation fails.
   * <!-- review default-valued parameters optional parameters --> Contiguous default-valued parameters and optional parameters are collapsed where possible.
 
+> [!NOTE]
+> For endpoints created by controllers and Razor Pages, `controller`, `action`, `page`, and `area` are part of the endpoint's **required values**, so they're always present in the accepted values. As a result:
+>
+> * They aren't invalidated by a change to a route value that appears to their left, such as a `culture` parameter.
+> * Inline default values in the route template, such as `{controller=DefaultController}`, aren't applied, because default values are used only when the accepted values are *missing* a value.
+>
+> For example, with the template `{culture}/api1/{controller=DefaultController}/{action=DefaultAction}/{id?}` and a current request of `/en/api1/MyController/Index/111`, the call `Url.RouteUrl("ApiRoute1", new { culture = "ar" })` generates `/ar/api1/MyController/Index`, not `/ar/api1/DefaultController/DefaultAction`. The `id` value isn't used because it has no required value and is to the right of a changed value. To use the template's default values, specify them explicitly:
+>
+> ```csharp
+> Url.RouteUrl("ApiRoute1", new { culture = "ar", controller = "DefaultController", action = "DefaultAction" })
+> ```
+>
+> For a related limitation, see [Problems with route value invalidation](#problems-with-route-value-invalidation).
+
 Values explicitly provided that don't match a segment of the route are added to the query string. The following table shows the result when using the route template `{controller}/{action}/{id?}`.
 
 | Ambient Values                     | Explicit Values                        | Result                  |
@@ -812,6 +827,8 @@ Optional route parameters must come after all required route parameters and lite
 :::code language="csharp" source="~/fundamentals/routing/samples/8.x/OptionalParams/Controllers/MyController.cs" highlight="10":::
 
 ### Problems with route value invalidation
+
+For related information about how required values, such as `controller` and `action`, affect route value invalidation and template default values, see the note in [URL generation process](#url-generation-process).
 
 The following code shows an example of a URL generation scheme that's not supported by routing:
 
@@ -844,8 +861,8 @@ The following links provide information on how to configure endpoint metadata:
 * [IAuthorizationPolicyProvider sample](https://github.com/dotnet/AspNetCore/tree/release/3.1/src/Security/samples/CustomPolicyProvider) using a custom `[MinimumAgeAuthorize]` attribute
 * [Test authentication with the [Authorize] attribute](xref:security/authentication/identity#test-identity)
 * <xref:Microsoft.AspNetCore.Builder.AuthorizationEndpointConventionBuilderExtensions.RequireAuthorization%2A>
-* [Selecting the scheme with the [Authorize] attribute](xref:security/authorization/limitingidentitybyscheme#selecting-the-scheme-with-the-authorize-attribute)
-* [Apply policies using the [Authorize] attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
+* [Select a scheme with an `[Authorize]` attribute](xref:security/authorization/authorize-with-a-specific-scheme#select-a-scheme-with-an-authorize-attribute)
+* [Apply policies using an `[Authorize]` attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
 * <xref:security/authorization/roles>
 
 <a name="hostmatch"></a>
@@ -1073,18 +1090,18 @@ app.UseAuthorization(new AuthorizationPolicy() { ... });
 app.MapMyFramework(...).RequireAuthorization();
 ```
 
-As an example of this guideline, consider the `UseAuthorization` middleware. The authorization middleware allows you to pass in a fallback policy. <!-- shown where?  (shown here) --> The fallback policy, if specified, applies to both:
+As an example of this guideline, consider the authorization middleware. A configured fallback policy applies when the middleware can't produce a policy from authorization metadata, including:
 
-* Endpoints without a specified policy.
+* Endpoints without authorization metadata that produces a policy.
 * Requests that don't match an endpoint.
 
-This makes the authorization middleware useful outside of the context of routing. The authorization middleware can be used for traditional middleware programming.
+This behavior makes the authorization middleware useful outside of routing and for traditional middleware programming. For complete policy selection rules, see <xref:security/authorization/policies#default-and-fallback-policies>.
 
 [!INCLUDE[](~/includes/dbg-route.md)]
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 :::moniker-end
 

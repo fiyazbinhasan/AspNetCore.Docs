@@ -422,7 +422,7 @@ The constraint name and arguments are passed to the <xref:Microsoft.AspNetCore.R
 
 Route parameters may also have parameter transformers. Parameter transformers transform a parameter's value when generating links and matching actions and pages to URLs. Like constraints, parameter transformers can be added inline to a route parameter by adding a `:` and transformer name after the route parameter name. For example, the route template `blog/{article:slugify}` specifies a `slugify` transformer. For more information on parameter transformers, see the [Parameter transformers](#parameter-transformers) section.
 
-The following table demonstrates example route templates and their behavior:
+The following table demonstrates example route templates and their behavior.
 
 | Route Template                           | Example Matching URI    | The request URI&hellip;                                                      |
 |------------------------------------------|-------------------------|------------------------------------------------------------------------------|
@@ -478,7 +478,7 @@ Route constraints execute when a match has occurred to the incoming URL and the 
 > [!WARNING]
 > Don't use constraints for input validation. If constraints are used for input validation, invalid input results in a `404` Not Found response. Invalid input should produce a `400` Bad Request with an appropriate error message. Route constraints are used to disambiguate similar routes, not to validate the inputs for a particular route.
 
-The following table demonstrates example route constraints and their expected behavior:
+The following table demonstrates example route constraints and their expected behavior.
 
 | constraint          | Example                                     | Example Matches                        | Notes                                                                                     |
 |---------------------|---------------------------------------------|----------------------------------------|-------------------------------------------------------------------------------------------|
@@ -499,7 +499,7 @@ The following table demonstrates example route constraints and their expected be
 | `range(min,max)`    | `{age:range(18,120)}`                       | `91`                                   | Integer value must be at least 18 but no more than 120                                    |
 | `alpha`             | `{name:alpha}`                              | `Rick`                                 | String must consist of one or more alphabetical characters, `a`-`z` and case-insensitive. |
 | `regex(expression)` | `{ssn:regex(^\\d{{3}}-\\d{{2}}-\\d{{4}}$)}` | `123-45-6789`                          | String must match the regular expression. See tips about defining a regular expression.   |
-| `required`          | `{name:required}`                           | `Rick`                                 | Used to enforce that a non-parameter value is present during URL generation               |
+| `required`          | `{name:required}`                           | `Rick`                                 | Enforces that an explicit value (not an ambient value) is present during URL generation.  |
 
 [!INCLUDE[](~/includes/regex.md)]
 
@@ -534,14 +534,14 @@ Regular expressions use delimiters and tokens similar to those used by routing a
 * Replace `\` characters provided in the string as `\\` characters in the C# source file in order to escape the `\` string escape character.
 * [Verbatim string literals](/dotnet/csharp/language-reference/keywords/string).
 
-To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the characters in the expression, for example, `{{`, `}}`, `[[`, `]]`. The following table shows a regular expression and its escaped version:
+To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the characters in the expression, for example, `{{`, `}}`, `[[`, `]]`. The following table shows a regular expression and its escaped version.
 
 | Regular expression    | Escaped regular expression     |
 | --------------------- | ------------------------------ |
 | `^\d{3}-\d{2}-\d{4}$` | `^\\d{{3}}-\\d{{2}}-\\d{{4}}$` |
 | `^[a-z]{2}$`          | `^[[a-z]]{{2}}$`               |
 
-Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match:
+Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match.
 
 | Expression   | String    | Match | Comment               |
 | ------------ | --------- | :---: |  -------------------- |
@@ -775,6 +775,20 @@ Next, the **accepted values** can be used to expand the route template. The rout
   * If any route parameter to the right of a missing optional parameter has a value, the operation fails.
   * <!-- review default-valued parameters optional parameters --> Contiguous default-valued parameters and optional parameters are collapsed where possible.
 
+> [!NOTE]
+> For endpoints created by controllers and Razor Pages, `controller`, `action`, `page`, and `area` are part of the endpoint's **required values**, so they're always present in the accepted values. As a result:
+>
+> * They aren't invalidated by a change to a route value that appears to their left, such as a `culture` parameter.
+> * Inline default values in the route template, such as `{controller=DefaultController}`, aren't applied, because default values are used only when the accepted values are *missing* a value.
+>
+> For example, with the template `{culture}/api1/{controller=DefaultController}/{action=DefaultAction}/{id?}` and a current request of `/en/api1/MyController/Index/111`, the call `Url.RouteUrl("ApiRoute1", new { culture = "ar" })` generates `/ar/api1/MyController/Index`, not `/ar/api1/DefaultController/DefaultAction`. The `id` value isn't used because it has no required value and is to the right of a changed value. To use the template's default values, specify them explicitly:
+>
+> ```csharp
+> Url.RouteUrl("ApiRoute1", new { culture = "ar", controller = "DefaultController", action = "DefaultAction" })
+> ```
+>
+> For a related limitation, see [Problems with route value invalidation](#problems-with-route-value-invalidation).
+
 Values explicitly provided that don't match a segment of the route are added to the query string. The following table shows the result when using the route template `{controller}/{action}/{id?}`.
 
 | Ambient Values                     | Explicit Values                        | Result                  |
@@ -791,6 +805,8 @@ Optional route parameters must come after all required route parameters. In the 
 :::code language="csharp" source="~/fundamentals/routing/samples/8.x/OptionalParams/Controllers/MyController.cs" highlight="10":::
 
 ### Problems with route value invalidation
+
+For related information about how required values, such as `controller` and `action`, affect route value invalidation and template default values, see the note in [URL generation process](#url-generation-process).
 
 The following code shows an example of a URL generation scheme that's not supported by routing:
 
@@ -823,8 +839,8 @@ The following links provide information on how to configure endpoint metadata:
 * [IAuthorizationPolicyProvider sample](https://github.com/dotnet/AspNetCore/tree/release/3.1/src/Security/samples/CustomPolicyProvider) using a custom `[MinimumAgeAuthorize]` attribute
 * [Test authentication with the [Authorize] attribute](xref:security/authentication/identity#test-identity)
 * <xref:Microsoft.AspNetCore.Builder.AuthorizationEndpointConventionBuilderExtensions.RequireAuthorization%2A>
-* [Selecting the scheme with the [Authorize] attribute](xref:security/authorization/limitingidentitybyscheme#selecting-the-scheme-with-the-authorize-attribute)
-* [Apply policies using the [Authorize] attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
+* [Select a scheme with an `[Authorize]` attribute](xref:security/authorization/authorize-with-a-specific-scheme#select-a-scheme-with-an-authorize-attribute)
+* [Apply policies using an `[Authorize]` attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
 * <xref:security/authorization/roles>
 
 <a name="hostmatch"></a>
@@ -1000,18 +1016,18 @@ app.UseAuthorization(new AuthorizationPolicy() { ... });
 app.MapMyFramework(...).RequireAuthorization();
 ```
 
-As an example of this guideline, consider the `UseAuthorization` middleware. The authorization middleware allows you to pass in a fallback policy. <!-- shown where?  (shown here) --> The fallback policy, if specified, applies to both:
+As an example of this guideline, consider the authorization middleware. A configured fallback policy applies when the middleware can't produce a policy from authorization metadata, including:
 
-* Endpoints without a specified policy.
+* Endpoints without authorization metadata that produces a policy.
 * Requests that don't match an endpoint.
 
-This makes the authorization middleware useful outside of the context of routing. The authorization middleware can be used for traditional middleware programming.
+This behavior makes the authorization middleware useful outside of routing and for traditional middleware programming. For complete policy selection rules, see <xref:security/authorization/policies#default-and-fallback-policies>.
 
 [!INCLUDE[](~/includes/dbg-route.md)]
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 :::moniker-end
 
@@ -1439,7 +1455,7 @@ The constraint name and arguments are passed to the <xref:Microsoft.AspNetCore.R
 
 Route parameters may also have parameter transformers. Parameter transformers transform a parameter's value when generating links and matching actions and pages to URLs. Like constraints, parameter transformers can be added inline to a route parameter by adding a `:` and transformer name after the route parameter name. For example, the route template `blog/{article:slugify}` specifies a `slugify` transformer. For more information on parameter transformers, see the [Parameter transformers](#parameter-transformers) section.
 
-The following table demonstrates example route templates and their behavior:
+The following table demonstrates example route templates and their behavior.
 
 | Route Template                           | Example Matching URI    | The request URI&hellip;                                                      |
 |------------------------------------------|-------------------------|------------------------------------------------------------------------------|
@@ -1495,7 +1511,7 @@ Route constraints execute when a match has occurred to the incoming URL and the 
 > [!WARNING]
 > Don't use constraints for input validation. If constraints are used for input validation, invalid input results in a `404` Not Found response. Invalid input should produce a `400` Bad Request with an appropriate error message. Route constraints are used to disambiguate similar routes, not to validate the inputs for a particular route.
 
-The following table demonstrates example route constraints and their expected behavior:
+The following table demonstrates example route constraints and their expected behavior.
 
 | constraint          | Example                                     | Example Matches                        | Notes                                                                                     |
 |---------------------|---------------------------------------------|----------------------------------------|-------------------------------------------------------------------------------------------|
@@ -1551,14 +1567,14 @@ Regular expressions use delimiters and tokens similar to those used by routing a
 * Replace `\` characters provided in the string as `\\` characters in the C# source file in order to escape the `\` string escape character.
 * [Verbatim string literals](/dotnet/csharp/language-reference/keywords/string).
 
-To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the characters in the expression, for example, `{{`, `}}`, `[[`, `]]`. The following table shows a regular expression and its escaped version:
+To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the characters in the expression, for example, `{{`, `}}`, `[[`, `]]`. The following table shows a regular expression and its escaped version.
 
 | Regular expression    | Escaped regular expression     |
 | --------------------- | ------------------------------ |
 | `^\d{3}-\d{2}-\d{4}$` | `^\\d{{3}}-\\d{{2}}-\\d{{4}}$` |
 | `^[a-z]{2}$`          | `^[[a-z]]{{2}}$`               |
 
-Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match:
+Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match.
 
 | Expression   | String    | Match | Comment               |
 | ------------ | --------- | :---: |  -------------------- |
@@ -1792,6 +1808,20 @@ Next, the **accepted values** can be used to expand the route template. The rout
   * If any route parameter to the right of a missing optional parameter has a value, the operation fails.
   * <!-- review default-valued parameters optional parameters --> Contiguous default-valued parameters and optional parameters are collapsed where possible.
 
+> [!NOTE]
+> For endpoints created by controllers and Razor Pages, `controller`, `action`, `page`, and `area` are part of the endpoint's **required values**, so they're always present in the accepted values. As a result:
+>
+> * They aren't invalidated by a change to a route value that appears to their left, such as a `culture` parameter.
+> * Inline default values in the route template, such as `{controller=DefaultController}`, aren't applied, because default values are used only when the accepted values are *missing* a value.
+>
+> For example, with the template `{culture}/api1/{controller=DefaultController}/{action=DefaultAction}/{id?}` and a current request of `/en/api1/MyController/Index/111`, the call `Url.RouteUrl("ApiRoute1", new { culture = "ar" })` generates `/ar/api1/MyController/Index`, not `/ar/api1/DefaultController/DefaultAction`. The `id` value isn't used because it has no required value and is to the right of a changed value. To use the template's default values, specify them explicitly:
+>
+> ```csharp
+> Url.RouteUrl("ApiRoute1", new { culture = "ar", controller = "DefaultController", action = "DefaultAction" })
+> ```
+>
+> For a related limitation, see [Problems with route value invalidation](#problems-with-route-value-invalidation).
+
 Values explicitly provided that don't match a segment of the route are added to the query string. The following table shows the result when using the route template `{controller}/{action}/{id?}`.
 
 | Ambient Values                     | Explicit Values                        | Result                  |
@@ -1802,6 +1832,8 @@ Values explicitly provided that don't match a segment of the route are added to 
 | controller = "Home"                | action = "About", color = "Red"        | `/Home/About?color=Red` |
 
 ### Problems with route value invalidation
+
+For related information about how required values, such as `controller` and `action`, affect route value invalidation and template default values, see the note in [URL generation process](#url-generation-process).
 
 The following code shows an example of a URL generation scheme that's not supported by routing:
 
@@ -1834,8 +1866,8 @@ The following links provide information on how to configure endpoint metadata:
 * [IAuthorizationPolicyProvider sample](https://github.com/dotnet/AspNetCore/tree/release/3.1/src/Security/samples/CustomPolicyProvider) using a custom `[MinimumAgeAuthorize]` attribute
 * [Test authentication with the [Authorize] attribute](xref:security/authentication/identity#test-identity)
 * <xref:Microsoft.AspNetCore.Builder.AuthorizationEndpointConventionBuilderExtensions.RequireAuthorization%2A>
-* [Selecting the scheme with the [Authorize] attribute](xref:security/authorization/limitingidentitybyscheme#selecting-the-scheme-with-the-authorize-attribute)
-* [Apply policies using the [Authorize] attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
+* [Select a scheme with an `[Authorize]` attribute](xref:security/authorization/authorize-with-a-specific-scheme#select-a-scheme-with-an-authorize-attribute)
+* [Apply policies using an `[Authorize]` attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
 * <xref:security/authorization/roles>
 
 <a name="hostmatch"></a>
@@ -2005,18 +2037,18 @@ app.UseAuthorization(new AuthorizationPolicy() { ... });
 app.MapMyFramework(...).RequireAuthorization();
 ```
 
-As an example of this guideline, consider the `UseAuthorization` middleware. The authorization middleware allows you to pass in a fallback policy. <!-- shown where?  (shown here) --> The fallback policy, if specified, applies to both:
+As an example of this guideline, consider the authorization middleware. A configured fallback policy applies when the middleware can't produce a policy from authorization metadata, including:
 
-* Endpoints without a specified policy.
+* Endpoints without authorization metadata that produces a policy.
 * Requests that don't match an endpoint.
 
-This makes the authorization middleware useful outside of the context of routing. The authorization middleware can be used for traditional middleware programming.
+This behavior makes the authorization middleware useful outside of routing and for traditional middleware programming. For complete policy selection rules, see <xref:security/authorization/policies#default-and-fallback-policies>.
 
 [!INCLUDE[](~/includes/dbg-route.md)]
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 :::moniker-end
 
@@ -2038,12 +2070,12 @@ This document covers low-level details of ASP.NET Core routing. For information 
 * For controllers, see <xref:mvc/controllers/routing>.
 * For Razor Pages conventions, see <xref:razor-pages/razor-pages-conventions>.
 
-The endpoint routing system described in this document applies to ASP.NET Core 3.0 and later. For information on the previous routing system based on <xref:Microsoft.AspNetCore.Routing.IRouter>, select the ASP.NET Core 2.1 version using one of the following approaches:
+The endpoint routing system described in this document applies to ASP.NET Core 3.0 or later. For information on the previous routing system based on <xref:Microsoft.AspNetCore.Routing.IRouter>, select the ASP.NET Core 2.1 version using one of the following approaches:
 
 * The version selector for a previous version.
 * Select [ASP.NET Core 2.1 routing](?preserve-view=true&view=aspnetcore-2.1).
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples/3.x/RoutingSample) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/routing/samples/3.x/RoutingSample) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 The download samples for this document are enabled by a specific `Startup` class. To run a specific sample, modify `Program.cs` to call the desired `Startup` class.
 
@@ -2102,8 +2134,6 @@ The endpoint routing system described in this document is new as of ASP.NET Core
 The following example shows routing with [health checks](xref:host-and-deploy/health-checks) and authorization:
 
 :::code language="csharp" source="~/fundamentals/routing/samples/3.x/RoutingSample/AuthorizationStartup.cs" id="snippet":::
-
-[!INCLUDE[request localized comments](~/includes/code-comments-loc.md)]
 
 The preceding example demonstrates how:
 
@@ -2328,7 +2358,7 @@ Due to the kinds of extensibility provided by routing, it isn't possible for the
 >
 > The order of operations inside <xref:Microsoft.AspNetCore.Builder.EndpointRoutingApplicationBuilderExtensions.UseEndpoints%2A> doesn't influence the behavior of routing, with one exception. <xref:Microsoft.AspNetCore.Builder.ControllerEndpointRouteBuilderExtensions.MapControllerRoute%2A> and <xref:Microsoft.AspNetCore.Builder.MvcAreaRouteBuilderExtensions.MapAreaRoute%2A> automatically assign an order value to their endpoints based on the order they are invoked. This simulates long-time behavior of controllers without the routing system providing the same guarantees as older routing implementations.
 >
-> In the legacy implementation of routing, it's possible to implement routing extensibility that has a dependency on the order in which routes are processed. Endpoint routing in ASP.NET Core 3.0 and later:
+> In the legacy implementation of routing, it's possible to implement routing extensibility that has a dependency on the order in which routes are processed. Endpoint routing in ASP.NET Core 3.0 or later:
 > 
 > * Doesn't have a concept of routes.
 > * Doesn't provide ordering guarantees. All endpoints are processed at once.
@@ -2440,7 +2470,7 @@ The constraint name and arguments are passed to the <xref:Microsoft.AspNetCore.R
 
 Route parameters may also have parameter transformers. Parameter transformers transform a parameter's value when generating links and matching actions and pages to URLs. Like constraints, parameter transformers can be added inline to a route parameter by adding a `:` and transformer name after the route parameter name. For example, the route template `blog/{article:slugify}` specifies a `slugify` transformer. For more information on parameter transformers, see the [Parameter transformer reference](#parameter-transformer-reference) section.
 
-The following table demonstrates example route templates and their behavior:
+The following table demonstrates example route templates and their behavior.
 
 | Route Template                           | Example Matching URI    | The request URI&hellip;                                                      |
 |------------------------------------------|-------------------------|------------------------------------------------------------------------------|
@@ -2494,7 +2524,7 @@ Route constraints execute when a match has occurred to the incoming URL and the 
 > [!WARNING]
 > Don't use constraints for input validation. If constraints are used for input validation, invalid input results in a `404` Not Found response. Invalid input should produce a `400` Bad Request with an appropriate error message. Route constraints are used to disambiguate similar routes, not to validate the inputs for a particular route.
 
-The following table demonstrates example route constraints and their expected behavior:
+The following table demonstrates example route constraints and their expected behavior.
 
 | constraint          | Example                                     | Example Matches                        | Notes                                                                                     |
 |---------------------|---------------------------------------------|----------------------------------------|-------------------------------------------------------------------------------------------|
@@ -2550,14 +2580,14 @@ Regular expressions use delimiters and tokens similar to those used by routing a
 * Replace `\` characters provided in the string as `\\` characters in the C# source file in order to escape the `\` string escape character.
 * [Verbatim string literals](/dotnet/csharp/language-reference/keywords/string).
 
-To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the characters in the expression, for example, `{{`, `}}`, `[[`, `]]`. The following table shows a regular expression and its escaped version:
+To escape routing parameter delimiter characters `{`, `}`, `[`, `]`, double the characters in the expression, for example, `{{`, `}}`, `[[`, `]]`. The following table shows a regular expression and its escaped version.
 
 | Regular expression    | Escaped regular expression     |
 | --------------------- | ------------------------------ |
 | `^\d{3}-\d{2}-\d{4}$` | `^\\d{{3}}-\\d{{2}}-\\d{{4}}$` |
 | `^[a-z]{2}$`          | `^[[a-z]]{{2}}$`               |
 
-Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match:
+Regular expressions used in routing often start with the `^` character and match the starting position of the string. The expressions often end with the `$` character and match the end of the string. The `^` and `$` characters ensure that the regular expression matches the entire route parameter value. Without the `^` and `$` characters, the regular expression matches any substring within the string, which is often undesirable. The following table provides examples and explains why they match or fail to match.
 
 | Expression   | String    | Match | Comment               |
 | ------------ | --------- | :---: |  -------------------- |
@@ -2797,6 +2827,20 @@ Next, the **accepted values** can be used to expand the route template. The rout
   * If any route parameter to the right of a missing optional parameter has a value, the operation fails.
   * <!-- review default-valued parameters optional parameters --> Contiguous default-valued parameters and optional parameters are collapsed where possible.
 
+> [!NOTE]
+> For endpoints created by controllers and Razor Pages, `controller`, `action`, `page`, and `area` are part of the endpoint's **required values**, so they're always present in the accepted values. As a result:
+>
+> * They aren't invalidated by a change to a route value that appears to their left, such as a `culture` parameter.
+> * Inline default values in the route template, such as `{controller=DefaultController}`, aren't applied, because default values are used only when the accepted values are *missing* a value.
+>
+> For example, with the template `{culture}/api1/{controller=DefaultController}/{action=DefaultAction}/{id?}` and a current request of `/en/api1/MyController/Index/111`, the call `Url.RouteUrl("ApiRoute1", new { culture = "ar" })` generates `/ar/api1/MyController/Index`, not `/ar/api1/DefaultController/DefaultAction`. The `id` value isn't used because it has no required value and is to the right of a changed value. To use the template's default values, specify them explicitly:
+>
+> ```csharp
+> Url.RouteUrl("ApiRoute1", new { culture = "ar", controller = "DefaultController", action = "DefaultAction" })
+> ```
+>
+> For a related limitation, see [Problems with route value invalidation](#problems-with-route-value-invalidation).
+
 Values explicitly provided that don't match a segment of the route are added to the query string. The following table shows the result when using the route template `{controller}/{action}/{id?}`.
 
 | Ambient Values                     | Explicit Values                        | Result                  |
@@ -2807,6 +2851,8 @@ Values explicitly provided that don't match a segment of the route are added to 
 | controller = "Home"                | action = "About", color = "Red"        | `/Home/About?color=Red` |
 
 ### Problems with route value invalidation
+
+For related information about how required values, such as `controller` and `action`, affect route value invalidation and template default values, see the note in [URL generation process](#url-generation-process).
 
 As of ASP.NET Core 3.0, some URL generation schemes used in earlier ASP.NET Core versions don't work well with URL generation. The ASP.NET Core team plans to add features to address these needs in a future release. For now the best solution is to use legacy routing.
 
@@ -2827,8 +2873,8 @@ The following links provide information on configuring endpoint metadata:
 * [IAuthorizationPolicyProvider sample](https://github.com/dotnet/AspNetCore/tree/release/3.1/src/Security/samples/CustomPolicyProvider) using a custom `[MinimumAgeAuthorize]` attribute
 * [Test authentication with the [Authorize] attribute](xref:security/authentication/identity#test-identity)
 * <xref:Microsoft.AspNetCore.Builder.AuthorizationEndpointConventionBuilderExtensions.RequireAuthorization%2A>
-* [Selecting the scheme with the [Authorize] attribute](xref:security/authorization/limitingidentitybyscheme#selecting-the-scheme-with-the-authorize-attribute)
-* [Apply policies using the [Authorize] attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
+* [Select a scheme with an `[Authorize]` attribute](xref:security/authorization/authorize-with-a-specific-scheme#select-a-scheme-with-an-authorize-attribute)
+* [Apply policies using an `[Authorize]` attribute](xref:security/authorization/policies#apply-policies-to-mvc-controllers)
 * <xref:security/authorization/roles>
 
 <a name="hostmatch"></a>
@@ -2894,7 +2940,7 @@ The following list provides some insight into routing features that are relative
   * Are significantly more expensive than parsing a regular URL path segment.
   * Result in many more substrings being allocated.
   * The complex segment logic was not updated in ASP.NET Core 3.0 routing performance update.
-* Synchronous data access: Many complex apps have database access as part of their routing. ASP.NET Core 2.2 and earlier routing might not provide the right extensibility points to support database access routing. For example, <xref:Microsoft.AspNetCore.Routing.IRouteConstraint>, and <xref:Microsoft.AspNetCore.Mvc.ActionConstraints.IActionConstraint> are synchronous. Extensibility points such as <xref:Microsoft.AspNetCore.Routing.MatcherPolicy> and <xref:Microsoft.AspNetCore.Routing.EndpointSelectorContext> are asynchronous.
+* Synchronous data access: Many complex apps have database access as part of their routing. ASP.NET Core 2.2 or earlier routing might not provide the right extensibility points to support database access routing. For example, <xref:Microsoft.AspNetCore.Routing.IRouteConstraint>, and <xref:Microsoft.AspNetCore.Mvc.ActionConstraints.IActionConstraint> are synchronous. Extensibility points such as <xref:Microsoft.AspNetCore.Routing.MatcherPolicy> and <xref:Microsoft.AspNetCore.Routing.EndpointSelectorContext> are asynchronous.
 
 ## Guidance for library authors
 
@@ -2983,12 +3029,12 @@ app.UseEndpoints(endpoints =>
 });
 ```
 
-As an example of this guideline, consider the `UseAuthorization` middleware. The authorization middleware allows you to pass in a fallback policy. <!-- shown where?  (shown here) --> The fallback policy, if specified, applies to both:
+As an example of this guideline, consider the authorization middleware. A configured fallback policy applies when the middleware can't produce a policy from authorization metadata, including:
 
-* Endpoints without a specified policy.
+* Endpoints without authorization metadata that produces a policy.
 * Requests that don't match an endpoint.
 
-This makes the authorization middleware useful outside of the context of routing. The authorization middleware can be used for traditional middleware programming.
+This behavior makes the authorization middleware useful outside of routing and for traditional middleware programming. For complete policy selection rules, see <xref:security/authorization/policies#default-and-fallback-policies>.
 
 [!INCLUDE[](~/includes/dbg-route.md)]
 

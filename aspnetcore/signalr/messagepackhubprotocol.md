@@ -1,15 +1,15 @@
 ---
 title: Use MessagePack Hub Protocol in SignalR for ASP.NET Core
-author: bradygaster
+ai-usage: ai-assisted
+author: wadepickett
 description: Add MessagePack Hub Protocol to ASP.NET Core SignalR.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
-ms.date: 7/16/2021
+ms.date: 10/02/2026
 uid: signalr/messagepackhubprotocol
 ---
-
 # Use MessagePack Hub Protocol in SignalR for ASP.NET Core
+
 :::moniker range=">= aspnetcore-6.0"
 
 This article assumes the reader is familiar with the topics covered in <xref:tutorials/signalr>.
@@ -148,7 +148,7 @@ The MessagePack protocol doesn't provide a way to encode the `Kind` value of a `
 
 ### MessagePack support in "ahead-of-time" compilation environment
 
-The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation (such as Xamarin iOS or Unity). It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90#aot-code-generation-to-support-unityxamarin). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
+The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation, such as NET Multi-platform App UI (.NET MAUI) or Unity. It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90#aot-code-generation-to-support-unityxamarin). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
 
 ```csharp
 services.AddSignalR()
@@ -177,6 +177,10 @@ For more information on this limitation, see GitHub issue [aspnet/SignalR#2937](
 ### Chars and Strings in Java
 
 In the java client, `char` objects will be serialized as one-character `String` objects. This is in contrast with the C# and JavaScript client, which serialize them as `short` objects. The MessagePack spec itself does not define behavior for `char` objects, so it is up to the library author to determine how to serialize them. The difference in behavior between our clients is a result of the libraries we used for our implementations.
+
+### Android device support
+
+Depending on the MessagePack version targeted by the .NET release, the MessagePack integration can increase the minimum Android API level. For example, `signalr-messagepack` 8.0.24 resolves `jackson-databind` 2.18, raising the minimum Android API level from 21 to 26. If you need to support older Android devices than a given MessagePack integration permits, use the default JSON protocol, which doesn't have this MessagePack dependency constraint. For more information, see [[SignalR Java client]: signalr-messagepack 8.0.24 drops Android 7 support in a patch release (`dotnet/aspnetcore` #68893)](https://github.com/dotnet/aspnetcore/issues/68893).
 
 ## Additional resources
 
@@ -339,7 +343,7 @@ For more information on this limitation, see GitHub issue [aspnet/SignalR#2228](
 
 ### MessagePack support in "ahead-of-time" compilation environment
 
-The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation (such as Xamarin iOS or Unity). It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90#aot-code-generation-to-support-unityxamarin). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
+The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation, such as NET Multi-platform App UI (.NET MAUI) or Unity. It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v2.1.90#aot-code-generation-to-support-unityxamarin). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
 
 ```csharp
 services.AddSignalR()
@@ -368,6 +372,10 @@ For more information on this limitation, see GitHub issue [aspnet/SignalR#2937](
 ### Chars and Strings in Java
 
 In the java client, `char` objects will be serialized as one-character `String` objects. This is in contrast with the C# and JavaScript client, which serialize them as `short` objects. The MessagePack spec itself does not define behavior for `char` objects, so it is up to the library author to determine how to serialize them. The difference in behavior between our clients is a result of the libraries we used for our implementations.
+
+### Android device support
+
+Depending on the MessagePack version targeted by the .NET release, the MessagePack integration can increase the minimum Android API level. For example, `signalr-messagepack` 8.0.24 resolves `jackson-databind` 2.18, raising the minimum Android API level from 21 to 26. If you need to support older Android devices than a given MessagePack integration permits, use the default JSON protocol, which doesn't have this MessagePack dependency constraint. For more information, see [[SignalR Java client]: signalr-messagepack 8.0.24 drops Android 7 support in a patch release (`dotnet/aspnetcore` #68893)](https://github.com/dotnet/aspnetcore/issues/68893).
 
 ## Additional resources
 
@@ -410,7 +418,7 @@ services.AddSignalR()
 ```
 
 > [!WARNING]
-> We strongly recommend reviewing [CVE-2020-5234](https://github.com/neuecc/MessagePack-CSharp/security/advisories/GHSA-7q36-4xx7-xcxf) and applying the recommended patches. For example, setting the `MessagePackSecurity.Active` static property to `MessagePackSecurity.UntrustedData`. Setting the `MessagePackSecurity.Active` requires manually installing a [1.9.x version of MessagePack](https://www.nuget.org/packages/MessagePack/1.9.3). Installing `MessagePack` 1.9.x upgrades the version SignalR uses. `MessagePack` version 2.x introduced breaking changes and is incompatible with SignalR versions 3.1 and earlier. When `MessagePackSecurity.Active` isn't set to `MessagePackSecurity.UntrustedData`, a malicious client could cause a denial of service. Set `MessagePackSecurity.Active` in `Program.Main`, as shown in the following code:
+> We strongly recommend reviewing [CVE-2020-5234](https://github.com/neuecc/MessagePack-CSharp/security/advisories/GHSA-7q36-4xx7-xcxf) and applying the recommended patches. For example, setting the `MessagePackSecurity.Active` static property to `MessagePackSecurity.UntrustedData`. Setting the `MessagePackSecurity.Active` requires manually installing a [1.9.x version of MessagePack](https://www.nuget.org/packages/MessagePack/1.9.3). Installing `MessagePack` 1.9.x upgrades the version SignalR uses. `MessagePack` version 2.x introduced breaking changes and is incompatible with SignalR versions 3.1 or earlier. When `MessagePackSecurity.Active` isn't set to `MessagePackSecurity.UntrustedData`, a malicious client could cause a denial of service. Set `MessagePackSecurity.Active` in `Program.Main`, as shown in the following code:
 
 ```csharp
 using MessagePack;
@@ -524,7 +532,7 @@ For more information on this limitation, see GitHub issue [aspnet/SignalR#2228](
 
 ### MessagePack support in "ahead-of-time" compilation environment
 
-The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation (such as Xamarin iOS or Unity). It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80#pre-code-generationunityxamarin-supports). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
+The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation, such as NET Multi-platform App UI (.NET MAUI) or Unity. It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80#pre-code-generationunityxamarin-supports). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
 
 ```csharp
 services.AddSignalR()
@@ -547,6 +555,10 @@ InvalidDataException: Error binding arguments. Make sure that the types of the p
 ```
 
 For more information on this limitation, see GitHub issue [aspnet/SignalR#2937](https://github.com/aspnet/SignalR/issues/2937).
+
+### Android device support
+
+Depending on the MessagePack version targeted by the .NET release, the MessagePack integration can increase the minimum Android API level. For example, `signalr-messagepack` 8.0.24 resolves `jackson-databind` 2.18, raising the minimum Android API level from 21 to 26. If you need to support older Android devices than a given MessagePack integration permits, use the default JSON protocol, which doesn't have this MessagePack dependency constraint. For more information, see [[SignalR Java client]: signalr-messagepack 8.0.24 drops Android 7 support in a patch release (`dotnet/aspnetcore` #68893)](https://github.com/dotnet/aspnetcore/issues/68893).
 
 ## Additional resources
 
@@ -703,7 +715,7 @@ For more information on this limitation, see GitHub issue [aspnet/SignalR#2228](
 
 ### MessagePack support in "ahead-of-time" compilation environment
 
-The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation (such as Xamarin iOS or Unity). It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80#pre-code-generationunityxamarin-supports). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
+The [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80) library used by the .NET client and server uses code generation to optimize serialization. As a result, it isn't supported by default on environments that use "ahead-of-time" compilation, such as NET Multi-platform App UI (.NET MAUI) or Unity. It's possible to use MessagePack in these environments by "pre-generating" the serializer/deserializer code. For more information, see [the MessagePack-CSharp documentation](https://github.com/neuecc/MessagePack-CSharp/tree/v1.8.80#pre-code-generationunityxamarin-supports). Once you have pre-generated the serializers, you can register them using the configuration delegate passed to `AddMessagePackProtocol`:
 
 ```csharp
 services.AddSignalR()
@@ -726,6 +738,10 @@ InvalidDataException: Error binding arguments. Make sure that the types of the p
 ```
 
 For more information on this limitation, see GitHub issue [aspnet/SignalR#2937](https://github.com/aspnet/SignalR/issues/2937).
+
+### Android device support
+
+Depending on the MessagePack version targeted by the .NET release, the MessagePack integration can increase the minimum Android API level. For example, `signalr-messagepack` 8.0.24 resolves `jackson-databind` 2.18, raising the minimum Android API level from 21 to 26. If you need to support older Android devices than a given MessagePack integration permits, use the default JSON protocol, which doesn't have this MessagePack dependency constraint. For more information, see [[SignalR Java client]: signalr-messagepack 8.0.24 drops Android 7 support in a patch release (`dotnet/aspnetcore` #68893)](https://github.com/dotnet/aspnetcore/issues/68893).
 
 ## Additional resources
 

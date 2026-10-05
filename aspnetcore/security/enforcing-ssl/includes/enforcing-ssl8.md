@@ -1,7 +1,7 @@
 :::moniker range="= aspnetcore-8.0"
 
 > [!NOTE]
-> If you're using .NET 9 SDK or later, see the updated Linux procedures in the [.NET 9 version of this article](?view=aspnetcore-9.0&preserve-view=true).
+> If you're using .NET 9 or later SDK, see the updated Linux procedures in the [.NET 9 version of this article](?view=aspnetcore-9.0&preserve-view=true).
 
 > [!WARNING]
 > ## API projects
@@ -29,13 +29,13 @@ API projects can reject HTTP requests rather than use `UseHttpsRedirection` to r
 
 We recommend that production ASP.NET Core web apps use:
 
-* HTTPS Redirection Middleware (<xref:Microsoft.AspNetCore.Builder.HttpsPolicyBuilderExtensions.UseHttpsRedirection%2A>) to redirect HTTP requests to HTTPS.
-* HSTS Middleware ([UseHsts](#http-strict-transport-security-protocol-hsts)) to send HTTP Strict Transport Security Protocol (HSTS) headers to clients.
+* HTTPS redirection middleware (<xref:Microsoft.AspNetCore.Builder.HttpsPolicyBuilderExtensions.UseHttpsRedirection%2A>) to redirect HTTP requests to HTTPS.
+* HSTS middleware ([UseHsts](#http-strict-transport-security-hsts-protocol)) to send HTTP Strict Transport Security (HSTS) protocol headers to clients.
 
 > [!NOTE]
-> Apps deployed in a reverse proxy configuration allow the proxy to handle connection security (HTTPS). If the proxy also handles HTTPS redirection, there's no need to use HTTPS Redirection Middleware. If the proxy server also handles writing HSTS headers (for example, [native HSTS support in IIS 10.0 (1709) or later](/iis/get-started/whats-new-in-iis-10-version-1709/iis-10-version-1709-hsts#iis-100-version-1709-native-hsts-support)), HSTS Middleware isn't required by the app. For more information, see [Opt-out of HTTPS/HSTS on project creation](#opt-out-of-httpshsts-on-project-creation).
+> Apps deployed in a reverse proxy configuration allow the proxy to handle connection security (HTTPS). If the proxy also handles HTTPS redirection, there's no need to use HTTPS redirection middleware. If the proxy server also handles writing HSTS headers (for example, [native HSTS support in IIS 10.0 (1709) or later](/iis/get-started/whats-new-in-iis-10-version-1709/iis-10-version-1709-hsts#iis-100-version-1709-native-hsts-support)), HSTS middleware isn't required by the app. For more information, see [Opt-out of HTTPS/HSTS on project creation](#opt-out-of-httpshsts-on-project-creation).
 
-### UseHttpsRedirection
+### HTTPS redirection middleware (`UseHttpsRedirection`)
 
 The following code calls <xref:Microsoft.AspNetCore.Builder.HttpsPolicyBuilderExtensions.UseHttpsRedirection%2A> in the `Program.cs` file:
 
@@ -46,7 +46,10 @@ The preceding highlighted code:
 * Uses the default <xref:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionOptions.RedirectStatusCode?displayProperty=nameWithType> (<xref:Microsoft.AspNetCore.Http.StatusCodes.Status307TemporaryRedirect>).
 * Uses the default <xref:Microsoft.AspNetCore.HttpsPolicy.HttpsRedirectionOptions.HttpsPort?displayProperty=nameWithType> (null) unless overridden by the `ASPNETCORE_HTTPS_PORT` environment variable or <xref:Microsoft.AspNetCore.Hosting.Server.Features.IServerAddressesFeature>.
 
-We recommend using temporary redirects rather than permanent redirects. Link caching can cause unstable behavior in development environments. If you prefer to send a permanent redirect status code when the app is in a non-Development environment, see the [Configure permanent redirects in production](#configure-permanent-redirects-in-production) section. We recommend using [HSTS](#http-strict-transport-security-protocol-hsts) to signal to clients that only secure resource requests should be sent to the app (only in production).
+We recommend using temporary redirects rather than permanent redirects. Link caching can cause unstable behavior in development environments. If you prefer to send a permanent redirect status code when the app is in a non-`Development` environment, see the [Configure permanent redirects in production](#configure-permanent-redirects-in-production) section. We recommend using [HSTS](#http-strict-transport-security-hsts-protocol) to signal to clients that only secure resource requests should be sent to the app (only in production).
+
+> [!NOTE]
+> Don't confuse the `HTTPS_PORT` configuration key and `ASPNETCORE_HTTPS_PORT` environment variable, which set the port for HTTPS redirection middleware, with the `HTTPS_PORTS` configuration key and `ASPNETCORE_HTTPS_PORTS` environment variable, which set the ports for Kestrel/HTTP.sys endpoint configuration.
 
 ### Port configuration
 
@@ -88,7 +91,7 @@ For more information, see [Kestrel endpoint configuration](xref:fundamentals/ser
 
 Any firewall between the client and server must also have communication ports open for traffic.
 
-If requests are forwarded in a reverse proxy configuration, use [Forwarded Headers Middleware](xref:host-and-deploy/proxy-load-balancer) before calling HTTPS Redirection Middleware. Forwarded Headers Middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header. The middleware permits redirect URIs and other security policies to work correctly. When Forwarded Headers Middleware isn't used, the backend app might not receive the correct scheme and end up in a redirect loop. A common end user error message is that too many redirects have occurred.
+If requests are forwarded in a reverse proxy configuration, use [forwarded headers middleware](xref:host-and-deploy/proxy-load-balancer) before calling HTTPS redirection middleware. Forwarded headers middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header. The middleware permits redirect URIs and other security policies to work correctly. When forwarded headers middleware isn't used, the backend app might not receive the correct scheme and end up in a redirect loop. A common end user error message is that too many redirects have occurred.
 
 When deploying to Azure App Service, follow the guidance in [Tutorial: Bind an existing custom SSL certificate to Azure Web Apps](/azure/app-service/app-service-web-tutorial-custom-ssl).
 
@@ -107,21 +110,21 @@ The preceding highlighted code:
 
 #### Configure permanent redirects in production
 
-The middleware defaults to sending a <xref:Microsoft.AspNetCore.Http.StatusCodes.Status307TemporaryRedirect> with all redirects. If you prefer to send a permanent redirect status code when the app is in a non-Development environment, wrap the middleware options configuration in a conditional check for a non-Development environment.
+The middleware defaults to sending a <xref:Microsoft.AspNetCore.Http.StatusCodes.Status307TemporaryRedirect> with all redirects. If you prefer to send a permanent redirect status code when the app is in a non-`Development` environment, wrap the middleware options configuration in a conditional check for a non-`Development` environment.
 
 When configuring services in `Program.cs`:
 
 [!code-csharp[](~/security/enforcing-ssl/sample-snapshot/6.x/Program3.cs?highlight=7-14)]
 
-## HTTPS Redirection Middleware alternative approach
+## HTTPS redirection middleware alternative approach
 
-An alternative to using HTTPS Redirection Middleware (`UseHttpsRedirection`) is to use URL Rewriting Middleware (`AddRedirectToHttps`). `AddRedirectToHttps` can also set the status code and port when the redirect is executed. For more information, see [URL Rewriting Middleware](xref:fundamentals/url-rewriting).
+An alternative to using HTTPS redirection middleware (`UseHttpsRedirection`) is to use URL rewriting middleware (`AddRedirectToHttps`). `AddRedirectToHttps` can also set the status code and port when the redirect is executed. For more information, see [URL rewriting middleware](xref:fundamentals/url-rewriting).
 
-When redirecting to HTTPS without the requirement for additional redirect rules, we recommend using HTTPS Redirection Middleware (`UseHttpsRedirection`) described in this article.
+When redirecting to HTTPS without the requirement for additional redirect rules, we recommend using HTTPS redirection middleware (`UseHttpsRedirection`) described in this article.
 
 <a name="hsts"></a>
 
-## HTTP Strict Transport Security Protocol (HSTS)
+## HTTP Strict Transport Security (HSTS) protocol
 
 Per [OWASP](https://www.owasp.org/index.php/About_The_Open_Web_Application_Security_Project), [HTTP Strict Transport Security (HSTS)](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html) is an opt-in security enhancement that's specified by a web app through the use of a response header. When a [browser that supports HSTS](https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html#browser-support) receives this header:
 
@@ -159,7 +162,7 @@ The following highlighted code:
 
 ## Opt-out of HTTPS/HSTS on project creation
 
-In some backend service scenarios where connection security is handled at the public-facing edge of the network, configuring connection security at each node isn't required. Web apps that are generated from the templates in Visual Studio or from the [dotnet new](/dotnet/core/tools/dotnet-new) command enable [HTTPS redirection](#require-https) and [HSTS](#http-strict-transport-security-protocol-hsts). For deployments that don't require these scenarios, you can opt-out of HTTPS/HSTS when the app is created from the template.
+In some backend service scenarios where connection security is handled at the public-facing edge of the network, configuring connection security at each node isn't required. Web apps that are generated from the templates in Visual Studio or from the [dotnet new](/dotnet/core/tools/dotnet-new) command enable [HTTPS redirection](#require-https) and [HSTS](#http-strict-transport-security-hsts-protocol). For deployments that don't require these scenarios, you can opt-out of HTTPS/HSTS when the app is created from the template.
 
 To opt-out of HTTPS/HSTS:
 
@@ -185,7 +188,7 @@ dotnet new webapp --no-https
 
 For the Firefox browser, see the next section.
 
-The .NET Core SDK includes an HTTPS development certificate. The certificate is installed as part of the first-run experience. For example, `dotnet --info` produces a variation of the following output:
+The .NET SDK includes an HTTPS development certificate. The certificate is installed as part of the first-run experience. For example, `dotnet --info` produces a variation of the following output:
 
 ```cli
 ASP.NET Core
@@ -196,7 +199,7 @@ For establishing trust on other platforms refer to the platform specific documen
 For more information on configuring HTTPS see https://go.microsoft.com/fwlink/?linkid=848054.
 ```
 
-Installing the .NET Core SDK installs the ASP.NET Core HTTPS development certificate to the local user certificate store. The certificate has been installed, but it's not trusted. To trust the certificate, perform the one-time step to run the `dotnet dev-certs` tool:
+Installing the .NET SDK installs the ASP.NET Core HTTPS development certificate to the local user certificate store. The certificate has been installed, but it's not trusted. To trust the certificate, perform the one-time step to run the `dotnet dev-certs` tool:
 
 ```dotnetcli
 dotnet dev-certs https --trust

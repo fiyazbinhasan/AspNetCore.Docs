@@ -3,7 +3,7 @@ title: Develop ASP.NET Core apps using a file watcher
 author: tdykstra
 description: This tutorial demonstrates how to install and use the .NET CLI's file watcher (dotnet watch) tool in an ASP.NET Core app.
 ms.author: tdykstra
-ms.date: 05/31/2018
+ms.date: 09/23/2026
 uid: tutorials/dotnet-watch
 ---
 # Develop ASP.NET Core apps using a file watcher
@@ -43,7 +43,7 @@ Navigate to the product API (`http://localhost:<port number>/api/math/product?a=
 
 ## Add `dotnet watch` to a project
 
-The `dotnet watch` file watcher tool is included with version 2.1.300 of the .NET Core SDK. The following steps are required when using an earlier version of the .NET Core SDK.
+The `dotnet watch` file watcher tool is included with version 2.1.300 of the .NET SDK. The following steps are required when using an earlier version of the .NET SDK.
 
 1. Add a `Microsoft.DotNet.Watcher.Tools` package reference to the `.csproj` file:
 
@@ -223,7 +223,33 @@ Some configuration options can be passed to `dotnet watch` through environment v
 
 ## Non-ASCII characters
 
-Visual Studio 17.2 and later includes the .NET SDK 6.0.300 and later. With the .NET SDK and 6.0.300 later, `dotnet-watch` emits non-ASCII characters to the console during a hot reload session. On certain console hosts, such as the Windows conhost, these characters may appear garbled. To avoid garbled characters, consider one of the following approaches:
+Visual Studio 17.2 or later includes the .NET SDK 6.0.300 or later. With the .NET SDK and 6.0.300 later, `dotnet-watch` emits non-ASCII characters to the console during a hot reload session. On certain console hosts, such as the Windows conhost, these characters may appear garbled. To avoid garbled characters, consider one of the following approaches:
 
 * Configure the `DOTNET_WATCH_SUPPRESS_EMOJIS=1` environment variable to suppress emitting these values.
 * Switch to a different terminal, such as https://github.com/microsoft/terminal, that  supports rendering non-ASCII characters.
+
+
+## File watcher limits in Linux
+
+When running `dotnet watch` on Linux or in Docker containers, you may encounter an error indicating that the configured user limit on the number of inotify instances has been reached:
+
+`The configured user limit (128) on the number of inotify instances has been reached, or the per-process limit on the number of open file descriptors has been reached.`
+
+If the inotify instance limit is exhausted, increase `fs.inotify.max_user_instances`. If the process has reached its open-file-descriptor limit, increase that limit instead. The separate `fs.inotify.max_user_watches` setting applies when the inotify watch limit is exhausted.
+
+To temporarily increase these limits, run the following commands:
+
+```console
+sudo sysctl fs.inotify.max_user_instances=524288
+sudo sysctl fs.inotify.max_user_watches=524288
+```
+
+To make this change permanent, add the following lines to the `/etc/sysctl.conf` file:
+
+```ini
+fs.inotify.max_user_instances=524288
+fs.inotify.max_user_watches=524288
+```
+
+> [!NOTE]
+> For Docker containers, these limits are inherited from the host operating system. You must configure the `sysctl` settings on the host machine, rather than inside the container.

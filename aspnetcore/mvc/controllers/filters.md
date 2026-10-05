@@ -4,8 +4,7 @@ author: tdykstra
 description: Learn how filters work and how to use them in ASP.NET Core.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 6/20/2023
+ms.date: 04/28/2026
 uid: mvc/controllers/filters
 ---
 # Filters in ASP.NET Core
@@ -32,7 +31,11 @@ This document applies to Razor Pages, API controllers, and controllers with view
 
 Filters run within the *ASP.NET Core action invocation pipeline*, sometimes referred to as the *filter pipeline*. The filter pipeline runs after ASP.NET Core selects the action to execute:
 
-:::image source="~/mvc/controllers/filters/_static/filter-pipeline-1.png" alt-text="The request is processed through Other Middleware, Routing Middleware, Action Selection, and the Action Invocation Pipeline. The request processing continues back through Action Selection, Routing Middleware, and various Other Middleware before becoming a response sent to the client.":::
+:::image source="~/mvc/controllers/filters/_static/filter-pipeline-1.png" alt-text="The request is processed through other middleware, routing middleware, Action Selection, and the Action Invocation Pipeline. The request processing continues back through Action Selection, routing middleware, and various other middleware before becoming a response sent to the client.":::
+
+The following diagram shows the filter pipeline execution order for MVC and Razor Pages:
+
+![ASP.NET Core filter pipeline](~/mvc/controllers/filters/_static/filter-pipeline-3.svg)
 
 ### Filter types
 
@@ -42,7 +45,7 @@ Each filter type is executed at a different stage in the filter pipeline:
 
   * Run first.
   * Determine whether the user is authorized for the request.
-  * Short-circuit the pipeline if the request is not authorized.
+  * Short-circuit the pipeline if the request isn't authorized.
 
 * [Resource filters](#resource-filters):
 
@@ -65,17 +68,17 @@ Each filter type is executed at a different stage in the filter pipeline:
   * Are **not** supported in Razor Pages.
   * Can be invoked on both actions and route handler-based endpoints.
 
-* [Exception filters](#exception-filters) apply global policies to unhandled exceptions that occur before the response body has been written to.
+* [Exception filters](#exception-filters):
+  * Apply global policies to unhandled exceptions that occur before the response body has been written to.
+  * Run after model binding and action filters, but before the action result is executed.
+  * Run only if an unhandled exception occurs during action execution or action result execution.
+  * Don't run for exceptions thrown during middleware execution, routing, or model binding.
 
 * [Result filters](#result-filters):
   
   * Run immediately before and after the execution of action results.
   * Run only when the action method executes successfully.
   * Are useful for logic that must surround view or formatter execution.
-
-The following diagram shows how filter types interact in the filter pipeline:
-
-:::image source="~/mvc/controllers/filters/_static/filter-pipeline-2.png" alt-text="The request is processed through Authorization Filters, Resource Filters, Model Binding, Action Filters, Action Execution and Action Result Conversion, Exception Filters, Result Filters, and Result Execution. On the way out, the request is only processed by Result Filters and Resource Filters before becoming a response sent to the client.":::
 
 Razor Pages also support [Razor Page filters](xref:razor-pages/filter), which run before and after a Razor Page handler.
 
@@ -101,7 +104,7 @@ Interfaces for multiple filter stages can be implemented in a single class. For 
 * Asynchronous: <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncActionFilter> and <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncResultFilter>
 * <xref:Microsoft.AspNetCore.Mvc.Filters.IOrderedFilter>
 
-Implement **either** the synchronous or the async version of a filter interface, **not** both. The runtime checks first to see if the filter implements the async interface, and if so, it calls that. If not, it calls the synchronous interface's method(s). If both asynchronous and synchronous interfaces are implemented in one class, only the async method is called. When using abstract classes like <xref:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute>, override only the synchronous methods or the asynchronous methods for each filter type.
+Implement **either** the synchronous or the async version of a filter interface, **not** both. The runtime checks first to see if the filter implements the async interface, and if so, it calls that. If not, it calls the synchronous interface's methods. If both asynchronous and synchronous interfaces are implemented in one class, only the async method is called. When using abstract classes like <xref:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute>, override only the synchronous methods or the asynchronous methods for each filter type.
 
 ### Built-in filter attributes
 
@@ -115,7 +118,7 @@ Attributes allow filters to accept arguments, as shown in the preceding example.
 
 :::code language="csharp" source="~/mvc/controllers/filters/samples/8.x/FiltersSample/Controllers/ResponseHeaderController.cs" id="snippet_ClassIndex" highlight="1":::
 
-Use a tool such as the [browser developer tools](https://developer.mozilla.org/docs/Learn/Common_questions/What_are_browser_developer_tools) to examine the headers. Under **Response Headers**, `filter-header: Filter Value` is displayed.
+Use a tool such as the [browser developer tools](https://developer.mozilla.org/docs/Learn_web_development/Howto/Tools_and_setup/What_are_browser_developer_tools) to examine the headers. Under **Response Headers**, `filter-header: Filter Value` is displayed.
 
 The following code applies `ResponseHeaderAttribute` to both a controller and an action:
 
@@ -137,14 +140,14 @@ Filter attributes:
 * <xref:Microsoft.AspNetCore.Mvc.ServiceFilterAttribute>
 * <xref:Microsoft.AspNetCore.Mvc.TypeFilterAttribute>
 
-Filters cannot be applied to Razor Page handler methods. They can be applied either to the Razor Page model or globally.
+Filters can't be applied to Razor Page handler methods. They can be applied either to the Razor Page model or globally.
 
 ## Filter scopes and order of execution
 
 A filter can be added to the pipeline at one of three *scopes*:
 
 * Using an attribute on a controller or Razor Page.
-* Using an attribute on a controller action. Filter attributes cannot be applied to Razor Pages handler methods.
+* Using an attribute on a controller action. Filter attributes can't be applied to Razor Pages handler methods.
 * Globally for all controllers, actions, and Razor Pages as shown in the following code:
   :::code language="csharp" source="~/mvc/controllers/filters/samples/8.x/FiltersSample/Program.cs" id="snippet_GlobalFilter" highlight="6":::
 
@@ -240,7 +243,7 @@ Filters can be added by type or by instance. If an instance is added, that insta
 * An instance is created for each request.
 * Any constructor dependencies are populated by [dependency injection](xref:fundamentals/dependency-injection) (DI).
 
-Filters that are implemented as attributes and added directly to controller classes or action methods cannot have constructor dependencies provided by [dependency injection](xref:fundamentals/dependency-injection) (DI). Constructor dependencies cannot be provided by DI because attributes must have their constructor parameters supplied where they're applied. 
+Filters that are implemented as attributes and added directly to controller classes or action methods can't have constructor dependencies provided by [dependency injection](xref:fundamentals/dependency-injection) (DI). Constructor dependencies can't be provided by DI because attributes must have their constructor parameters supplied where they're applied.
 
 The following filters support constructor dependencies provided from DI:
 
@@ -273,9 +276,9 @@ In the following code, the `ServiceFilter` attribute retrieves an instance of th
 
 When using `ServiceFilterAttribute`, setting <xref:Microsoft.AspNetCore.Mvc.ServiceFilterAttribute.IsReusable?displayProperty=nameWithType>:
 
-* Provides a hint that the filter instance *may* be reused outside of the request scope it was created within. The ASP.NET Core runtime doesn't guarantee:
+* Provides a hint that the filter instance *might* be reused outside of the request scope it was created within. The ASP.NET Core runtime doesn't guarantee:
   * That a single instance of the filter will be created.
-  * The filter will not be re-requested from the DI container at some later point.
+  * The filter won't be re-requested from the DI container at some later point.
 * Shouldn't be used with a filter that depends on services with a lifetime other than singleton.
 
  <xref:Microsoft.AspNetCore.Mvc.ServiceFilterAttribute> implements <xref:Microsoft.AspNetCore.Mvc.Filters.IFilterFactory>. `IFilterFactory` exposes the <xref:Microsoft.AspNetCore.Mvc.Filters.IFilterFactory.CreateInstance%2A> method for creating an <xref:Microsoft.AspNetCore.Mvc.Filters.IFilterMetadata> instance. `CreateInstance` loads the specified type from DI.
@@ -290,9 +293,10 @@ Because `TypeFilterAttribute` types aren't resolved directly from the DI contain
 * `TypeFilterAttribute` can optionally accept constructor arguments for the type.
 
 When using `TypeFilterAttribute`, setting <xref:Microsoft.AspNetCore.Mvc.TypeFilterAttribute.IsReusable?displayProperty=nameWithType>:
-* Provides hint that the filter instance *may* be reused outside of the request scope it was created within. The ASP.NET Core runtime provides no guarantees that a single instance of the filter will be created.
 
-* Should not be used with a filter that depends on services with a lifetime other than singleton.
+* Provides hint that the filter instance *might* be reused outside of the request scope it was created within. The ASP.NET Core runtime provides no guarantees that a single instance of the filter will be created.
+
+* Shouldn't be used with a filter that depends on services with a lifetime other than singleton.
 
 The following example shows how to pass arguments to a type using `TypeFilterAttribute`:
 
@@ -309,12 +313,12 @@ Authorization filters:
 Custom authorization filters require a custom authorization framework. Prefer configuring the authorization policies or writing a custom authorization policy over writing a custom filter. The built-in authorization filter:
 
 * Calls the authorization system.
-* Does not authorize requests.
+* Doesn't authorize requests.
 
 Do **not** throw exceptions within authorization filters:
 
-* The exception will not be handled.
-* Exception filters will not handle the exception.
+* The exception won't be handled.
+* Exception filters won't handle the exception.
 
 Consider issuing a challenge when an exception occurs in an authorization filter.
 
@@ -353,9 +357,9 @@ The following code shows a sample action filter:
 
 The <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext> provides the following properties:
 
-* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext.ActionArguments> - enables reading the inputs to an action method.
-* <xref:Microsoft.AspNetCore.Mvc.Controller> - enables manipulating the controller instance.
-* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext.Result%2A> - setting `Result` short-circuits execution of the action method and subsequent action filters.
+* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext.ActionArguments>: Enables reading the inputs to an action method.
+* <xref:Microsoft.AspNetCore.Mvc.Controller>: Enables manipulating the controller instance.
+* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutingContext.Result%2A>: Setting `Result` short-circuits execution of the action method and subsequent action filters.
 
 Throwing an exception in an action method:
 
@@ -364,8 +368,8 @@ Throwing an exception in an action method:
 
 The <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext> provides `Controller` and `Result` plus the following properties:
 
-* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Canceled%2A> - True if the action execution was short-circuited by another filter.
-* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Exception%2A> - Non-null if the action or a previously run action filter threw an exception. Setting this property to null:
+* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Canceled%2A>: True if another filter short-circuited the action execution.
+* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Exception%2A>: Non-null if the action or a previously run action filter threw an exception. Setting this property to null:
   * Effectively handles the exception.
   * `Result` is executed as if it was returned from the action method.
 
@@ -391,7 +395,7 @@ The `OnActionExecuting` action filter can be used to:
 The `OnActionExecuted` method runs after the action method:
 
 * And can see and manipulate the results of the action through the <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Result> property.
-* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Canceled> is set to true if the action execution was short-circuited by another filter.
+* <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Canceled> is set to true if another filter short-circuited the action execution.
 * <xref:Microsoft.AspNetCore.Mvc.Filters.ActionExecutedContext.Exception> is set to a non-null value if the action or a subsequent action filter threw an exception. Setting `Exception` to null:
   * Effectively handles an exception.
   * `ActionExecutedContext.Result` is executed as if it were returned normally from the action method.
@@ -423,7 +427,7 @@ To handle an exception, set the <xref:Microsoft.AspNetCore.Mvc.Filters.Exception
 Exception filters:
 
 * Are good for trapping exceptions that occur within actions.
-* Are not as flexible as error handling middleware.
+* Aren't as flexible as error handling middleware.
 
 Prefer middleware for exception handling. Use exception filters only where error handling *differs* based on which action method is called. For example, an app might have action methods for both API endpoints and for views/HTML. The API endpoints could return error information as JSON, while the view-based actions could return an error page as HTML.
 
@@ -444,7 +448,7 @@ The following code shows a sample result filter:
 
 The kind of result being executed depends on the action. An action returning a view includes all razor processing as part of the <xref:Microsoft.AspNetCore.Mvc.ViewResult> being executed. An API method might perform some serialization as part of the execution of the result. Learn more about [action results](xref:mvc/controllers/actions).
 
-Result filters are only executed when an action or action filter produces an action result. Result filters are not executed when:
+Result filters are only executed when an action or action filter produces an action result. Result filters aren't executed when:
 
 * An authorization filter or resource filter short-circuits the pipeline.
 * An exception filter handles an exception by producing an action result.
@@ -454,11 +458,11 @@ The <xref:Microsoft.AspNetCore.Mvc.Filters.IResultFilter.OnResultExecuting%2A?di
 * Prevents execution of the action result and subsequent filters.
 * Is treated as a failure instead of a successful result.
 
-When the <xref:Microsoft.AspNetCore.Mvc.Filters.IResultFilter.OnResultExecuted%2A?displayProperty=fullName> method runs, the response has probably already been sent to the client. If the response has already been sent to the client, it cannot be changed.
+When the <xref:Microsoft.AspNetCore.Mvc.Filters.IResultFilter.OnResultExecuted%2A?displayProperty=fullName> method runs, the response has probably already been sent to the client. If the response has already been sent to the client, it can't be changed.
 
-`ResultExecutedContext.Canceled` is set to `true` if the action result execution was short-circuited by another filter.
+`ResultExecutedContext.Canceled` is set to `true` if another filter short-circuited the action result execution.
 
-`ResultExecutedContext.Exception` is set to a non-null value if the action result or a subsequent result filter threw an exception. Setting `Exception` to null effectively handles an exception and prevents the exception from being thrown again later in the pipeline. There is no reliable way to write data to a response when handling an exception in a result filter. If the headers have been flushed to the client when an action result throws an exception, there's no reliable mechanism to send a failure code.
+`ResultExecutedContext.Exception` is set to a non-null value if the action result or a subsequent result filter threw an exception. Setting `Exception` to null effectively handles an exception and prevents the exception from being thrown again later in the pipeline. There's no reliable way to write data to a response when handling an exception in a result filter. If the headers have been flushed to the client when an action result throws an exception, there's no reliable mechanism to send a failure code.
 
 For an <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncResultFilter>, a call to `await next` on the <xref:Microsoft.AspNetCore.Mvc.Filters.ResultExecutionDelegate> executes any subsequent result filters and the action result. To short-circuit, set <xref:Microsoft.AspNetCore.Mvc.Filters.ResultExecutingContext.Cancel?displayProperty=nameWithType> to `true` and don't call the `ResultExecutionDelegate`:
 
@@ -483,15 +487,15 @@ For example, the following filter always runs and sets an action result (<xref:M
 
 `IFilterFactory.IsReusable`:
 
-* Is a hint by the factory that the filter instance created by the factory may be reused outside of the request scope it was created within.
+* Is a hint by the factory that the filter instance created by the factory might be reused outside of the request scope it was created within.
 * Should ***not*** be used with a filter that depends on services with a lifetime other than singleton.
 
 The ASP.NET Core runtime doesn't guarantee:
 
 * That a single instance of the filter will be created.
-* The filter will not be re-requested from the DI container at some later point.
+* The filter won't be re-requested from the DI container at some later point.
 
-> [!WARNING] 
+> [!WARNING]
 > Only configure <xref:Microsoft.AspNetCore.Mvc.Filters.IFilterFactory.IsReusable?displayProperty=nameWithType> to return `true` if the source of the filters is unambiguous, the filters are stateless, and the filters are safe to use across multiple HTTP requests. For instance, don't return filters from DI that are registered as scoped or transient if `IFilterFactory.IsReusable` returns `true`.
 
 `IFilterFactory` can be implemented using custom attribute implementations as another approach to creating filters:
@@ -539,7 +543,7 @@ When passing an *instance* of a filter into `Add`, instead of its `Type`, the fi
 
 ## Additional resources
 
-* [View or download sample](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/samples) ([how to download](xref:index#how-to-download-a-sample)).
+* [View or download sample](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample)).
 * <xref:razor-pages/filter>
 
 :::moniker-end

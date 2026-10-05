@@ -1,10 +1,9 @@
 ---
 title: SignalR HubContext
-author: bradygaster
+author: wadepickett
 description: Learn how to use the ASP.NET Core SignalR HubContext service for sending notifications to clients from outside a hub.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
 ms.date: 02/20/2023
 uid: signalr/hubcontext
 ---
@@ -15,7 +14,7 @@ The SignalR hub is the core abstraction for sending messages to clients connecte
 > [!NOTE]
 > The `IHubContext` is for sending notifications to clients, it is not used to call methods on the `Hub`.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/hubcontext/sample/) [(how to download)](xref:index#how-to-download-a-sample)
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/hubcontext/sample/) [(how to download)](xref:fundamentals/index#how-to-download-a-sample)
 
 ## Get an instance of `IHubContext`
 
@@ -54,11 +53,11 @@ app.Use(async (context, next) =>
 >
 > Apps that need to map a user to the connection ID and persist that mapping can do one of the following:
 >
-> - Persist mapping of single or multiple connections as groups. See [Groups in SignalR](xref:signalr/groups#groups-in-signalr) for more information.
-> - Retain connection and user information through a singleton service. See [Inject services into a hub](xref:signalr/hubs#inject-services-into-a-hub) for more information. The singleton service can use any storage method, such as:
->   - In-memory storage in a dictionary.
->   - Permanent external storage.  For example, a database or Azure Table storage using the [Azure.Data.Tables NuGet package](https://www.nuget.org/packages/Azure.Data.Tables/).
-> - Pass the connection ID between clients.
+> * Persist mapping of single or multiple connections as groups. See [Groups in SignalR](xref:signalr/groups#groups-in-signalr) for more information.
+> * Retain connection and user information through a singleton service. See [Inject services into a hub](xref:signalr/hubs#inject-services-into-a-hub) for more information. The singleton service can use any storage method, such as:
+>   * In-memory storage in a dictionary.
+>   * Permanent external storage.  For example, a database or Azure Table storage using the [Azure.Data.Tables NuGet package](https://www.nuget.org/packages/Azure.Data.Tables/).
+> * Pass the connection ID between clients.
 
 ### Get an instance of `IHubContext` from IHost
 
@@ -104,7 +103,7 @@ public class ChatController : Controller
 }
 ```
 
-See [Strongly typed hubs](xref:signalr/hubs#strongly-typed-hubs) for more information.
+See [Use strongly typed hubs](xref:signalr/hubs#use-strongly-typed-hubs) for more information.
 
 :::moniker range=">= aspnetcore-6.0"
 

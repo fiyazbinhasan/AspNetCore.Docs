@@ -3,7 +3,7 @@ title: Configure portable object localization in ASP.NET Core
 author: sebastienros
 description: This article introduces Portable Object files and outlines steps for using them in an ASP.NET Core application with the Orchard Core framework.
 ms.author: wpickett
-ms.date: 09/26/2017
+ms.date: 07/09/2025
 uid: fundamentals/portable-object-localization
 ---
 # Configure portable object localization in ASP.NET Core
@@ -16,14 +16,15 @@ This article walks through the steps for using Portable Object (PO) files in an 
 
 **Note:** Orchard Core isn't a Microsoft product. Microsoft provides no support for this feature.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/6.x/POLocalization) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/6.x/POLocalization) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## What is a PO file?
 
 PO files are distributed as text files containing the translated strings for a given language. Some advantages of using PO files instead of *.resx* files include:
-- PO files support pluralization; *.resx* files don't support pluralization.
-- PO files aren't compiled like *.resx* files. As such, specialized tooling and build steps aren't required.
-- PO files work well with collaborative online editing tools.
+
+* PO files support pluralization; *.resx* files don't support pluralization.
+* PO files aren't compiled like *.resx* files. As such, specialized tooling and build steps aren't required.
+* PO files work well with collaborative online editing tools.
 
 ### Example
 
@@ -44,15 +45,15 @@ msgstr[1] "Il y a {0} éléments."
 
 This example uses the following syntax:
 
-- `#:`: A comment indicating the context of the string to be translated. The same string might be translated differently depending on where it's being used.
-- `msgid`: The untranslated string.
-- `msgstr`: The translated string.
+* `#:`: A comment indicating the context of the string to be translated. The same string might be translated differently depending on where it's being used.
+* `msgid`: The untranslated string.
+* `msgstr`: The translated string.
 
 For pluralization support, more entries can be defined.
 
-- `msgid_plural`: The untranslated plural string.
-- `msgstr[0]`: The translated string for the case 0.
-- `msgstr[N]`: The translated string for the case N.
+* `msgid_plural`: The untranslated plural string.
+* `msgstr[0]`: The translated string for the case 0.
+* `msgstr[N]`: The translated string for the case N.
 
 The PO file specification can be found [here](https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/PO-Files.html).
 
@@ -113,7 +114,7 @@ msgstr[1] "Il y a {0} éléments."
 
 See [What is a PO file?](#what-is-a-po-file) for an explanation of what each entry in this example represents.
 
-### Adding a language using different pluralization forms
+### Add a language using different pluralization forms
 
 English and French strings were used in the previous example. English and French have only two pluralization forms and share the same form rules, which is that a cardinality of one is mapped to the first plural form. Any other cardinality is mapped to the second plural form.
 
@@ -231,14 +232,15 @@ This article walks through the steps for using Portable Object (PO) files in an 
 
 **Note:** Orchard Core isn't a Microsoft product. Consequently, Microsoft provides no support for this feature.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/5.x/POLocalization) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/5.x/POLocalization) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## What is a PO file?
 
 PO files are distributed as text files containing the translated strings for a given language. Some advantages of using PO files instead of *.resx* files include:
-- PO files support pluralization; *.resx* files don't support pluralization.
-- PO files aren't compiled like *.resx* files. As such, specialized tooling and build steps aren't required.
-- PO files work well with collaborative online editing tools.
+
+* PO files support pluralization; *.resx* files don't support pluralization.
+* PO files aren't compiled like *.resx* files. As such, specialized tooling and build steps aren't required.
+* PO files work well with collaborative online editing tools.
 
 ### Example
 
@@ -259,15 +261,15 @@ msgstr[1] "Il y a {0} éléments."
 
 This example uses the following syntax:
 
-- `#:`: A comment indicating the context of the string to be translated. The same string might be translated differently depending on where it's being used.
-- `msgid`: The untranslated string.
-- `msgstr`: The translated string.
+* `#:`: A comment indicating the context of the string to be translated. The same string might be translated differently depending on where it's being used.
+* `msgid`: The untranslated string.
+* `msgstr`: The translated string.
 
 In the case of pluralization support, more entries can be defined.
 
-- `msgid_plural`: The untranslated plural string.
-- `msgstr[0]`: The translated string for the case 0.
-- `msgstr[N]`: The translated string for the case N.
+* `msgid_plural`: The untranslated plural string.
+* `msgstr[0]`: The translated string for the case 0.
+* `msgstr[N]`: The translated string for the case N.
 
 The PO file specification can be found [here](https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/PO-Files.html).
 
@@ -332,7 +334,7 @@ msgstr[1] "Il y a {0} éléments."
 
 See [What is a PO file?](#what-is-a-po-file) for an explanation of what each entry in this example represents.
 
-### Adding a language using different pluralization forms
+### Add a language using different pluralization forms
 
 English and French strings were used in the previous example. English and French have only two pluralization forms and share the same form rules, which is that a cardinality of one is mapped to the first plural form. Any other cardinality is mapped to the second plural form.
 
@@ -442,14 +444,15 @@ This article walks through the steps for using Portable Object (PO) files in an 
 
 **Note:** Orchard Core isn't a Microsoft product. Consequently, Microsoft provides no support for this feature.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/3.x/POLocalization) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/3.x/POLocalization) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## What is a PO file?
 
 PO files are distributed as text files containing the translated strings for a given language. Some advantages of using PO files instead of *.resx* files include:
-- PO files support pluralization; *.resx* files don't support pluralization.
-- PO files aren't compiled like *.resx* files. As such, specialized tooling and build steps aren't required.
-- PO files work well with collaborative online editing tools.
+
+* PO files support pluralization; *.resx* files don't support pluralization.
+* PO files aren't compiled like *.resx* files. As such, specialized tooling and build steps aren't required.
+* PO files work well with collaborative online editing tools.
 
 ### Example
 
@@ -471,15 +474,15 @@ msgstr[1] "Les adresses email sont \"{0}\""
 
 This example uses the following syntax:
 
-- `#:`: A comment indicating the context of the string to be translated. The same string might be translated differently depending on where it's being used.
-- `msgid`: The untranslated string.
-- `msgstr`: The translated string.
+* `#:`: A comment indicating the context of the string to be translated. The same string might be translated differently depending on where it's being used.
+* `msgid`: The untranslated string.
+* `msgstr`: The translated string.
 
 In the case of pluralization support, more entries can be defined.
 
-- `msgid_plural`: The untranslated plural string.
-- `msgstr[0]`: The translated string for the case 0.
-- `msgstr[N]`: The translated string for the case N.
+* `msgid_plural`: The untranslated plural string.
+* `msgstr[0]`: The translated string for the case 0.
+* `msgstr[N]`: The translated string for the case N.
 
 The PO file specification can be found [here](https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/PO-Files.html).
 
@@ -544,7 +547,7 @@ msgstr[1] "Il y a {0} éléments."
 
 See [What is a PO file?](#what-is-a-po-file) for an explanation of what each entry in this example represents.
 
-### Adding a language using different pluralization forms
+### Add a language using different pluralization forms
 
 English and French strings were used in the previous example. English and French have only two pluralization forms and share the same form rules, which is that a cardinality of one is mapped to the first plural form. Any other cardinality is mapped to the second plural form.
 

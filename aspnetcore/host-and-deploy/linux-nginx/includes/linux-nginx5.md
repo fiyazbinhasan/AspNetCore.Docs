@@ -1,5 +1,5 @@
 ---
-ms.custom: linux-related-content
+ms.custom: linux-related-content, sfi-ropc-nochange
 ---
 :::moniker range="= aspnetcore-5.0"
 This guide explains setting up a production-ready ASP.NET Core environment on an Ubuntu 16.04 server. These instructions likely work with newer versions of Ubuntu, but the instructions haven't been tested with newer versions.
@@ -28,13 +28,13 @@ At any point in the future after upgrading the shared framework, restart the ASP
 
 Configure the app for a [framework-dependent deployment](/dotnet/core/deploying/#framework-dependent-deployments-fdd).
 
-If the app is run locally in the [Development environment](xref:fundamentals/environments#configure-services-and-middleware-by-environment) and isn't configured by the server to make secure HTTPS connections, adopt either of the following approaches:
+If the app is run locally in the [`Development` environment](xref:fundamentals/environments#configure-services-and-middleware-by-environment) and isn't configured by the server to make secure HTTPS connections, adopt either of the following approaches:
 
 * Configure the app to handle secure local connections. For more information, see the [HTTPS configuration](#https-configuration) section.
 
 * Configure the app to run at the insecure endpoint:
 
-  * Deactivate HTTPS Redirection Middleware in the Development environment (`Program.cs`):
+  * Deactivate HTTPS redirection middleware in the `Development` environment (`Program.cs`):
 
     ```csharp
     if (!app.Environment.IsDevelopment())
@@ -49,7 +49,7 @@ If the app is run locally in the [Development environment](xref:fundamentals/env
 
 For more information on configuration by environment, see <xref:fundamentals/environments>.
 
-Run [dotnet publish](/dotnet/core/tools/dotnet-publish) from the development environment to package an app into a directory (for example, `bin/Release/{TARGET FRAMEWORK MONIKER}/publish`, where the placeholder `{TARGET FRAMEWORK MONIKER}` is the Target Framework Moniker/TFM) that can run on the server:
+Run [dotnet publish](/dotnet/core/tools/dotnet-publish) from the `Development` environment to package an app into a directory (for example, `bin/Release/{TARGET FRAMEWORK MONIKER}/publish`, where the placeholder `{TARGET FRAMEWORK MONIKER}` is the Target Framework Moniker/TFM) that can run on the server:
 
 ```dotnetcli
 dotnet publish --configuration Release
@@ -77,9 +77,9 @@ Kestrel is great for serving dynamic content from ASP.NET Core. However, the web
 
 For the purposes of this guide, a single instance of Nginx is used. It runs on the same server, alongside the HTTP server. Based on requirements, a different setup may be chosen.
 
-Because requests are forwarded by reverse proxy, use the [Forwarded Headers Middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package. The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
+Because requests are forwarded by reverse proxy, use the [forwarded headers middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package. The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
 
-[!INCLUDE[](~/includes/ForwardedHeaders.md)]
+Forwarded headers middleware should run before other middleware. This ordering ensures that the middleware relying on forwarded headers information can consume the header values for processing. To run forwarded headers middleware after diagnostics and error handling middleware, see [forwarded headers middleware order](xref:host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order).
 
 Invoke the <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders%2A> method at the top of `Program.cs` before calling other middleware. Configure the middleware to forward the `X-Forwarded-For` and `X-Forwarded-Proto` headers:
 
@@ -95,7 +95,7 @@ app.UseAuthentication();
 
 If no <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions> are specified to the middleware, the default headers to forward are `None`.
 
-Proxies running on loopback addresses (`127.0.0.0/8`, `[::1]`), including the standard localhost address (`127.0.0.1`), are trusted by default. If other trusted proxies or networks within the organization handle requests between the Internet and the web server, add them to the list of <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownProxies%2A> or <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks%2A> with <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>. The following example adds a trusted proxy server at IP address 10.0.0.100 to the Forwarded Headers Middleware `KnownProxies` in `Program.cs`:
+Proxies running on loopback addresses (`127.0.0.0/8`, `[::1]`), including the standard localhost address (`127.0.0.1`), are trusted by default. If other trusted proxies or networks within the organization handle requests between the Internet and the web server, add them to the list of <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownProxies%2A> or <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks%2A> with <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>. The following example adds a trusted proxy server at IP address 10.0.0.100 to the forwarded headers middleware `KnownProxies` in `Program.cs`:
 
 ```csharp
 using System.Net;
@@ -146,7 +146,7 @@ server {
 }
 ```
 
-If the app is a SignalR or Blazor Server app, see <xref:signalr/scale#linux-with-nginx> and <xref:blazor/host-and-deploy/server#linux-with-nginx> respectively for more information.
+If the app is a SignalR or Blazor Server app, see <xref:signalr/scale#linux-with-nginx> and <xref:blazor/host-and-deploy/server/index#linux-with-nginx> respectively for more information.
 
 When no `server_name` matches, Nginx uses the default server. If no default server is defined, the first server in the configuration file is the default server. As a best practice, add a specific default server that returns a status code of 444 in your configuration file. A default server configuration example is:
 
@@ -172,7 +172,7 @@ To directly run the app on the server:
 
 If the app runs on the server but fails to respond over the Internet, check the server's firewall and confirm port 80 is open. If using an Azure Ubuntu VM, add a Network Security Group (NSG) rule that enables inbound port 80 traffic. There's no need to enable an outbound port 80 rule, as the outbound traffic is automatically granted when the inbound rule is enabled.
 
-When done testing the app, shut down the app with <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) at the command prompt.
+When done testing the app, shut down the app with <kbd>Ctrl</kbd>+<kbd>C</kbd> in the command shell.
 
 ## Monitor the app
 
@@ -314,7 +314,7 @@ Linux Security Modules (LSM) is a framework that's part of the Linux kernel sinc
 Close off all external ports that aren't in use. Uncomplicated firewall (ufw) provides a front end for `iptables` by providing a CLI for configuring the firewall.
 
 > [!WARNING]
-> A firewall will prevent access to the whole system if not configured correctly. Failure to specify the correct SSH port will effectively lock you out of the system if you are using SSH to connect to it. The default port is 22. For more information, see the [introduction to ufw](https://help.ubuntu.com/community/UFW) and the [manual](https://manpages.ubuntu.com/manpages/lunar/en/man8/ufw.8.html).
+> A firewall will prevent access to the whole system if not configured correctly. Failure to specify the correct SSH port will effectively lock you out of the system if you are using SSH to connect to it. The default port is 22. For more information, see the [introduction to ufw](https://help.ubuntu.com/community/UFW) and the [manual](https://manpages.ubuntu.com/manpages/resolute/man8/ufw.8.html).
 
 Install `ufw` and configure it to allow traffic on any ports needed.
 
@@ -366,12 +366,12 @@ Configure the app to use a certificate in development for the `dotnet run` comma
 
 * Harden the security by employing some of the practices depicted in the following */etc/nginx/nginx.conf* file.
 
-* The following example doesn't configure the server to redirect insecure requests. We recommend using HTTPS Redirection Middleware. For more information, see <xref:security/enforcing-ssl>.
+* The following example doesn't configure the server to redirect insecure requests. We recommend using HTTPS redirection middleware. For more information, see <xref:security/enforcing-ssl>.
 
   > [!NOTE]
-  > For development environments where the server configuration handles secure redirection instead of HTTPS Redirection Middleware, we recommend using temporary redirects (302) rather than permanent redirects (301). Link caching can cause unstable behavior in development environments.
+  > For development environments where the server configuration handles secure redirection instead of HTTPS redirection middleware, we recommend using temporary redirects (302) rather than permanent redirects (301). Link caching can cause unstable behavior in development environments.
 
-* Adding a `Strict-Transport-Security` (HSTS) header ensures all subsequent requests made by the client are over HTTPS. For guidance on setting the `Strict-Transport-Security` header, see <xref:security/enforcing-ssl#http-strict-transport-security-protocol-hsts>.
+* Adding a `Strict-Transport-Security` (HSTS) header ensures all subsequent requests made by the client are over HTTPS. For guidance on setting the `Strict-Transport-Security` header, see <xref:security/enforcing-ssl#http-strict-transport-security-hsts-protocol>.
 
 * If HTTPS will be disabled in the future, use one of the following approaches:
 
@@ -387,7 +387,7 @@ Add the */etc/nginx/proxy.conf* configuration file:
 [!code-nginx[](~/host-and-deploy/linux-nginx/nginx.conf)]
 
 > [!NOTE]
-> Blazor WebAssembly apps require a larger `burst` parameter value to accommodate the larger number of requests made by an app. For more information, see <xref:blazor/host-and-deploy/webassembly#nginx>.
+> Blazor WebAssembly apps require a larger `burst` parameter value to accommodate the larger number of requests made by an app. For more information, see <xref:blazor/host-and-deploy/webassembly/nginx>.
 
 > [!NOTE]
 > The preceding example disables Online Certificate Status Protocol (OCSP) Stapling. If enabled, confirm that the certificate supports the feature. For more information and guidance on enabling OCSP, see the following properties in the [Module ngx_http_ssl_module (Nginx documentation)](http://nginx.org/en/docs/http/ngx_http_ssl_module.html) article:
@@ -471,13 +471,13 @@ At any point in the future after upgrading the shared framework, restart the ASP
 
 Configure the app for a [framework-dependent deployment](/dotnet/core/deploying/#framework-dependent-deployments-fdd).
 
-If the app is run locally in the [Development environment](xref:fundamentals/environments#configure-services-and-middleware-by-environment) and isn't configured by the server to make secure HTTPS connections, adopt either of the following approaches:
+If the app is run locally in the [`Development` environment](xref:fundamentals/environments#configure-services-and-middleware-by-environment) and isn't configured by the server to make secure HTTPS connections, adopt either of the following approaches:
 
 * Configure the app to handle secure local connections. For more information, see the [HTTPS configuration](#https-configuration) section.
 
 * Configure the app to run at the insecure endpoint:
 
-  * Deactivate HTTPS Redirection Middleware in the Development environment (`Program.cs`):
+  * Deactivate HTTPS redirection middleware in the `Development` environment (`Program.cs`):
 
     ```csharp
     if (!app.Environment.IsDevelopment())
@@ -492,7 +492,7 @@ If the app is run locally in the [Development environment](xref:fundamentals/env
 
 For more information on configuration by environment, see <xref:fundamentals/environments>.
 
-Run [dotnet publish](/dotnet/core/tools/dotnet-publish) from the development environment to package an app into a directory (for example, `bin/Release/{TARGET FRAMEWORK MONIKER}/publish`, where the placeholder `{TARGET FRAMEWORK MONIKER}` is the Target Framework Moniker/TFM) that can run on the server:
+Run [dotnet publish](/dotnet/core/tools/dotnet-publish) from the `Development` environment to package an app into a directory (for example, `bin/Release/{TARGET FRAMEWORK MONIKER}/publish`, where the placeholder `{TARGET FRAMEWORK MONIKER}` is the Target Framework Moniker/TFM) that can run on the server:
 
 ```dotnetcli
 dotnet publish --configuration Release
@@ -520,11 +520,11 @@ Kestrel is great for serving dynamic content from ASP.NET Core. However, the web
 
 For the purposes of this guide, a single instance of Nginx is used. It runs on the same server, alongside the HTTP server. Based on requirements, a different setup may be chosen.
 
-Because requests are forwarded by reverse proxy, use the [Forwarded Headers Middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package. The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
+Because requests are forwarded by reverse proxy, use the [forwarded headers middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package. The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
 
-[!INCLUDE[](~/includes/ForwardedHeaders.md)]
+Forwarded headers middleware should run before other middleware. This ordering ensures that the middleware relying on forwarded headers information can consume the header values for processing. To run forwarded headers middleware after diagnostics and error handling middleware, see [forwarded headers middleware order](xref:host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order).
 
-Invoke the <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders%2A> method at the top of `Startup.Configure` before calling other middleware. Configure the middleware to forward the `X-Forwarded-For` and `X-Forwarded-Proto` headers:
+Invoke the <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders%2A> method at the top of the request processing pipeline before calling other middleware. Configure the middleware to forward the `X-Forwarded-For` and `X-Forwarded-Proto` headers:
 
 ```csharp
 using Microsoft.AspNetCore.HttpOverrides;
@@ -541,7 +541,7 @@ app.UseAuthentication();
 
 If no <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions> are specified to the middleware, the default headers to forward are `None`.
 
-Proxies running on loopback addresses (`127.0.0.0/8`, `[::1]`), including the standard localhost address (`127.0.0.1`), are trusted by default. If other trusted proxies or networks within the organization handle requests between the Internet and the web server, add them to the list of <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownProxies%2A> or <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks%2A> with <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>. The following example adds a trusted proxy server at IP address 10.0.0.100 to the Forwarded Headers Middleware `KnownProxies` in `Startup.ConfigureServices`:
+Proxies running on loopback addresses (`127.0.0.0/8`, `[::1]`), including the standard localhost address (`127.0.0.1`), are trusted by default. If other trusted proxies or networks within the organization handle requests between the Internet and the web server, add them to the list of <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownProxies%2A> or <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks%2A> with <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>. The following example adds a trusted proxy server at IP address 10.0.0.100 to the forwarded headers middleware `KnownProxies` in `Startup.ConfigureServices`:
 
 ```csharp
 using System.Net;
@@ -592,7 +592,7 @@ server {
 }
 ```
 
-If the app is a SignalR or Blazor Server app, see <xref:signalr/scale#linux-with-nginx> and <xref:blazor/host-and-deploy/server#linux-with-nginx> respectively for more information.
+If the app is a SignalR or Blazor Server app, see <xref:signalr/scale#linux-with-nginx> and <xref:blazor/host-and-deploy/server/index#linux-with-nginx> respectively for more information.
 
 When no `server_name` matches, Nginx uses the default server. If no default server is defined, the first server in the configuration file is the default server. As a best practice, add a specific default server that returns a status code of 444 in your configuration file. A default server configuration example is:
 
@@ -618,7 +618,7 @@ To directly run the app on the server:
 
 If the app runs on the server but fails to respond over the Internet, check the server's firewall and confirm port 80 is open. If using an Azure Ubuntu VM, add a Network Security Group (NSG) rule that enables inbound port 80 traffic. There's no need to enable an outbound port 80 rule, as the outbound traffic is automatically granted when the inbound rule is enabled.
 
-When done testing the app, shut down the app with <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) at the command prompt.
+When done testing the app, shut down the app with <kbd>Ctrl</kbd>+<kbd>C</kbd> in the command shell.
 
 ## Monitor the app
 
@@ -760,7 +760,7 @@ Linux Security Modules (LSM) is a framework that's part of the Linux kernel sinc
 Close off all external ports that aren't in use. Uncomplicated firewall (ufw) provides a front end for `iptables` by providing a CLI for configuring the firewall.
 
 > [!WARNING]
-> A firewall will prevent access to the whole system if not configured correctly. Failure to specify the correct SSH port will effectively lock you out of the system if you are using SSH to connect to it. The default port is 22. For more information, see the [introduction to ufw](https://help.ubuntu.com/community/UFW) and the [manual](https://manpages.ubuntu.com/manpages/lunar/en/man8/ufw.8.html).
+> A firewall will prevent access to the whole system if not configured correctly. Failure to specify the correct SSH port will effectively lock you out of the system if you are using SSH to connect to it. The default port is 22. For more information, see the [introduction to ufw](https://help.ubuntu.com/community/UFW) and the [manual](https://manpages.ubuntu.com/manpages/resolute/man8/ufw.8.html).
 
 Install `ufw` and configure it to allow traffic on any ports needed.
 
@@ -813,12 +813,12 @@ Configure the app to use a certificate in development for the `dotnet run` comma
 
 * Harden the security by employing some of the practices depicted in the following */etc/nginx/nginx.conf* file.
 
-* The following example doesn't configure the server to redirect insecure requests. We recommend using HTTPS Redirection Middleware. For more information, see <xref:security/enforcing-ssl>.
+* The following example doesn't configure the server to redirect insecure requests. We recommend using HTTPS redirection middleware. For more information, see <xref:security/enforcing-ssl>.
 
   > [!NOTE]
-  > For development environments where the server configuration handles secure redirection instead of HTTPS Redirection Middleware, we recommend using temporary redirects (302) rather than permanent redirects (301). Link caching can cause unstable behavior in development environments.
+  > For development environments where the server configuration handles secure redirection instead of HTTPS redirection middleware, we recommend using temporary redirects (302) rather than permanent redirects (301). Link caching can cause unstable behavior in development environments.
 
-* Adding a `Strict-Transport-Security` (HSTS) header ensures all subsequent requests made by the client are over HTTPS. For guidance on setting the `Strict-Transport-Security` header, see <xref:security/enforcing-ssl#http-strict-transport-security-protocol-hsts>.
+* Adding a `Strict-Transport-Security` (HSTS) header ensures all subsequent requests made by the client are over HTTPS. For guidance on setting the `Strict-Transport-Security` header, see <xref:security/enforcing-ssl#http-strict-transport-security-hsts-protocol>.
 
 * If HTTPS will be disabled in the future, use one of the following approaches:
 
@@ -834,7 +834,7 @@ Add the */etc/nginx/proxy.conf* configuration file:
 [!code-nginx[](~/host-and-deploy/linux-nginx/nginx.conf)]
 
 > [!NOTE]
-> Blazor WebAssembly apps require a larger `burst` parameter value to accommodate the larger number of requests made by an app. For more information, see <xref:blazor/host-and-deploy/webassembly#nginx>.
+> Blazor WebAssembly apps require a larger `burst` parameter value to accommodate the larger number of requests made by an app. For more information, see <xref:blazor/host-and-deploy/webassembly/nginx>.
 
 > [!NOTE]
 > The preceding example disables Online Certificate Status Protocol (OCSP) Stapling. If enabled, confirm that the certificate supports the feature. For more information and guidance on enabling OCSP, see the following properties in the [Module ngx_http_ssl_module (Nginx documentation)](http://nginx.org/en/docs/http/ngx_http_ssl_module.html) article:

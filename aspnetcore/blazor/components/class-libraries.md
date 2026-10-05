@@ -1,11 +1,11 @@
 ---
 title: Consume ASP.NET Core Razor components from a Razor class library (RCL)
+ai-usage: ai-assisted
 author: guardrex
 description: Discover how components can be included in Blazor apps from an external Razor class library (RCL).
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 07/02/2026
 uid: blazor/components/class-libraries
 ---
 # Consume ASP.NET Core Razor components from a Razor class library (RCL)
@@ -53,6 +53,20 @@ Just as components are regular .NET types, components provided by an RCL are nor
 
 ---
 
+## How an RCL is different from an ASP.NET Core class library
+
+The following characteristics distinguish an RCL from an ASP.NET Core class library:
+
+* An RCL uses the `Microsoft.NET.Sdk.Razor` SDK, while an ordinary class library project uses the `Microsoft.NET.Sdk` SDK. The `Microsoft.NET.Sdk.Razor` SDK builds the library with custom MSBuild tooling specifically designed to compile, build, and package Razor files (`.cshtml`) and Razor component files (`.razor`).
+
+:::moniker range=">= aspnetcore-5.0"
+
+* An RCL's project file (`.csproj`) includes the `SupportedPlatform` property for the `browser` platform. For more information, see the [Client-side browser compatibility analyzer](#client-side-browser-compatibility-analyzer) section.
+
+:::moniker-end
+
+* An RCL references the [`Microsoft.AspNetCore.Components.Web` NuGet package](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Web) and usually relies on an imports file (`_Imports.razor`) with an `@using` statement for the <xref:Microsoft.AspNetCore.Components.Web?displayProperty=fullName> namespace. The package provides web-specific infrastructure, HTML element abstractions, and event handling bindings required to run Blazor apps inside a web browser.
+
 ## Consume a Razor component from an RCL
 
 To consume components from an RCL in another project, use either of the following approaches:
@@ -60,7 +74,7 @@ To consume components from an RCL in another project, use either of the followin
 * Use the full component type name, which includes the RCL's namespace.
 * Individual components can be added by name without the RCL's namespace if Razor's [`@using`](xref:mvc/views/razor#using) directive declares the RCL's namespace. Use the following approaches:
   * Add the `@using` directive to individual components.
-  * include the `@using` directive in the top-level `_Imports.razor` file to make the library's components available to an entire project. Add the directive to an `_Imports.razor` file at any level to apply the namespace to a single component or set of components within a folder. When an `_Imports.razor` file is used, individual components don't require an `@using` directive for the RCL's namespace.
+  * Include the `@using` directive in the top-level imports file (`_Imports.razor`) to make the library's components available to an entire project. Add the directive to an imports file at any level to apply the namespace to a single component or set of components within a folder. When an imports file is used, individual components don't require an `@using` directive for the RCL's namespace.
 
 In the following examples, `ComponentLibrary` is an RCL containing the `Component1` component. The `Component1` component is an example component automatically added to an RCL created from the RCL project template that isn't created to support pages and views.
 
@@ -84,7 +98,7 @@ In the app that consumes the RCL, reference the `Component1` component using its
 <ComponentLibrary.Component1 />
 ```
 
-Alternatively, add a [`@using`](xref:mvc/views/razor#using) directive and use the component without its namespace. The following `@using` directive can also appear in any `_Imports.razor` file in or above the current folder.
+Alternatively, add a [`@using`](xref:mvc/views/razor#using) directive and use the component without its namespace. The following `@using` directive can also appear in any imports file (`_Imports.razor`) in or above the current folder.
 
 `ConsumeComponent2.razor`:
 
@@ -340,7 +354,7 @@ For more information, see <xref:razor-pages/ui-class#create-an-rcl-with-static-a
 
 ## Supply components and static assets to multiple hosted Blazor apps
 
-For more information, see <xref:blazor/host-and-deploy/multiple-hosted-webassembly>.
+For more information, see <xref:blazor/host-and-deploy/webassembly/multiple-hosted-webassembly>.
 
 :::moniker-end
 

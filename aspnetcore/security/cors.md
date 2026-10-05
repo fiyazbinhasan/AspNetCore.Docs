@@ -1,10 +1,10 @@
 ---
 title: Enable Cross-Origin Requests (CORS) in ASP.NET Core
+ai-usage: ai-assisted
 author: tdykstra
 description: Learn how CORS as a standard for allowing or rejecting cross-origin requests in an ASP.NET Core app.
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 9/02/2024
+ms.date: 05/12/2026
 uid: security/cors
 ---
 # Enable Cross-Origin Requests (CORS) in ASP.NET Core
@@ -26,7 +26,7 @@ Browser security prevents a web page from making requests to a different domain 
 * Allows a server to explicitly allow some cross-origin requests while rejecting others.
 * Is safer and more flexible than earlier techniques, such as [JSONP](/dotnet/framework/wcf/samples/jsonp).
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/cors/8.0sample/Cors/Web2API) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/cors/8.0sample/Cors/Web2API) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Same origin
 
@@ -63,7 +63,7 @@ Each approach is detailed in the following sections.
 
 ## CORS with named policy and middleware
 
-CORS Middleware handles cross-origin requests. The following code applies a CORS policy to all the app's endpoints with the specified origins:
+CORS middleware handles cross-origin requests. The following code applies a CORS policy to all the app's endpoints with the specified origins:
 
 [!code-csharp[](~/security/cors/8.0sample/Cors/Web2API/Program.cs?name=snippet&highlight=1,5-13,24)]
 
@@ -73,7 +73,7 @@ The preceding code:
 * Calls the <xref:Microsoft.AspNetCore.Builder.CorsMiddlewareExtensions.UseCors%2A> extension method and specifies the  `_myAllowSpecificOrigins` CORS policy. `UseCors` adds the CORS middleware. The call to `UseCors` must be placed after `UseRouting`, but before `UseAuthorization`. For more information, see [Middleware order](xref:fundamentals/middleware/index#middleware-order).
 * Calls <xref:Microsoft.Extensions.DependencyInjection.CorsServiceCollectionExtensions.AddCors%2A> with a [lambda expression](/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions). The lambda takes a <xref:Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicyBuilder> object. [Configuration options](#cors-policy-options), such as `WithOrigins`, are described later in this article.
 * Enables the `_myAllowSpecificOrigins` CORS policy for all controller endpoints. See [endpoint routing](#ecors6) to apply a CORS policy to specific endpoints.
-* When using [Response Caching Middleware](xref:performance/caching/middleware), call <xref:Microsoft.AspNetCore.Builder.CorsMiddlewareExtensions.UseCors%2A> before <xref:Microsoft.AspNetCore.Builder.ResponseCachingExtensions.UseResponseCaching%2A>.
+* When using [response caching middleware](xref:performance/caching/middleware), call <xref:Microsoft.AspNetCore.Builder.CorsMiddlewareExtensions.UseCors%2A> before <xref:Microsoft.AspNetCore.Builder.ResponseCachingExtensions.UseResponseCaching%2A>.
 
 With endpoint routing, the CORS middleware **must** be configured to execute between the calls to `UseRouting` and  `UseEndpoints`.
 
@@ -202,14 +202,16 @@ This section describes the various options that can be set in a CORS policy:
 
 <xref:Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicyBuilder.AllowAnyOrigin%2A>: Allows CORS requests from all origins with any scheme (`http` or `https`). `AllowAnyOrigin` is insecure because *any website* can make cross-origin requests to the app.
 
-> [!NOTE]
-> Specifying `AllowAnyOrigin` and `AllowCredentials` is an insecure configuration and can result in cross-site request forgery. The CORS service returns an invalid CORS response when an app is configured with both methods.
+> [!WARNING]
+> Specifying `AllowAnyOrigin` and `AllowCredentials` is an insecure configuration and can result in cross-site request forgery. The CORS service returns an invalid CORS response when an app is configured with both methods. Bypassing the built-in checks by using `SetIsOriginAllowed(_ => true)` together with `AllowCredentials` is also an insecure configuration.
 
 `AllowAnyOrigin` affects preflight requests and the `Access-Control-Allow-Origin` header. For more information, see the [Preflight requests](#preflight-requests) section.
 
 <xref:Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicyBuilder.SetIsOriginAllowedToAllowWildcardSubdomains%2A>: Sets the <xref:Microsoft.AspNetCore.Cors.Infrastructure.CorsPolicy.IsOriginAllowed%2A> property of the policy to be a function that allows origins to match a configured wildcard domain when evaluating if the origin is allowed.
 
 [!code-csharp[](~/security/cors/8.0sample/Cors/Web2API/Program.cs?name=snippet_aa)]
+
+In the preceding code, `SetIsOriginAllowedToAllowWildcardSubdomains` is called with the wildcard origin `"https://*.example.com"`. This configuration allows CORS requests from any subdomain of `example.com`, such as `https://subdomain.example.com` or `https://api.example.com`. The `*` wildcard character must be included in the origin to enable wildcard subdomain matching.
 
 ### Set the allowed HTTP methods
 
@@ -230,7 +232,7 @@ To allow all author request headers, call <xref:Microsoft.AspNetCore.Cors.Infras
 
 `AllowAnyHeader` affects preflight requests and the [Access-Control-Request-Headers](https://developer.mozilla.org/docs/Web/HTTP/Headers/Access-Control-Request-Method) header. For more information, see the [Preflight requests](#preflight-requests) section.
 
-A CORS Middleware policy match to specific headers specified by `WithHeaders` is only possible when the headers sent in `Access-Control-Request-Headers` exactly match the headers stated in `WithHeaders`.
+A CORS middleware policy match to specific headers specified by `WithHeaders` is only possible when the headers sent in `Access-Control-Request-Headers` exactly match the headers stated in `WithHeaders`.
 
 For instance, consider an app configured as follows:
 
@@ -238,13 +240,13 @@ For instance, consider an app configured as follows:
 app.UseCors(policy => policy.WithHeaders(HeaderNames.CacheControl));
 ```
 
-CORS Middleware declines a preflight request with the following request header because `Content-Language` ([HeaderNames.ContentLanguage](xref:Microsoft.Net.Http.Headers.HeaderNames.ContentLanguage)) isn't listed in `WithHeaders`:
+CORS middleware declines a preflight request with the following request header because `Content-Language` ([HeaderNames.ContentLanguage](xref:Microsoft.Net.Http.Headers.HeaderNames.ContentLanguage)) isn't listed in `WithHeaders`:
 
 ```
 Access-Control-Request-Headers: Cache-Control, Content-Language
 ```
 
-The app returns a *200 OK* response but doesn't send the CORS headers back. Therefore, the browser doesn't attempt the cross-origin request.
+The app returns a `204 No Content` response but doesn't send the CORS headers back. Therefore, the browser doesn't attempt the cross-origin request.
 
 ### Set the exposed response headers
 
@@ -361,7 +363,7 @@ The preflight request uses the [HTTP OPTIONS](https://developer.mozilla.org/docs
 * [Access-Control-Request-Method](https://developer.mozilla.org/docs/Web/HTTP/Headers/Access-Control-Request-Method): The HTTP method that will be used for the actual request.
 * [Access-Control-Request-Headers](https://developer.mozilla.org/docs/Web/HTTP/Headers/Access-Control-Allow-Headers): A list of request headers that the app sets on the actual request. As stated earlier, this doesn't include headers that the browser sets, such as `User-Agent`.
 
-If the preflight request is denied, the app returns a `200 OK` response but doesn't set the CORS headers. Therefore, the browser doesn't attempt the cross-origin request. For an example of a denied preflight request, see the [Test CORS](#testc6) section of this document.
+If the preflight request is denied, the app returns a `204 No Content` response but doesn't set the CORS headers. Therefore, the browser doesn't attempt the cross-origin request. For an example of a denied preflight request, see the [Test CORS](#testc6) section of this document.
 
 Using the F12 tools, the console app shows an error similar to one of the following, depending on the browser:
 
@@ -539,12 +541,15 @@ needs to be installed and configured for the app.
 
 ## Test CORS
 
-The [sample download](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/cors/8.0sample/Cors/Web2API) has code to test CORS. See [how to download](xref:index#how-to-download-a-sample). The sample is an API project with Razor Pages added:
+The [sample download](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/cors/8.0sample/Cors/Web2API) has code to test CORS. See [how to download](xref:fundamentals/index#how-to-download-a-sample). The sample is an API project with Razor Pages added:
 
 [!code-csharp[](~/security/cors/8.0sample/Cors/Web2API/ProgramTest.cs?name=snippet_test)]
 
   > [!WARNING]
   > `WithOrigins("https://localhost:<port>");` should only be used for testing a sample app similar to the [download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/live/aspnetcore/security/cors/8.0sample/Cors).
+
+> [!NOTE]
+> If you're using `launchSettings.json` in Visual Studio or [configuring C# debug settings in VS Code](https://code.visualstudio.com/docs/csharp/debugger-settings), and using IIS Express to debug locally, ensure that you've configured IIS Express for `"anonymousAuthentication": true`. When `"anonymousAuthentication"` is `false`, the ASP.NET Core web environment host will not see any preflight requests. In particular, if you're using NTLM authentication (`"windowsAuthentication": true`), the first step of the NTLM challenge-response is to send the web browser a 401 challenge, which can make it challenging to verify your preflight route is configured correctly.
 
 The following `ValuesController` provides the endpoints for testing:
 
@@ -567,7 +572,7 @@ Using a browser with the F12 tools:
      
 CORS-enabled endpoints can be tested with a tool, such as [curl](https://curl.haxx.se/) or [Fiddler](https://www.telerik.com/fiddler). When using a tool, the origin of the request specified by the `Origin` header must differ from the host receiving the request. If the request isn't *cross-origin* based on the value of the `Origin` header:
 
-* There's no need for CORS Middleware to process the request.
+* There's no need for CORS middleware to process the request.
 * CORS headers aren't returned in the response.
 
 The following command uses `curl` to issue an OPTIONS request with information:

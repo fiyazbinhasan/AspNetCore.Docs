@@ -1,11 +1,12 @@
 ---
 title: Secure ASP.NET Core Blazor WebAssembly
+ai-usage: ai-assisted
 author: guardrex
 description: Learn how to secure Blazor WebAssembly apps as single-page applications (SPAs).
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.custom: sfi-ropc-nochange
+ms.date: 09/18/2026
 uid: blazor/security/webassembly/index
 ---
 # Secure ASP.NET Core Blazor WebAssembly
@@ -18,11 +19,55 @@ The Blazor WebAssembly security documentation primarily focuses on how to accomp
 
 ## Client-side/SPA security of sensitive data and credentials
 
-A Blazor WebAssembly app's .NET/C# codebase is served to clients, and the app's code can't be protected from inspection and tampering by users. Never place credentials or secrets into a Blazor WebAssembly app, such as app secrets, connection strings, passwords, private .NET/C# code, or other sensitive data.
+A Blazor WebAssembly app's .NET/C# codebase is served to clients, and the app's code can't be protected from inspection and tampering by users. Never place sensitive data into a Blazor WebAssembly app, such as app secrets, connection strings, passwords, security keys, and private .NET/C# code.
 
-To protect .NET/C# code and use [ASP.NET Core Data Protection](xref:security/data-protection/introduction) features to secure data, use a server-side ASP.NET Core web API. Have the client-side Blazor WebAssembly app call the server-side web API for secure app features and data processing. For more information, see <xref:blazor/call-web-api?pivots=webassembly> and the articles in this node.
+The following technologies are useful for storing sensitive data, which can be used together in the same app to split responsibilities for storing data among `Development`, `Staging`, and `Production` environments:
 
-For local development testing, the [Secret Manager tool](xref:security/app-secrets) is recommended for securing sensitive data.
+* [Secret Manager tool](xref:security/app-secrets): Only used on the local development system.
+* [Azure Key Vault](https://azure.microsoft.com/products/key-vault/): Can be used for locally-running apps in the `Development` environment and for `Staging`/`Production` deployments.
+
+For examples of the preceding approaches, see <xref:blazor/security/webassembly/standalone-with-identity/account-confirmation-and-password-recovery#configure-a-secret-for-the-email-providers-security-key>.
+
+## Web API requests
+
+<!-- A version of this content is also in the Call web API 
+     article under the heading:
+     "Client-side scenarios for calling external web APIs" -->
+
+To protect .NET/C# code and data, use [ASP.NET Core Data Protection](xref:security/data-protection/introduction) features with a server-side ASP.NET Core backend web API. The client-side Blazor WebAssembly app calls the server-side web API for secure app features and data processing. For more information, see <xref:blazor/call-web-api?pivots=webassembly> and the articles and examples in this documentation node.
+
+Blazor WebAssembly apps are often prevented from making direct calls across origins to web APIs due to [Cross-Origin Request Sharing (CORS) security](xref:blazor/call-web-api#cross-origin-resource-sharing-cors). A typical exception looks like the following:
+
+> :::no-loc text="Access to fetch at '{URL}' from origin 'https://localhost:{PORT}' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.":::
+
+Even if you call <xref:Microsoft.AspNetCore.Components.WebAssembly.Http.WebAssemblyHttpRequestMessageExtensions.SetBrowserRequestMode%2A> with a <xref:Microsoft.AspNetCore.Components.WebAssembly.Http.BrowserRequestMode> field of `NoCors` (1) seeking to circumvent the preceding exception, the request usually fails due to CORS restrictions on the web API's origin, such as a restriction that only allows calls from specific origins or a restriction that prevents JavaScript [`fetch`](https://developer.mozilla.org/docs/Web/API/Fetch_API/Using_Fetch) requests from a browser. The only way for such calls to succeed is for the web API that you're calling to allow your origin to call its origin with the correct CORS configuration. Most external web APIs don't allow you to configure their CORS policies. To deal with this restriction, adopt either of the following strategies:
+
+* Maintain your own server-side ASP.NET Core backend web API. The client-side Blazor WebAssembly app calls your server-side web API, and your web API makes the request from its server-based C# code (not a browser) to the external web API with the correct CORS headers, returning the result to your client-side Blazor WebAssembly app.
+
+* Use a proxy service to proxy the request from the client-side Blazor WebAssembly app to the external web API. The proxy service uses a server-side app to make the request on the client's behalf and returns the result after the call succeeds. In the following example based on [CloudFlare's CORS PROXY](https://corsproxy.io/), the `{REQUEST URI}` placeholder is the request URI:
+
+  ```razor
+  @using System.Net
+  @inject IHttpClientFactory ClientFactory
+
+  ...
+
+  @code {
+      public async Task CallApi()
+      {
+          var client = ClientFactory.CreateClient();
+
+          var urlEncodedRequestUri = WebUtility.UrlEncode("{REQUEST URI}");
+
+          using var request = new HttpRequestMessage(HttpMethod.Get, 
+              $"https://corsproxy.io/?{urlEncodedRequestUri}");
+
+          using var response = await client.SendAsync(request);
+
+          ...
+      }
+  }
+  ```
 
 ## Authentication library
 
@@ -97,9 +142,9 @@ Blazor WebAssembly provides methods to add and retrieve additional parameters fo
 
 To pass additional parameters, <xref:Microsoft.AspNetCore.Components.NavigationManager> supports passing and retrieving history entry state when performing external location changes. For more information, see the following resources:
 
-* Blazor *Fundamentals* > *Routing and navigation* article
-  * [Navigation history state](xref:blazor/fundamentals/routing#navigation-history-state)
-  * [Navigation options](xref:blazor/fundamentals/routing#navigation-options)
+* Blazor *Fundamentals* > *Navigation* article
+  * [Navigation history state](xref:blazor/fundamentals/navigation#navigation-history-state)
+  * [Navigation options](xref:blazor/fundamentals/navigation#navigation-options)
 * MDN documentation: [History API](https://developer.mozilla.org/docs/Web/API/History_API)
 
 The state stored by the History API provides the following benefits for remote authentication:
@@ -126,11 +171,13 @@ The following authentication scenarios are covered in the <xref:blazor/security/
 
 :::moniker-end
 
-## Require authorization for the entire app
+## Blazor WebAssembly authorization patterns
 
-Apply the [`[Authorize]` attribute](xref:blazor/security/index#authorize-attribute) ([API documentation](xref:Microsoft.AspNetCore.Authorization.AuthorizeAttribute)) to each Razor component of the app using ***one*** of the following approaches:
+*For patterns that apply to server-side Blazor apps (Blazor Web Apps, Blazor Server apps), see <xref:blazor/security/additional-scenarios#server-side-blazor-app-authorization-patterns>.*
 
-* In the app's Imports file, add an [`@using`](xref:mvc/views/razor#using) directive for the <xref:Microsoft.AspNetCore.Authorization?displayProperty=fullName> namespace with an [`@attribute`](xref:mvc/views/razor#attribute) directive for the [`[Authorize]` attribute](xref:blazor/security/index#authorize-attribute).
+Unlike server-side Blazor apps, Blazor WebAssembly apps don't support setting an <xref:Microsoft.AspNetCore.Authorization.AuthorizationOptions.FallbackPolicy?displayProperty=nameWithType> to a policy with <xref:Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder.RequireAuthenticatedUser%2A>. The [server-side fallback policy](xref:security/authorization/policies#default-and-fallback-policies) is enforced by authorization middleware and isn't a client-side authorization mechanism. Therefore, the only supported pattern for Blazor WebAssembly apps is to apply the [`[Authorize]` attribute](xref:blazor/security/index#authorize-attribute) ([API documentation](xref:Microsoft.AspNetCore.Authorization.AuthorizeAttribute)) to Razor components using ***one*** of the following approaches:
+
+* In the app's imports file, add an [`@using`](xref:mvc/views/razor#using) directive for the <xref:Microsoft.AspNetCore.Authorization?displayProperty=fullName> namespace with an [`@attribute`](xref:mvc/views/razor#attribute) directive for the [`[Authorize]` attribute](xref:blazor/security/index#authorize-attribute).
 
   `_Imports.razor`:
 
@@ -154,9 +201,6 @@ Apply the [`[Authorize]` attribute](xref:blazor/security/index#authorize-attribu
   @using Microsoft.AspNetCore.Authorization
   @attribute [Authorize]
   ```
-
-> [!NOTE]
-> Setting an <xref:Microsoft.AspNetCore.Authorization.AuthorizationOptions.FallbackPolicy?displayProperty=nameWithType> to a policy with <xref:Microsoft.AspNetCore.Authorization.AuthorizationPolicyBuilder.RequireAuthenticatedUser%2A> is **not** supported.
 
 ## Use one identity provider app registration per app
 
@@ -220,7 +264,7 @@ For examples, see the following resources:
 
 :::moniker range="< aspnetcore-8.0"
 
-[Prerendering](xref:blazor/components/prerendering-and-integration) isn't supported for authentication endpoints (`/authentication/` path segment).
+[Prerendering](xref:blazor/components/integration) isn't supported for authentication endpoints (`/authentication/` path segment).
 
 :::moniker-end
 
@@ -272,7 +316,7 @@ if (tokenResult.TryGetToken(out var token))
 
 *This section applies to Blazor WebAssembly apps in ASP.NET Core in .NET 7 or later.*
 
-To enable debug or trace logging, see the *Authentication logging (Blazor WebAssembly)* section in a 7.0 or later version of the <xref:blazor/fundamentals/logging> article.
+To enable debug or trace logging, see the *Authentication logging (Blazor WebAssembly)* section in a .NET 7 or later version of the <xref:blazor/fundamentals/logging> article.
 
 ## The WebAssembly sandbox
 
@@ -307,6 +351,8 @@ Hosted Blazor WebAssembly apps:
 
 :::moniker-end
 
+[!INCLUDE[](~/includes/azure-active-directory-b2c-eol-support-notice.md)]
+
 Further configuration guidance is found in the following articles:
 
 * <xref:blazor/security/webassembly/additional-scenarios>
@@ -330,7 +376,7 @@ For more information, see the following resources:
   * [General documentation](/entra/identity-platform/)
   * [Access tokens](/entra/identity-platform/access-tokens)
 * <xref:host-and-deploy/proxy-load-balancer>
-  * Using Forwarded Headers Middleware to preserve HTTPS scheme information across proxy servers and internal networks.
+  * Using forwarded headers middleware to preserve HTTPS scheme information across proxy servers and internal networks.
   * Additional scenarios and use cases, including manual scheme configuration, request path changes for correct request routing, and forwarding the request scheme for Linux and non-IIS reverse proxies.
 * [Prerendering with authentication](xref:blazor/security/webassembly/additional-scenarios#prerendering-with-authentication)
 * [WebAssembly: Security](https://webassembly.org/docs/security/)

@@ -1,6 +1,6 @@
 :::moniker range="= aspnetcore-8.0"
 
-ASP.NET Core 8.0 introduces support for [.NET native ahead-of-time (AOT)](/dotnet/core/deploying/native-aot/).
+.NET 8 introduces support for [.NET native ahead-of-time (AOT)](/dotnet/core/deploying/native-aot/).
 
 ## Why use Native AOT with ASP.NET Core
 
@@ -22,7 +22,7 @@ The preceding chart shows that Native AOT has lower app size, memory usage, and 
 
 ## ASP.NET Core and Native AOT compatibility
 
-Not all features in ASP.NET Core are currently compatible with Native AOT. The following table summarizes ASP.NET Core feature compatibility with Native AOT:
+Not all features in ASP.NET Core are currently compatible with Native AOT. The following table summarizes ASP.NET Core feature compatibility with Native AOT.
 
 | Feature | Fully Supported | Partially Supported | Not Supported |
 | - | - | - | - |
@@ -77,7 +77,7 @@ Native AOT analysis includes all of the app's code and the libraries the app dep
 
 In .NET 8, Native AOT is supported by the following ASP.NET Core app types:
 
-* minimal APIs - For more information, see the [The Web API (Native AOT) template](#the-web-api-native-aot-template) section later in this article.
+* Minimal APIs - For more information, see the [The Web API (Native AOT) template](#the-web-api-native-aot-template) section later in this article.
 * gRPC - For more information, see [gRPC and Native AOT](xref:grpc/native-aot).
 * Worker services - For more information, see [AOT in Worker Service templates](xref:fundamentals/host/hosted-services?view=aspnetcore-8.0&preserve-view=true#native-aot).
 
@@ -85,7 +85,7 @@ In .NET 8, Native AOT is supported by the following ASP.NET Core app types:
 
 The **ASP.NET Core Web API (Native AOT)** template (short name `webapiaot`) creates a project with AOT enabled. The template differs from the **Web API** project template in the following ways:
 
-* Uses minimal APIs only, as MVC isn't yet compatible with Native AOT.
+* Uses Minimal APIs only, as MVC isn't yet compatible with Native AOT.
 * Uses the <xref:Microsoft.AspNetCore.Builder.WebApplication.CreateSlimBuilder> API to ensure only the essential features are enabled by default, minimizing the app's deployed size.
 * Is configured to listen on HTTP only, as HTTPS traffic is commonly handled by an ingress service in cloud-native deployments.
 * Doesn't include a launch profile for running under IIS or IIS Express.
@@ -185,7 +185,7 @@ The template uses the <xref:Microsoft.AspNetCore.Builder.WebApplication.CreateSl
 
 The `CreateSlimBuilder` method initializes the <xref:Microsoft.AspNetCore.Builder.WebApplicationBuilder> with the minimum ASP.NET Core features necessary to run an app.
 
-As noted earlier, the `CreateSlimBuilder` method doesn't include support for HTTPS or HTTP/3. These protocols typically aren't required for apps that run behind a TLS termination proxy. For example, see [TLS termination and end to end TLS with Application Gateway](/azure/application-gateway/ssl-overview). HTTPS can be enabled by calling [builder.WebHost.UseKestrelHttpsConfiguration](https://source.dot.net/#Microsoft.AspNetCore.Server.Kestrel/WebHostBuilderKestrelExtensions.cs,fcec859000ccaa50) <!-- TODO replace with xref: (xref:Microsoft.AspNetCore.Hosting.WebHostBuilderKestrelExtensions.UseKestrel%2A) --> HTTP/3 can be enabled by calling [builder.WebHost.UseQuic](xref:Microsoft.AspNetCore.Hosting.WebHostBuilderQuicExtensions.UseQuic%2A).
+As noted earlier, the `CreateSlimBuilder` method doesn't include support for HTTPS or HTTP/3. These protocols typically aren't required for apps that run behind a TLS termination proxy. For example, see [TLS termination and end to end TLS with Application Gateway](/azure/application-gateway/ssl-overview). HTTPS can be enabled by calling [builder.WebHost.UseKestrelHttpsConfiguration](/dotnet/api/microsoft.aspnetcore.hosting.webhostbuilderkestrelextensions.usekestrelhttpsconfiguration) HTTP/3 can be enabled by calling [builder.WebHost.UseQuic](xref:Microsoft.AspNetCore.Hosting.WebHostBuilderQuicExtensions.UseQuic%2A).
 
 ### `CreateSlimBuilder` vs `CreateBuilder`
 
@@ -248,7 +248,7 @@ The Minimal API framework is optimized for receiving and returning JSON payloads
 * Imposes compatibility requirements for JSON and Native AOT.
 * Requires the use of the [`System.Text.Json` source generator](/dotnet/standard/serialization/system-text-json/source-generation).
 
-All types that are transmitted as part of the HTTP body or returned from request delegates in Minimal APIs apps must be configured on a <xref:System.Text.Json.Serialization.JsonSerializerContext> that is registered via ASP.NET Core’s dependency injection:
+All types that are transmitted as part of the HTTP body or returned from request delegates in Minimal APIs apps must be configured on a <xref:System.Text.Json.Serialization.JsonSerializerContext> that is registered via ASP.NET Core's dependency injection:
 
 :::code language="csharp" source="~/fundamentals/aot/samples/Program.cs" highlight="7-10,25-99":::
 
@@ -274,9 +274,9 @@ See [this GitHub issue](https://github.com/dotnet/core/issues/8288) to report or
 * [Optimize AOT deployments](/dotnet/core/deploying/native-aot/optimizing)
 * [Configuration-binding source generator](/dotnet/core/whats-new/dotnet-8#configuration-binding-source-generator)
 * [Using the configuration binder source generator](https://andrewlock.net/exploring-the-dotnet-8-preview-using-the-new-configuration-binder-source-generator/)
-* [The minimal API AOT compilation template](https://andrewlock.net/exploring-the-dotnet-8-preview-the-minimal-api-aot-template/)
+* [The Minimal API AOT compilation template](https://andrewlock.net/exploring-the-dotnet-8-preview-the-minimal-api-aot-template/)
 * [Comparing `WebApplication.CreateBuilder` to `CreateSlimBuilder`](https://andrewlock.net/exploring-the-dotnet-8-preview-comparing-createbuilder-to-the-new-createslimbuilder-method/)
-* [Exploring the new minimal API source generator](https://andrewlock.net/exploring-the-dotnet-8-preview-exploring-the-new-minimal-api-source-generator/)
+* [Exploring the new Minimal API source generator](https://andrewlock.net/exploring-the-dotnet-8-preview-exploring-the-new-minimal-api-source-generator/)
 * [Replacing method calls with Interceptors](https://andrewlock.net/exploring-the-dotnet-8-preview-changing-method-calls-with-interceptors/)
 * [Behind `[LogProperties]` and the new telemetry logging source generator](https://andrewlock.net/behind-logproperties-and-the-new-telemetry-logging-source-generator/)
 

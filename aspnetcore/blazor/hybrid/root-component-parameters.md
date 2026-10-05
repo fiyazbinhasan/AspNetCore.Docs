@@ -3,9 +3,8 @@ title: Pass root component parameters in ASP.NET Core Blazor Hybrid
 author: guardrex
 description: Learn how to pass an optional dictionary of parameters to the root component in an ASP.NET Core Blazor Hybrid app.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: "mvc"
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/hybrid/root-component-parameters
 ---
 # Pass root component parameters in ASP.NET Core Blazor Hybrid
@@ -230,7 +229,7 @@ The following `Keypad` component example:
 
 @code {
     [CascadingParameter]
-    protected KeypadViewModel KeypadViewModel { get; set; }
+    private KeypadViewModel KeypadViewModel { get; set; }
 
     private void DeleteChar()
     {

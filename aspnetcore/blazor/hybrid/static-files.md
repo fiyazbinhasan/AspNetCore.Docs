@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor Hybrid static files
 author: guardrex
 description: Learn how to consume static asset files in Blazor Hybrid apps.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/hybrid/static-files
 ---
 # ASP.NET Core Blazor Hybrid static files
@@ -294,7 +293,13 @@ In a Razor component:
     {
         if (module is not null)
         {
-            await module.DisposeAsync();
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
 }

@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor SignalR guidance
 author: guardrex
 description: Learn how to configure and manage Blazor SignalR connections.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/fundamentals/signalr
 ---
 # ASP.NET Core Blazor SignalR guidance
@@ -22,11 +21,9 @@ Blazor works best when using WebSockets as the SignalR transport due to lower la
 
 :::moniker range=">= aspnetcore-8.0"
 
-<!-- UPDATE 9.0 Remove when support is present -->
-
 ## Azure SignalR Service with stateful reconnect
 
-[Stateful reconnect](xref:signalr/configuration#configure-stateful-reconnect) (<xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilderHttpExtensions.WithStatefulReconnect%2A>) was released with .NET 8 but isn't currently supported for the Azure SignalR Service. For more information, see [Stateful Reconnect Support? (`Azure/azure-signalr` #1878)](https://github.com/Azure/azure-signalr/issues/1878).
+The Azure SignalR Service with SDK [v1.26.1](https://github.com/Azure/azure-signalr/releases/tag/v1.26.1) or later supports [SignalR stateful reconnect](xref:signalr/configuration#configure-stateful-reconnect) (<xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilderHttpExtensions.WithStatefulReconnect%2A>).
 
 :::moniker-end
 
@@ -38,22 +35,22 @@ By default, Interactive Server components:
 
 * Enable compression for [WebSocket connections](xref:fundamentals/websockets). <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.DisableWebSocketCompression> (default: `false`) controls WebSocket compression.
 
-* Adopt a `frame-ancestors` [Content Security Policy (CSP)](https://developer.mozilla.org/docs/Web/HTTP/CSP) directive set to `'self'`, which only permits embedding the app in an `<iframe>` of the origin from which the app is served when compression is enabled or when a configuration for the WebSocket context is provided. `ContentSecurityFrameAncestorPolicy` controls the `frame-ancestors` CSP.
+* Adopt a [`frame-ancestors`](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors) Content Security Policy (CSP) directive set to `'self'`, which is the default and only permits embedding the app in an `<iframe>` of the origin from which the app is served when compression is enabled or when a configuration for the WebSocket context is provided.
 
-The `frame-ancestors` CSP can be removed manually by setting the value of <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.ContentSecurityFrameAncestorsPolicy> to `null`, as you may want to [configure the CSP in a centralized way](xref:blazor/security/content-security-policy). When the `frame-ancestors` CSP is managed in a centralized fashion, care must be taken to apply a policy whenever the first document is rendered. We don't recommend removing the policy completely, as it might make the app vulnerable to attack.
+The default `frame-ancestors` CSP can be changed by setting the value of <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.ContentSecurityFrameAncestorsPolicy%2A> to `null` if you want to [configure the CSP in a centralized way](xref:blazor/security/content-security-policy) or `'none'` for an even stricter policy. When the `frame-ancestors` CSP is managed in a centralized fashion, care must be taken to apply a policy whenever the first document is rendered. We don't recommend removing the policy completely, as it will make the app vulnerable to attack. For more information, see <xref:blazor/security/content-security-policy#the-frame-ancestors-directive> and the [MDN CSP Guide](https://developer.mozilla.org/docs/Web/HTTP/Guides/CSP).
 
-Use <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.ConfigureWebSocketAcceptContext> to configure the <xref:Microsoft.AspNetCore.Http.WebSocketAcceptContext> for the websocket connections used by the server components. By default, a policy that enables compression and sets a CSP for the frame ancestors defined in <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.ContentSecurityFrameAncestorsPolicy> is applied.
+Use <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.ConfigureWebSocketAcceptContext> to configure the <xref:Microsoft.AspNetCore.Http.WebSocketAcceptContext> for the WebSocket connections used by the server components. By default, a policy that enables compression and sets a CSP for the frame ancestors defined in <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.ContentSecurityFrameAncestorsPolicy> is applied.
 
 Usage examples:
 
-Disable compression by setting <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.DisableWebSocketCompression> to `true`, which reduces the [vulnerability of the app to attack](xref:blazor/security/server/interactive-server-side-rendering#interactive-server-components-with-websocket-compression-enabled) but may result in reduced performance:
+Disable compression by setting <xref:Microsoft.AspNetCore.Components.Server.ServerComponentsEndpointOptions.DisableWebSocketCompression> to `true`, which reduces the [vulnerability of the app to attack](xref:blazor/security/interactive-server-side-rendering#interactive-server-components-with-websocket-compression-enabled) but may result in reduced performance:
 
 ```csharp
 builder.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode(o => o.DisableWebSocketCompression = true)
 ```
 
-When compression is enabled, configure a stricter `frame-ancestors` CSP with a value of `'none'` (single quotes required), which allows WebSocket compression but prevents browsers from embedding the app into any `<iframe>`:
+When compression is enabled, configure a stricter `frame-ancestors` CSP with a value of `'none'` (single quotes required), which allows WebSocket compression but prevents browsers from embedding the app into an `<iframe>`:
 
 ```csharp
 builder.MapRazorComponents<App>()
@@ -78,7 +75,32 @@ builder.MapRazorComponents<App>()
 >
 > Additional options include specifying one or more host sources and scheme sources.
 
-For security implications, see <xref:blazor/security/server/interactive-server-side-rendering#interactive-server-components-with-websocket-compression-enabled>. For more information on the `frame-ancestors` directive, see [CSP: `frame-ancestors` (MDN documentation)](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors).
+For security implications, see <xref:blazor/security/interactive-server-side-rendering#interactive-server-components-with-websocket-compression-enabled>. For more information, see <xref:blazor/security/content-security-policy> and [CSP: `frame-ancestors` (MDN documentation)](https://developer.mozilla.org/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors).
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+### SignalR `ConfigureConnection` for Interactive Server components
+
+<!-- UPDATE 11.0 - API Browser cross-links -->
+
+Blazor provides access to configure the underlying SignalR connection options when using Interactive Server components through the `ConfigureConnection` property on `ServerComponentsEndpointOptions`. This enables configuration of `HttpConnectionDispatcherOptions` properties.
+
+```csharp
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode(options =>
+    {
+        options.ConfigureConnection = dispatcherOptions =>
+        {
+            dispatcherOptions.CloseOnAuthenticationExpiration = true;
+            dispatcherOptions.AllowStatefulReconnects = true;
+            dispatcherOptions.ApplicationMaxBufferSize = 1024 * 1024;
+        };
+    });
+```
+
+This provides a clean, type-safe API for configuring SignalR connection settings without needing to inspect endpoint metadata.
 
 :::moniker-end
 
@@ -86,7 +108,7 @@ For security implications, see <xref:blazor/security/server/interactive-server-s
 
 ## Disable response compression for Hot Reload
 
-When using [Hot Reload](xref:test/hot-reload), disable Response Compression Middleware in the `Development` environment. Whether or not the default code from a project template is used, always call <xref:Microsoft.AspNetCore.Builder.ResponseCompressionBuilderExtensions.UseResponseCompression%2A> first in the request processing pipeline.
+When using [Hot Reload](xref:test/hot-reload), disable response compression middleware in the `Development` environment. Whether or not the default code from a project template is used, always call <xref:Microsoft.AspNetCore.Builder.ResponseCompressionBuilderExtensions.UseResponseCompression%2A> first in the request processing pipeline.
 
 In the `Program` file:
 
@@ -141,13 +163,13 @@ hubConnection = new HubConnectionBuilder()
 
 The preceding example configures the hub connection URL to the absolute URI address at `/chathub`. The URI can also be set via a string, for example `https://signalr.example.com`, or via [configuration](xref:blazor/fundamentals/configuration). `Navigation` is an injected <xref:Microsoft.AspNetCore.Components.NavigationManager>.
 
-For more information, see <xref:signalr/configuration#configure-additional-options>.
+For more information, see <xref:signalr/configuration#configure-other-options>.
 
 ## Client-side rendering
 
 :::moniker range=">= aspnetcore-8.0"
 
-If prerendering is configured, prerendering occurs before the client connection to the server is established. For more information, see <xref:blazor/components/prerender>.
+If prerendering is configured, prerendering occurs before the client connection to the server is established. For more information, see <xref:blazor/state-management/prerendered-state-persistence>.
 
 :::moniker-end
 
@@ -156,13 +178,13 @@ If prerendering is configured, prerendering occurs before the client connection 
 If prerendering is configured, prerendering occurs before the client connection to the server is established. For more information, see the following articles:
 
 * <xref:mvc/views/tag-helpers/builtin-th/component-tag-helper>
-* <xref:blazor/components/prerendering-and-integration>
+* <xref:blazor/components/integration>
 
 :::moniker-end
 
 ## Prerendered state size and SignalR message size limit
 
-A large prerendered state size may exceed the SignalR circuit message size limit, which results in the following:
+A large prerendered state size may exceed Blazor's SignalR circuit message size limit, which results in the following:
 
 * The SignalR circuit fails to initialize with an error on the client: :::no-loc text="Circuit host not initialized.":::
 * The reconnection UI on the client appears when the circuit fails. Recovery isn't possible.
@@ -179,15 +201,15 @@ To resolve the problem, use ***either*** of the following approaches:
 * <xref:signalr/configuration>
 * [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))
 
-## Use session affinity (sticky sessions) for server-side webfarm hosting
+## Use session affinity (sticky sessions) for server-side web farm hosting
 
 When more than one backend server is in use, the app must implement session affinity, also called *sticky sessions*. Session affinity ensures that a client's circuit reconnects to the same server if the connection is dropped, which is important because client state is only held in the memory of the server that first established the client's circuit.
 
-The following error is thrown by an app that hasn't enabled session affinity in a webfarm:
+The following error is thrown by an app that hasn't enabled session affinity in a web farm:
 
 > :::no-loc text="Uncaught (in promise) Error: Invocation canceled due to the underlying connection being closed.":::
 
-For more information on session affinity with Azure App Service hosting, see <xref:blazor/host-and-deploy/server#azure-app-service>.
+For more information on session affinity with Azure App Service hosting, see <xref:blazor/host-and-deploy/server/index#azure-app-service>.
 
 ## Azure SignalR Service
 
@@ -198,7 +220,7 @@ The service isn't required for Blazor apps hosted in Azure App Service or Azure 
 * To facilitate connection scale out.
 * Handle global distribution.
 
-For more information, see <xref:blazor/host-and-deploy/server#azure-signalr-service>.
+For more information, see <xref:blazor/host-and-deploy/server/index#azure-signalr-service>.
 
 ## Server-side circuit handler options
 
@@ -295,11 +317,11 @@ services.AddServerSideBlazor().AddHubOptions(options =>
 :::moniker-end
 
 > [!WARNING]
-> The default value of <xref:Microsoft.AspNetCore.SignalR.HubOptions.MaximumReceiveMessageSize> is 32 KB. Increasing the value may increase the risk of [Denial of Service (DoS) attacks](xref:blazor/security/server/interactive-server-side-rendering#denial-of-service-dos-attacks).
+> The default value of <xref:Microsoft.AspNetCore.SignalR.HubOptions.MaximumReceiveMessageSize> is 32 KB. Increasing the value may increase the risk of [Denial of Service (DoS) attacks](xref:blazor/security/interactive-server-side-rendering#denial-of-service-dos-attacks).
 >
 > Blazor relies on <xref:Microsoft.AspNetCore.SignalR.HubOptions.MaximumParallelInvocationsPerClient%2A> set to 1, which is the default value. For more information, see [MaximumParallelInvocationsPerClient > 1 breaks file upload in Blazor Server mode (`dotnet/aspnetcore` #53951)](https://github.com/dotnet/aspnetcore/issues/53951).
 
-For information on memory management, see <xref:blazor/host-and-deploy/server#memory-management>.
+For information on memory management, see <xref:blazor/host-and-deploy/server/memory-management>.
 
 ## Blazor hub options
 
@@ -318,25 +340,44 @@ app.MapBlazorHub(options =>
 });
 ```
 
-<!-- UPDATE 10.0 The following is scheduled for a fix in .NET 10 -->
+:::moniker-end
 
-Configuring the hub used by <xref:Microsoft.AspNetCore.Builder.ServerRazorComponentsEndpointConventionBuilderExtensions.AddInteractiveServerRenderMode%2A> with <xref:Microsoft.AspNetCore.Builder.ComponentEndpointRouteBuilderExtensions.MapBlazorHub%2A> fails with an `AmbiguousMatchException`:
+:::moniker range="< aspnetcore-11.0"
+
+Configuring the hub used by <xref:Microsoft.AspNetCore.Builder.ServerRazorComponentsEndpointConventionBuilderExtensions.AddInteractiveServerRenderMode%2A> with <xref:Microsoft.AspNetCore.Builder.ComponentEndpointRouteBuilderExtensions.MapBlazorHub%2A> fails with an <xref:System.Reflection.AmbiguousMatchException>:
 
 > :::no-loc text="Microsoft.AspNetCore.Routing.Matching.AmbiguousMatchException: The request matched multiple endpoints.":::
 
-To workaround the problem for apps targeting .NET 8, give the custom-configured Blazor hub higher precedence using the <xref:Microsoft.AspNetCore.Builder.RoutingEndpointConventionBuilderExtensions.WithOrder%2A> method:
+To workaround the problem for apps targeting .NET 8/9, take the following approach.
+
+At the top of the `Program` file, add a `using` statement for <xref:Microsoft.AspNetCore.Http.Connections?displayProperty=fullName>:
 
 ```csharp
-app.MapBlazorHub(options =>
-{
-    options.CloseOnAuthenticationExpiration = true;
-}).WithOrder(-1);
+using Microsoft.AspNetCore.Http.Connections;
+```
+
+Where <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointRouteBuilderExtensions.MapRazorComponents%2A> is called, chain the following endpoint convention to the <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointConventionBuilder>:
+
+```csharp
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode()
+    .Add(e =>
+    {
+        var metadata = e.Metadata;
+        var dispatcherOptions = metadata.OfType<HttpConnectionDispatcherOptions>().FirstOrDefault();
+
+        if (dispatcherOptions != null)
+        {
+            dispatcherOptions.CloseOnAuthenticationExpiration = true;
+        }
+    });
 ```
 
 For more information, see the following resources:
 
 * [MapBlazorHub configuration in NET8 throws a The request matched multiple endpoints exception (`dotnet/aspnetcore` #51698)](https://github.com/dotnet/aspnetcore/issues/51698#issuecomment-1984340954)
 * [Attempts to map multiple blazor entry points with MapBlazorHub causes Ambiguous Route Error. This worked with net7 (`dotnet/aspnetcore` #52156)](https://github.com/dotnet/aspnetcore/issues/52156#issuecomment-1984503178)
+* [[Blazor] Provide access to the underlying SignalR HttpConnectionDispatcherOptions in AddInteractiveServerRenderMode (`dotnet/aspnetcore` #63520)](https://github.com/dotnet/aspnetcore/issues/63520)
 
 :::moniker-end
 
@@ -408,7 +449,7 @@ builder.Services.AddRazorComponents().AddInteractiveServerComponents()
     .AddHubOptions(options => options.MaximumReceiveMessageSize = 64 * 1024);
 ```
 
-Increasing the SignalR incoming message size limit comes at the cost of requiring more server resources, and it increases the risk of [Denial of Service (DoS) attacks](xref:blazor/security/server/interactive-server-side-rendering#denial-of-service-dos-attacks). Additionally, reading a large amount of content in to memory as strings or byte arrays can also result in allocations that work poorly with the garbage collector, resulting in additional performance penalties.
+Increasing the SignalR incoming message size limit comes at the cost of requiring more server resources, and it increases the risk of [Denial of Service (DoS) attacks](xref:blazor/security/interactive-server-side-rendering#denial-of-service-dos-attacks). Additionally, reading a large amount of content in to memory as strings or byte arrays can also result in allocations that work poorly with the garbage collector, resulting in additional performance penalties.
 
 A better option for reading large payloads is to send the content in smaller chunks and process the payload as a <xref:System.IO.Stream>. This can be used when reading large JavaScript (JS) interop JSON payloads or if JS interop data is available as raw bytes. For an example that demonstrates sending large binary payloads in server-side apps that uses techniques similar to the [`InputFile` component](xref:blazor/file-uploads), see the [Binary Submit sample app](https://github.com/aspnet/samples/tree/main/samples/aspnetcore/blazor/BinarySubmit) and the [Blazor `InputLargeTextArea` Component Sample](https://github.com/aspnet/samples/tree/main/samples/aspnetcore/blazor/InputLargeTextArea).
 
@@ -427,7 +468,7 @@ builder.Services.AddServerSideBlazor()
     .AddHubOptions(options => options.MaximumReceiveMessageSize = 64 * 1024);
 ```
 
-Increasing the SignalR incoming message size limit comes at the cost of requiring more server resources, and it increases the risk of [Denial of Service (DoS) attacks](xref:blazor/security/server/interactive-server-side-rendering#denial-of-service-dos-attacks). Additionally, reading a large amount of content in to memory as strings or byte arrays can also result in allocations that work poorly with the garbage collector, resulting in additional performance penalties.
+Increasing the SignalR incoming message size limit comes at the cost of requiring more server resources, and it increases the risk of [Denial of Service (DoS) attacks](xref:blazor/security/interactive-server-side-rendering#denial-of-service-dos-attacks). Additionally, reading a large amount of content in to memory as strings or byte arrays can also result in allocations that work poorly with the garbage collector, resulting in additional performance penalties.
 
 A better option for reading large payloads is to send the content in smaller chunks and process the payload as a <xref:System.IO.Stream>. This can be used when reading large JavaScript (JS) interop JSON payloads or if JS interop data is available as raw bytes. For an example that demonstrates sending large binary payloads in Blazor Server that uses techniques similar to the [`InputFile` component](xref:blazor/file-uploads), see the [Binary Submit sample app](https://github.com/aspnet/samples/tree/main/samples/aspnetcore/blazor/BinarySubmit) and the [Blazor `InputLargeTextArea` Component Sample](https://github.com/aspnet/samples/tree/main/samples/aspnetcore/blazor/InputLargeTextArea).
 
@@ -446,7 +487,7 @@ services.AddServerSideBlazor()
     .AddHubOptions(options => options.MaximumReceiveMessageSize = 64 * 1024);
 ```
 
-Increasing the SignalR incoming message size limit comes at the cost of requiring more server resources, and it increases the risk of [Denial of Service (DoS) attacks](xref:blazor/security/server/interactive-server-side-rendering#denial-of-service-dos-attacks). Additionally, reading a large amount of content in to memory as strings or byte arrays can also result in allocations that work poorly with the garbage collector, resulting in additional performance penalties.
+Increasing the SignalR incoming message size limit comes at the cost of requiring more server resources, and it increases the risk of [Denial of Service (DoS) attacks](xref:blazor/security/interactive-server-side-rendering#denial-of-service-dos-attacks). Additionally, reading a large amount of content in to memory as strings or byte arrays can also result in allocations that work poorly with the garbage collector, resulting in additional performance penalties.
 
 :::moniker-end
 
@@ -491,11 +532,107 @@ In the `Program` file, call <xref:Microsoft.AspNetCore.Builder.ComponentEndpoint
 
 ## Reflect the server-side connection state in the UI
 
-When the client detects that the connection has been lost, a default UI is displayed to the user while the client attempts to reconnect. If reconnection fails, the user is provided the option to retry.
+If the client detects a lost connection (circuit) to the server, a default UI is displayed to the user while the client attempts to reconnect:
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
 
-To customize the UI, define a single element with an `id` of `components-reconnect-modal`. The following example places the element in the `App` component.
+![The default reconnection UI.](signalr/_static/reconnection-ui-90-or-later.png)
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
+
+![The default reconnection UI.](signalr/_static/reconnection-ui-80-or-earlier.png)
+
+:::moniker-end
+
+If reconnection fails, the user is instructed to retry or reload the page:
+
+:::moniker range=">= aspnetcore-9.0"
+
+![The default retry UI.](signalr/_static/retry-ui-90-or-later.png)
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
+
+![The default retry UI.](signalr/_static/retry-ui-80-or-earlier.png)
+
+:::moniker-end
+
+If reconnection succeeds, user state is often lost. Custom code can be added to any component to save and reload user state across connection failures. For more information, see <xref:blazor/state-management/index> and <xref:blazor/state-management/server>.
+
+:::moniker range=">= aspnetcore-10.0"
+
+To create UI elements that track reconnection state, the following table describes:
+
+* A set of `components-reconnect-*` CSS classes (**CSS class** column) that are set or unset by Blazor on an element with an `id` of `components-reconnect-modal`.
+* A `components-reconnect-state-changed` event (**Event** column) that indicates a reconnection status change.
+
+| CSS class | Event | Indicates&hellip; |
+| --- | --- | --- |
+| `components-reconnect-show` | `show` | A lost connection. The client is attempting to reconnect. The reconnection modal is shown. |
+| `components-reconnect-paused` | `paused` | The connection is paused. For more information, see [Pause and resume circuits](xref:blazor/state-management/server#pause-and-resume-circuits). |
+| `components-reconnect-hide` | `hide` | An active connection is re-established to the server. The reconnection model is closed. |
+| `components-reconnect-retrying` | `retrying` | The client is attempting to reconnect. |
+| `components-reconnect-failed` | `failed` | Reconnection failed, probably due to a network failure. |
+| `components-reconnect-rejected` | `rejected` | Reconnection rejected. |
+
+When the reconnection state change in `components-reconnect-state-changed` is `failed`, call `Blazor.reconnect()` in JavaScript to attempt reconnection.
+
+When the reconnection state change is `rejected`, the server was reached but refused the connection, and the user's state on the server is lost. To reload the app, call `location.reload()` in JavaScript. This connection state may result when:
+
+* A crash in the server-side circuit occurs.
+* The client is disconnected long enough for the server to drop the user's state. Instances of the user's components are disposed.
+* The server is restarted, or the app's worker process is recycled.
+
+The developer adds an event listener on the reconnect modal element to monitor and react to reconnection state changes, as seen in the following example:
+
+```javascript
+const reconnectModal = document.getElementById("components-reconnect-modal");
+reconnectModal.addEventListener("components-reconnect-state-changed", 
+  handleReconnectStateChanged);
+
+function handleReconnectStateChanged(event) {
+  if (event.detail.state === "show") {
+    reconnectModal.showModal();
+  } else if (event.detail.state === "hide") {
+    reconnectModal.close();
+  } else if (event.detail.state === "failed") {
+    Blazor.reconnect();
+  } else if (event.detail.state === "rejected") {
+    location.reload();
+  }
+}
+```
+
+An element with an `id` of `components-reconnect-max-retries` displays the maximum number of reconnect retries:
+
+```html
+<span id="components-reconnect-max-retries"></span>
+```
+
+An element with an `id` of `components-reconnect-current-attempt` displays the current reconnect attempt:
+
+```html
+<span id="components-reconnect-current-attempt"></span>
+```
+
+An element with an `id` of `components-seconds-to-next-attempt` displays the number of seconds to the next reconnection attempt:
+
+```html
+<span id="components-seconds-to-next-attempt"></span>
+```
+
+The [Blazor Web App project template](https://github.com/dotnet/aspnetcore/tree/main/src/ProjectTemplates/Web.ProjectTemplates/content/BlazorWeb-CSharp) includes a `ReconnectModal` component (`Components/Layout/ReconnectModal.razor`) with collocated stylesheet and JavaScript files (`ReconnectModal.razor.css`, `ReconnectModal.razor.js`) that can be customized as needed. These files can be examined in the ASP.NET Core reference source or by inspecting an app created from the Blazor Web App project template. The component is added to the project when the project is created in Visual Studio with **Interactive render mode** set to **Server** or **Auto** or created with the .NET CLI with the option `--interactivity server` (default) or `--interactivity auto`.
+
+[!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-10.0"
+
+To customize the UI, define a single element with an `id` of `components-reconnect-modal` in the `<body>` element content. The following example places the element in the `App` component.
 
 `App.razor`:
 
@@ -503,7 +640,7 @@ To customize the UI, define a single element with an `id` of `components-reconne
 
 :::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
-To customize the UI, define a single element with an `id` of `components-reconnect-modal`. The following example places the element in the host page.
+To customize the UI, define a single element with an `id` of `components-reconnect-modal` in the `<body>` element content. The following example places the element in the host page.
 
 `Pages/_Host.cshtml`:
 
@@ -511,7 +648,7 @@ To customize the UI, define a single element with an `id` of `components-reconne
 
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-To customize the UI, define a single element with an `id` of `components-reconnect-modal`. The following example places the element in the layout page.
+To customize the UI, define a single element with an `id` of `components-reconnect-modal` in the `<body>` element content. The following example places the element in the layout page.
 
 `Pages/_Layout.cshtml`:
 
@@ -519,15 +656,17 @@ To customize the UI, define a single element with an `id` of `components-reconne
 
 :::moniker range="< aspnetcore-6.0"
 
-To customize the UI, define a single element with an `id` of `components-reconnect-modal`. The following example places the element in the host page.
+To customize the UI, define a single element with an `id` of `components-reconnect-modal` in the `<body>` element content. The following example places the element in the host page.
 
 `Pages/_Host.cshtml`:
 
 :::moniker-end
 
+:::moniker range="< aspnetcore-10.0"
+
 ```cshtml
 <div id="components-reconnect-modal">
-    There was a problem with the connection!
+    Connection lost.<br>Attempting to reconnect...
 </div>
 ```
 
@@ -536,7 +675,9 @@ To customize the UI, define a single element with an `id` of `components-reconne
 
 Add the following CSS styles to the site's stylesheet.
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-10.0"
 
 `wwwroot/app.css`:
 
@@ -548,6 +689,8 @@ Add the following CSS styles to the site's stylesheet.
 
 :::moniker-end
 
+:::moniker range="< aspnetcore-10.0"
+
 ```css
 #components-reconnect-modal {
     display: none;
@@ -557,6 +700,15 @@ Add the following CSS styles to the site's stylesheet.
 #components-reconnect-modal.components-reconnect-failed, 
 #components-reconnect-modal.components-reconnect-rejected {
     display: block;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 0.5rem;
+    text-align: center;
+    box-shadow: 0 3px 6px 2px rgba(0, 0, 0, 0.3);
+    margin: 50px 50px;
+    position: fixed;
+    top: 0;
+    z-index: 10001;
 }
 ```
 
@@ -569,25 +721,27 @@ The following table describes the CSS classes applied to the `components-reconne
 | `components-reconnect-failed`   | Reconnection failed, probably due to a network failure. To attempt reconnection, call `window.Blazor.reconnect()` in JavaScript. |
 | `components-reconnect-rejected` | Reconnection rejected. The server was reached but refused the connection, and the user's state on the server is lost. To reload the app, call `location.reload()` in JavaScript. This connection state may result when:<ul><li>A crash in the server-side circuit occurs.</li><li>The client is disconnected long enough for the server to drop the user's state. Instances of the user's components are disposed.</li><li>The server is restarted, or the app's worker process is recycled.</li></ul> |
 
-:::moniker range=">= aspnetcore-5.0"
+:::moniker-end
+
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-10.0"
 
 Customize the delay before the reconnection UI appears by setting the `transition-delay` property in the site's CSS for the modal element. The following example sets the transition delay from 500 ms (default) to 1,000 ms (1 second).
 
 :::moniker-end
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-10.0"
 
 `wwwroot/app.css`:
 
 :::moniker-end
 
-:::moniker range="< aspnetcore-8.0"
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-8.0"
 
 `wwwroot/css/site.css`:
 
 :::moniker-end
 
-:::moniker range=">= aspnetcore-5.0"
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-10.0"
 
 ```css
 #components-reconnect-modal {
@@ -606,11 +760,9 @@ To display the current reconnect attempt, define an element with an `id` of `com
 </div>
 ```
 
-When the custom reconnect modal appears, it renders content similar to the following based on the preceding code:
+When the custom reconnect modal appears, it renders the following content with a reconnection attempt counter:
 
-```html
-There was a problem with the connection! (Current reconnect attempt: 3 / 8)
-```
+> :::no-loc text="There was a problem with the connection! (Current reconnect attempt: 1 / 8)":::
 
 :::moniker-end
 
@@ -618,7 +770,7 @@ There was a problem with the connection! (Current reconnect attempt: 3 / 8)
 
 :::moniker range=">= aspnetcore-8.0"
 
-By default, components are prerendered on the server before the client connection to the server is established. For more information, see <xref:blazor/components/prerender>.
+By default, components are prerendered on the server before the client connection to the server is established. For more information, see <xref:blazor/state-management/prerendered-state-persistence>.
 
 :::moniker-end
 
@@ -725,7 +877,7 @@ builder.Services.AddIdleCircuitHandler(options =>
 Circuit activity handlers also provide an approach for accessing scoped Blazor services from other non-Blazor dependency injection (DI) scopes. For more information and examples, see:
 
 * <xref:blazor/fundamentals/dependency-injection#access-server-side-blazor-services-from-a-different-di-scope>
-* <xref:blazor/security/server/additional-scenarios#access-authenticationstateprovider-in-outgoing-request-middleware>
+* <xref:blazor/security/additional-scenarios#access-authenticationstateprovider-in-outgoing-request-middleware>
 
 :::moniker-end
 
@@ -733,25 +885,25 @@ Circuit activity handlers also provide an approach for accessing scoped Blazor s
 
 :::moniker range=">= aspnetcore-8.0"
 
-Configure the manual start of a Blazor app's SignalR circuit in the `App.razor` file of a Blazor Web App:
+Configure the manual start of Blazor's SignalR circuit in the `App.razor` file of a Blazor Web App:
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
-Configure the manual start of a Blazor app's SignalR circuit in the `Pages/_Host.cshtml` file (Blazor Server):
+Configure the manual start of Blazor's SignalR circuit in the `Pages/_Host.cshtml` file (Blazor Server):
 
 :::moniker-end
 
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-Configure the manual start of a Blazor app's SignalR circuit in the `Pages/_Layout.cshtml` file (Blazor Server):
+Configure the manual start of Blazor's SignalR circuit in the `Pages/_Layout.cshtml` file (Blazor Server):
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-6.0"
 
-Configure the manual start of a Blazor app's SignalR circuit in the `Pages/_Host.cshtml` file (Blazor Server):
+Configure the manual start of Blazor's SignalR circuit in the `Pages/_Host.cshtml` file (Blazor Server):
 
 :::moniker-end
 
@@ -773,7 +925,15 @@ Configure the following values for the client:
 
 The following example for the `App.razor` file (Blazor Web App) shows the assignment of default values.
 
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
 Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 ```html
 <script src="{BLAZOR SCRIPT}" autostart="false"></script>
@@ -788,7 +948,13 @@ Blazor Web App:
 </script>
 ```
 
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
 The following example for the `Pages/_Host.cshtml` file (Blazor Server, all versions except ASP.NET Core in .NET 6) or `Pages/_Layout.cshtml` file (Blazor Server, ASP.NET Core in .NET 6).
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
 
 Blazor Server:
 
@@ -803,7 +969,11 @@ Blazor Server:
 </script>
 ```
 
-**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script and the path to use, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 When creating a hub connection in a component, set the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.ServerTimeout> (default: 30 seconds) and <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.KeepAliveInterval> (default: 15 seconds) on the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilder>. Set the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.HandshakeTimeout> (default: 15 seconds) on the built <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection>. The following example shows the assignment of default values:
 
@@ -851,7 +1021,7 @@ The following example for the `Pages/_Host.cshtml` file (Blazor Server, all vers
 </script>
 ```
 
-**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script and the path to use, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
 
 When creating a hub connection in a component, set the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.ServerTimeout> (default: 30 seconds), <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.HandshakeTimeout> (default: 15 seconds), and <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.KeepAliveInterval> (default: 15 seconds) on the built <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection>. The following example shows the assignment of default values:
 
@@ -881,240 +1051,20 @@ When changing the values of the server timeout (<xref:Microsoft.AspNetCore.Signa
 
 For more information, see the *Global deployment and connection failures* sections of the following articles:
 
-* <xref:blazor/host-and-deploy/server#global-deployment-and-connection-failures>
-* <xref:blazor/host-and-deploy/webassembly#global-deployment-and-connection-failures>
-
-## Modify the server-side reconnection handler
-
-The reconnection handler's circuit connection events can be modified for custom behaviors, such as:
-
-* To notify the user if the connection is dropped.
-* To perform logging (from the client) when a circuit is connected.
-
-To modify the connection events, register callbacks for the following connection changes:
-
-* Dropped connections use `onConnectionDown`.
-* Established/re-established connections use `onConnectionUp`.
-
-**Both `onConnectionDown` and `onConnectionUp` must be specified.**
-
-:::moniker range=">= aspnetcore-8.0"
-
-Blazor Web App:
-
-```html
-<script src="{BLAZOR SCRIPT}" autostart="false"></script>
-<script>
-  Blazor.start({
-    circuit: {
-      reconnectionHandler: {
-        onConnectionDown: (options, error) => console.error(error),
-        onConnectionUp: () => console.log("Up, up, and away!")
-      }
-    }
-  });
-</script>
-```
-
-Blazor Server:
-
-:::moniker-end
-
-```html
-<script src="{BLAZOR SCRIPT}" autostart="false"></script>
-<script>
-  Blazor.start({
-    reconnectionHandler: {
-      onConnectionDown: (options, error) => console.error(error),
-      onConnectionUp: () => console.log("Up, up, and away!")
-    }
-  });
-</script>
-```
-
-**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script and the path to use, see <xref:blazor/project-structure#location-of-the-blazor-script>.
-
-:::moniker range=">= aspnetcore-7.0"
-
-### Automatically refresh the page when server-side reconnection fails
-
-The default reconnection behavior requires the user to take manual action to refresh the page after reconnection fails. However, a custom reconnection handler can be used to automatically refresh the page:
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-8.0"
-
-`App.razor`:
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
-
-`Pages/_Host.cshtml`:
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-7.0"
-
-```html
-<div id="reconnect-modal" style="display: none;"></div>
-<script src="{BLAZOR SCRIPT}" autostart="false"></script>
-<script src="boot.js"></script>
-```
-
-**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script and the path to use, see <xref:blazor/project-structure#location-of-the-blazor-script>.
-
-Create the following `wwwroot/boot.js` file.
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-8.0"
-
-Blazor Web App:
-
-```javascript
-(() => {
-  const maximumRetryCount = 3;
-  const retryIntervalMilliseconds = 5000;
-  const reconnectModal = document.getElementById('reconnect-modal');
-  
-  const startReconnectionProcess = () => {
-    reconnectModal.style.display = 'block';
-
-    let isCanceled = false;
-
-    (async () => {
-      for (let i = 0; i < maximumRetryCount; i++) {
-        reconnectModal.innerText = `Attempting to reconnect: ${i + 1} of ${maximumRetryCount}`;
-
-        await new Promise(resolve => setTimeout(resolve, retryIntervalMilliseconds));
-
-        if (isCanceled) {
-          return;
-        }
-
-        try {
-          const result = await Blazor.reconnect();
-          if (!result) {
-            // The server was reached, but the connection was rejected; reload the page.
-            location.reload();
-            return;
-          }
-
-          // Successfully reconnected to the server.
-          return;
-        } catch {
-          // Didn't reach the server; try again.
-        }
-      }
-
-      // Retried too many times; reload the page.
-      location.reload();
-    })();
-
-    return {
-      cancel: () => {
-        isCanceled = true;
-        reconnectModal.style.display = 'none';
-      },
-    };
-  };
-
-  let currentReconnectionProcess = null;
-
-  Blazor.start({
-    circuit: {
-      reconnectionHandler: {
-        onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
-        onConnectionUp: () => {
-          currentReconnectionProcess?.cancel();
-          currentReconnectionProcess = null;
-        }
-      }
-    }
-  });
-})();
-```
-
-Blazor Server:
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-7.0"
-
-```javascript
-(() => {
-  const maximumRetryCount = 3;
-  const retryIntervalMilliseconds = 5000;
-  const reconnectModal = document.getElementById('reconnect-modal');
-  
-  const startReconnectionProcess = () => {
-    reconnectModal.style.display = 'block';
-
-    let isCanceled = false;
-
-    (async () => {
-      for (let i = 0; i < maximumRetryCount; i++) {
-        reconnectModal.innerText = `Attempting to reconnect: ${i + 1} of ${maximumRetryCount}`;
-
-        await new Promise(resolve => setTimeout(resolve, retryIntervalMilliseconds));
-
-        if (isCanceled) {
-          return;
-        }
-
-        try {
-          const result = await Blazor.reconnect();
-          if (!result) {
-            // The server was reached, but the connection was rejected; reload the page.
-            location.reload();
-            return;
-          }
-
-          // Successfully reconnected to the server.
-          return;
-        } catch {
-          // Didn't reach the server; try again.
-        }
-      }
-
-      // Retried too many times; reload the page.
-      location.reload();
-    })();
-
-    return {
-      cancel: () => {
-        isCanceled = true;
-        reconnectModal.style.display = 'none';
-      },
-    };
-  };
-
-  let currentReconnectionProcess = null;
-
-  Blazor.start({
-    reconnectionHandler: {
-      onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
-      onConnectionUp: () => {
-        currentReconnectionProcess?.cancel();
-        currentReconnectionProcess = null;
-      }
-    }
-  });
-})();
-```
-
-For more information on Blazor startup, see <xref:blazor/fundamentals/startup>.
-
-:::moniker-end
+* <xref:blazor/host-and-deploy/server/index#global-deployment-and-connection-failures>
+* <xref:blazor/host-and-deploy/webassembly/index#global-deployment-and-connection-failures>
 
 ## Adjust the server-side reconnection retry count and interval
 
 To adjust the reconnection retry count and interval, set the number of retries (`maxRetries`) and period in milliseconds permitted for each retry attempt (`retryIntervalMilliseconds`).
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
 
 Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 ```html
 <script src="{BLAZOR SCRIPT}" autostart="false"></script>
@@ -1130,9 +1080,17 @@ Blazor Web App:
 </script>
 ```
 
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
 Blazor Server:
 
 :::moniker-end
+
+:::moniker range="< aspnetcore-11.0"
 
 ```html
 <script src="{BLAZOR SCRIPT}" autostart="false"></script>
@@ -1146,7 +1104,9 @@ Blazor Server:
 </script>
 ```
 
-**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script and the path to use, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+:::moniker-end
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -1157,6 +1117,16 @@ The default reconnect timing uses a computed backoff strategy. The first several
 [!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
 
 Customize the retry interval behavior by specifying a function to compute the retry interval. In the following exponential backoff example, the number of previous reconnection attempts is multiplied by 1,000 ms to calculate the retry interval. When the count of previous attempts to reconnect (`previousAttempts`) is greater than the maximum retry limit (`maxRetries`), `null` is assigned to the retry interval (`retryIntervalMilliseconds`) to cease further reconnection attempts:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-11.0"
+
+Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0"
 
 ```javascript
 Blazor.start({
@@ -1169,7 +1139,36 @@ Blazor.start({
 });
 ```
 
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-11.0"
+
+Blazor Server:
+
+```javascript
+Blazor.start({
+  reconnectionOptions: {
+    retryIntervalMilliseconds: (previousAttempts, maxRetries) => 
+      previousAttempts >= maxRetries ? null : previousAttempts * 1000
+  },
+});
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0"
+
 An alternative is to specify the exact sequence of retry intervals. After the last specified retry interval, retries stop because the `retryIntervalMilliseconds` function returns `undefined`:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-11.0"
+
+Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0"
 
 ```javascript
 Blazor.start({
@@ -1184,7 +1183,26 @@ Blazor.start({
 
 :::moniker-end
 
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-11.0"
+
+Blazor Server:
+
+```javascript
+Blazor.start({
+  reconnectionOptions: {
+    retryIntervalMilliseconds: 
+      Array.prototype.at.bind([0, 1000, 2000, 5000, 10000, 15000, 30000]),
+  },
+});
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0"
+
 For more information on Blazor startup, see <xref:blazor/fundamentals/startup>.
+
+:::moniker-end
 
 :::moniker range=">= aspnetcore-6.0"
 
@@ -1257,7 +1275,15 @@ The server timeout can be increased, and the Keep-Alive interval can remain the 
 
 In the following [startup configuration](xref:blazor/fundamentals/startup) example ([location of the Blazor script](xref:blazor/project-structure#location-of-the-blazor-script)), a custom value of 60 seconds is used for the server timeout. The Keep-Alive interval (`withKeepAliveInterval`) isn't set and uses its default value of 15 seconds.
 
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
 Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 ```html
 <script src="{BLAZOR SCRIPT}" autostart="false"></script>
@@ -1272,6 +1298,10 @@ Blazor Web App:
 </script>
 ```
 
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
 Blazor Server:
 
 ```html
@@ -1284,6 +1314,10 @@ Blazor Server:
   });
 </script>
 ```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 When creating a hub connection in a component, set the server timeout (<xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilderExtensions.WithServerTimeout%2A>, default: 30 seconds) on the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilder>. Set the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.HandshakeTimeout> (default: 15 seconds) on the built <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection>. Confirm that the timeouts are at least double the Keep-Alive interval (<xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilderExtensions.WithKeepAliveInterval%2A>/<xref:Microsoft.AspNetCore.SignalR.Client.HubConnection.KeepAliveInterval>) and that the Keep-Alive value matches between server and client.
 
@@ -1357,11 +1391,263 @@ protected override async Task OnInitializedAsync()
 
 :::moniker-end
 
+## Modify the server-side reconnection handler
+
+The reconnection handler's circuit connection events can be modified for custom behaviors, such as:
+
+* To notify the user if the connection is dropped.
+* To perform logging (from the client) when a circuit is connected.
+
+To modify the connection events, register callbacks for the following connection changes:
+
+* Dropped connections use `onConnectionDown`.
+* Established/re-established connections use `onConnectionUp`.
+
+**Both `onConnectionDown` and `onConnectionUp` must be specified.**
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
+
+```html
+<script src="{BLAZOR SCRIPT}" autostart="false"></script>
+<script>
+  Blazor.start({
+    circuit: {
+      reconnectionHandler: {
+        onConnectionDown: (options, error) => console.error(error),
+        onConnectionUp: () => console.log("Up, up, and away!")
+      }
+    }
+  });
+</script>
+```
+
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+Blazor Server:
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-11.0"
+
+```html
+<script src="{BLAZOR SCRIPT}" autostart="false"></script>
+<script>
+  Blazor.start({
+    reconnectionHandler: {
+      onConnectionDown: (options, error) => console.error(error),
+      onConnectionUp: () => console.log("Up, up, and away!")
+    }
+  });
+</script>
+```
+
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0"
+
+## Programmatic control of reconnection and reload behavior
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0"
+
+Blazor automatically attempts reconnection and refreshes the browser when reconnection fails. For more information, see the [Adjust the server-side reconnection retry count and interval](#adjust-the-server-side-reconnection-retry-count-and-interval) section. However, developer code can implement a custom reconnection handler to take full control of reconnection behavior.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-9.0"
+
+The default reconnection behavior requires the user to take manual action to refresh the page after reconnection fails. However, developer code can implement a custom reconnection handler to take full control of reconnection behavior, including implementing automatic page refresh after reconnection attempts fail.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
+
+`App.razor`:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
+
+`Pages/_Host.cshtml`:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0"
+
+```html
+<div id="reconnect-modal" style="display: none;"></div>
+<script src="{BLAZOR SCRIPT}" autostart="false"></script>
+<script src="boot.js"></script>
+```
+
+**In the preceding example, the `{BLAZOR SCRIPT}` placeholder is the Blazor script path and file name.** For the location of the script, see <xref:blazor/project-structure#location-of-the-blazor-script>.
+
+Create the following `wwwroot/boot.js` file.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+Blazor Web App:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
+
+```javascript
+(() => {
+  const maximumRetryCount = 3;
+  const retryIntervalMilliseconds = 5000;
+  const reconnectModal = document.getElementById('reconnect-modal');
+  
+  const startReconnectionProcess = () => {
+    reconnectModal.style.display = 'block';
+
+    let isCanceled = false;
+
+    (async () => {
+      for (let i = 0; i < maximumRetryCount; i++) {
+        reconnectModal.innerText = `Attempting to reconnect: ${i + 1} of ${maximumRetryCount}`;
+
+        await new Promise(resolve => setTimeout(resolve, retryIntervalMilliseconds));
+
+        if (isCanceled) {
+          return;
+        }
+
+        try {
+          const result = await Blazor.reconnect();
+          if (!result) {
+            // The server was reached, but the connection was rejected; reload the page.
+            location.reload();
+            return;
+          }
+
+          // Successfully reconnected to the server.
+          return;
+        } catch {
+          // Didn't reach the server; try again.
+        }
+      }
+
+      // Retried too many times; reload the page.
+      location.reload();
+    })();
+
+    return {
+      cancel: () => {
+        isCanceled = true;
+        reconnectModal.style.display = 'none';
+      },
+    };
+  };
+
+  let currentReconnectionProcess = null;
+
+  Blazor.start({
+    circuit: {
+      reconnectionHandler: {
+        onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
+        onConnectionUp: () => {
+          currentReconnectionProcess?.cancel();
+          currentReconnectionProcess = null;
+        }
+      }
+    }
+  });
+})();
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-7.0 < aspnetcore-11.0"
+
+Blazor Server:
+
+```javascript
+(() => {
+  const maximumRetryCount = 3;
+  const retryIntervalMilliseconds = 5000;
+  const reconnectModal = document.getElementById('reconnect-modal');
+  
+  const startReconnectionProcess = () => {
+    reconnectModal.style.display = 'block';
+
+    let isCanceled = false;
+
+    (async () => {
+      for (let i = 0; i < maximumRetryCount; i++) {
+        reconnectModal.innerText = `Attempting to reconnect: ${i + 1} of ${maximumRetryCount}`;
+
+        await new Promise(resolve => setTimeout(resolve, retryIntervalMilliseconds));
+
+        if (isCanceled) {
+          return;
+        }
+
+        try {
+          const result = await Blazor.reconnect();
+          if (!result) {
+            // The server was reached, but the connection was rejected; reload the page.
+            location.reload();
+            return;
+          }
+
+          // Successfully reconnected to the server.
+          return;
+        } catch {
+          // Didn't reach the server; try again.
+        }
+      }
+
+      // Retried too many times; reload the page.
+      location.reload();
+    })();
+
+    return {
+      cancel: () => {
+        isCanceled = true;
+        reconnectModal.style.display = 'none';
+      },
+    };
+  };
+
+  let currentReconnectionProcess = null;
+
+  Blazor.start({
+    reconnectionHandler: {
+      onConnectionDown: () => currentReconnectionProcess ??= startReconnectionProcess(),
+      onConnectionUp: () => {
+        currentReconnectionProcess?.cancel();
+        currentReconnectionProcess = null;
+      }
+    }
+  });
+})();
+```
+
+For more information on Blazor startup, see <xref:blazor/fundamentals/startup>.
+
+:::moniker-end
+
 :::moniker range=">= aspnetcore-5.0"
 
-## Disconnect the Blazor circuit from the client
+## Disconnect Blazor's SignalR circuit from the client
 
-A Blazor circuit is disconnected when the [`unload` page event](https://developer.mozilla.org/docs/Web/API/Window/unload_event) is triggered. To disconnect the circuit for other scenarios on the client, invoke `Blazor.disconnect` in the appropriate event handler. In the following example, the circuit is disconnected when the page is hidden ([`pagehide` event](https://developer.mozilla.org/docs/Web/API/Window/pagehide_event)):
+Blazor's SignalR circuit is disconnected when the [`unload` page event](https://developer.mozilla.org/docs/Web/API/Window/unload_event) is triggered. To disconnect the circuit for other scenarios on the client, invoke `Blazor.disconnect` in the appropriate event handler. In the following example, the circuit is disconnected when the page is hidden ([`pagehide` event](https://developer.mozilla.org/docs/Web/API/Window/pagehide_event)):
 
 ```javascript
 window.addEventListener('pagehide', () => {
@@ -1409,7 +1695,7 @@ When a circuit ends because a user has disconnected and the framework is cleanin
 
 ## Server-side circuit handler to capture users for custom services
 
-Use a <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler> to capture a user from the <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider> and set that user in a service. For more information and example code, see <xref:blazor/security/server/additional-scenarios#circuit-handler-to-capture-users-for-custom-services>.
+Use a <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler> to capture a user from the <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider> and set that user in a service. For more information and example code, see <xref:blazor/security/additional-scenarios#circuit-handler-to-capture-users-for-custom-services>.
 
 :::moniker range=">= aspnetcore-8.0"
 
@@ -1419,20 +1705,206 @@ Use a <xref:Microsoft.AspNetCore.Components.Server.Circuits.CircuitHandler> to c
 
 :::moniker-end
 
-## `IHttpContextAccessor`/`HttpContext` in Razor components
+## Start the SignalR circuit at a different URL
 
-[!INCLUDE[](~/blazor/security/includes/httpcontext.md)]
+Prevent automatically starting the app by adding `autostart="false"` to the Blazor `<script>` tag ([location of the Blazor start script](xref:blazor/project-structure#location-of-the-blazor-script)). Manually establish the circuit URL using `Blazor.start`. The following examples use the path `/signalr`.
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+Blazor Web Apps:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
+
+```diff
+- <script src="_framework/blazor.web.js"></script>
++ <script src="_framework/blazor.web.js" autostart="false"></script>
++ <script>
++   Blazor.start({
++     circuit: {
++       configureSignalR: builder => builder.withUrl("/signalr")
++     },
++   });
++ </script>
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+Blazor Server:
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-11.0"
+
+```diff
+- <script src="_framework/blazor.server.js"></script>
++ <script src="_framework/blazor.server.js" autostart="false"></script>
++ <script>
++   Blazor.start({
++     configureSignalR: builder => builder.withUrl("/signalr")
++   });
++ </script>
+```
+
+:::moniker-end
+
+Add the following <xref:Microsoft.AspNetCore.Builder.ComponentEndpointRouteBuilderExtensions.MapBlazorHub%2A> call with the hub path to the middleware processing pipeline in the server app's `Program` file.
+
+:::moniker range=">= aspnetcore-8.0"
+
+Blazor Web Apps:
+
+```csharp
+app.MapBlazorHub("/signalr");
+```
+
+Blazor Server:
+
+:::moniker-end
+
+Leave the existing call to <xref:Microsoft.AspNetCore.Builder.ComponentEndpointRouteBuilderExtensions.MapBlazorHub%2A> in the file and add a new call to <xref:Microsoft.AspNetCore.Builder.ComponentEndpointRouteBuilderExtensions.MapBlazorHub%2A> with the path:
+
+```diff
+app.MapBlazorHub();
++ app.MapBlazorHub("/signalr");
+```
+
+## Impersonation for Windows Authentication
+
+Authenticated hub connections (<xref:Microsoft.AspNetCore.SignalR.Client.HubConnection>) are created with <xref:Microsoft.AspNetCore.Http.Connections.Client.HttpConnectionOptions.UseDefaultCredentials%2A> to indicate the use of default credentials for HTTP requests. For more information, see <xref:signalr/authn-and-authz#windows-authentication>.
+
+When the app is running in IIS Express as the signed-in user under Windows Authentication, which is likely the user's personal or work account, the default credentials are those of the signed-in user.
+
+When the app is published to IIS, the app runs under the *Application Pool Identity*. The <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection> connects as the IIS "user" account hosting the app, not the user accessing the page.
+
+Implement *impersonation* with the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection> to use the identity of the browsing user.
+
+In the following example:
+
+* The user from the authentication state provider is cast to a <xref:System.Security.Principal.WindowsIdentity>.
+* The identity's access token is passed to <xref:System.Security.Principal.WindowsIdentity.RunImpersonatedAsync%2A?displayProperty=nameWithType> with the code that builds and starts the <xref:Microsoft.AspNetCore.SignalR.Client.HubConnection>.
+
+```csharp
+protected override async Task OnInitializedAsync()
+{
+    var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+    if (authState?.User.Identity is not null)
+    {
+        var user = authState.User.Identity as WindowsIdentity;
+
+        if (user is not null)
+        {
+            await WindowsIdentity.RunImpersonatedAsync(user.AccessToken, 
+                async () =>
+                {
+                    hubConnection = new HubConnectionBuilder()
+                        .WithUrl(NavManager.ToAbsoluteUri("/hub"), config =>
+                        {
+                            config.UseDefaultCredentials = true;
+                        })
+                        .WithAutomaticReconnect()
+                        .Build();
+
+                        hubConnection.On<string>("name", userName =>
+                        {
+                            name = userName;
+                            InvokeAsync(StateHasChanged);
+                        });
+
+                        await hubConnection.StartAsync();
+                });
+        }
+    }
+}
+```
+
+In the preceding code, `NavManager` is a <xref:Microsoft.AspNetCore.Components.NavigationManager>, and `AuthenticationStateProvider` is an <xref:Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider> service instance ([`AuthenticationStateProvider` documentation](xref:blazor/security/authentication-state)).
+
+## Configure the hub URL endpoint for a loopback connection
+
+*This section only applies to server-side Blazor apps.*
+
+If HTTP requests in a server-side Blazor app are failing to connect to itself when using <xref:Microsoft.AspNetCore.Components.NavigationManager.ToAbsoluteUri%2A?displayProperty=nameWithType>, you might have a load balancer or proxy that isn't expecting requests from the backend server. In this scenario, you can try to change the hub URL that the client is using to connect directly to the backend server.
+
+The following example:
+
+* Configures the hub URL using <xref:System.UriBuilder> and passes it to <xref:Microsoft.AspNetCore.SignalR.Client.HubConnectionBuilderHttpExtensions.WithUrl%2A>.
+* Sets the URI based on the server's address (<xref:Microsoft.AspNetCore.Hosting.Server.Features.IServerAddressesFeature>) and machine name (<xref:System.Environment.MachineName%2A>).
+
+```razor
+@using System.Net
+@using System.Net.Sockets
+@using Microsoft.AspNetCore.Hosting.Server
+@using Microsoft.AspNetCore.Hosting.Server.Features
+@using Microsoft.AspNetCore.SignalR.Client
+@inject IHostEnvironment Environment
+@inject IServer Server
+
+...
+
+@code {
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var serverAddress = Server.Features
+           .Get<IServerAddressesFeature>()?
+           .Addresses
+           .FirstOrDefault(a => a.StartsWith("http://") || a.StartsWith("https://"));
+
+        if (serverAddress is null)
+        {
+            throw new InvalidOperationException("No server address available.");
+        }
+
+        var uri = new UriBuilder(serverAddress + "/chathub");
+
+        // If Kestrel is bound to a wildcard, substitute a real IP
+        if (uri.Host is "0.0.0.0" or "[::]" or "+" or "*")
+        {
+            var addresses = await Dns.GetHostAddressesAsync(
+                System.Environment.MachineName);
+            var ip = addresses.FirstOrDefault(a =>
+                a.AddressFamily == AddressFamily.InterNetwork
+                && !IPAddress.IsLoopback(a));
+
+            if (ip is null)
+            {
+                throw new InvalidOperationException("No suitable IP address.");
+            }
+
+            uri.Host = ip.ToString();
+        }
+
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(uri.Uri)
+            .Build();
+
+        hubConnection.On<ChatMessage>("ReceiveMessage", (message) =>
+        {
+            ...
+        });
+
+        await hubConnection.StartAsync();
+    }
+}
+```
 
 ## Additional server-side resources
 
-* [Server-side host and deployment guidance: SignalR configuration](xref:blazor/host-and-deploy/server#signalr-configuration)
+* [Server-side host and deployment guidance: SignalR configuration](xref:blazor/host-and-deploy/server/index#signalr-configuration)
 * <xref:signalr/introduction>
 * <xref:signalr/configuration>
 * Server-side security documentation
   * <xref:blazor/security/index>
-  * <xref:blazor/security/server/index>
-  * <xref:blazor/security/server/interactive-server-side-rendering>
-  * <xref:blazor/security/server/additional-scenarios>
+  * <xref:blazor/security/index>
+  * <xref:blazor/security/interactive-server-side-rendering>
+  * <xref:blazor/security/additional-scenarios>
+* <xref:blazor/components/httpcontext>
 * [Server-side reconnection events and component lifecycle events](xref:blazor/components/lifecycle#blazor-server-reconnection-events)
 * [What is Azure SignalR Service?](/azure/azure-signalr/signalr-overview)
 * [Performance guide for Azure SignalR Service](/azure/azure-signalr/signalr-concept-performance)

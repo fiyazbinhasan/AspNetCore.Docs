@@ -1,7 +1,7 @@
 
 :::moniker range="= aspnetcore-7.0"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs.Samples/tree/main/mvc/action-return-types/7.x/WebApiSample) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs.Samples/tree/main/mvc/action-return-types/7.x/WebApiSample) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ASP.NET Core provides the following options for web API controller action return types:
 
@@ -24,7 +24,7 @@ When multiple return types are possible, it's common to mix an <xref:Microsoft.A
 
 ### Return IEnumerable\<T> or IAsyncEnumerable\<T>
 
-See [Return `IEnumerable<T>` or `IAsyncEnumerable<T>`](/aspnet/core/fundamentals/best-practices#return-ienumerablet-or-iasyncenumerablet) for performance considerations.
+See [Return `IEnumerable<T>` or `IAsyncEnumerable<T>`](xref:fundamentals/best-practices#return-ienumerablet-or-iasyncenumerablet) for performance considerations.
 
 ASP.NET Core buffers the result of actions that return <xref:System.Collections.Generic.IEnumerable%601> before writing them to the response. Consider declaring the action signature's return type as <xref:System.Collections.Generic.IAsyncEnumerable%601> to guarantee asynchronous iteration. Ultimately, the iteration mode is based on the underlying concrete type being returned and the selected formatter affects how the result is processed:
 
@@ -84,7 +84,7 @@ If the [`[ApiController]`](xref:Microsoft.AspNetCore.Mvc.ApiControllerAttribute)
 
 ## ActionResult vs IActionResult
 
-The following section compares `ActionResult` to  `IActionResult`
+The following section compares `ActionResult` to `IActionResult`.
 
 ### ActionResult\<T> type
 
@@ -131,12 +131,12 @@ In the preceding action:
 
 ## HttpResults type
 
-In addition to the MVC-specific built-in result types (<xref:Microsoft.AspNetCore.Mvc.IActionResult> and [ActionResult\<T>](xref:Microsoft.AspNetCore.Mvc.ActionResult%601)), ASP.NET Core includes the [HttpResults](xref:Microsoft.AspNetCore.Http.HttpResults) types that can be used in both [Minimal APIs](/aspnet/core/fundamentals/minimal-apis) and Web API.
+In addition to the MVC-specific built-in result types (<xref:Microsoft.AspNetCore.Mvc.IActionResult> and [ActionResult\<T>](xref:Microsoft.AspNetCore.Mvc.ActionResult%601)), ASP.NET Core includes the [HttpResults](xref:Microsoft.AspNetCore.Http.HttpResults) types that can be used in both [Minimal APIs](xref:fundamentals/minimal-apis) and Web API.
 
 Different than the MVC-specific result types, the `HttpResults`:
 
 * Are a results implementation that is processed by a call to [IResult.ExecuteAsync](xref:Microsoft.AspNetCore.Http.IResult.ExecuteAsync%2A).
-* Does ***not*** leverage the configured [Formatters](/aspnet/core/web-api/advanced/formatting#format-specific-action-results). Not leveraging the configured formatters means:
+* Does ***not*** leverage the configured [Formatters](xref:web-api/advanced/formatting#format-specific-action-results). Not leveraging the configured formatters means:
 
   * Some features like `Content negotiation` aren't available.
   * The produced `Content-Type` is decided by the `HttpResults` implementation.
@@ -177,7 +177,7 @@ The static [TypedResults](<xref:Microsoft.AspNetCore.Http.TypedResults>) class r
 
 When multiple `IResult` return types are needed, returning [`Results<TResult1, TResultN>`](/dotnet/api/microsoft.aspnetcore.http.httpresults.results-2) is preferred over returning `IResult`. Returning `Results<TResult1, TResultN>` is preferred because generic union types automatically retain the endpoint metadata.
 
-The `Results<TResult1, TResultN>` union types implement implicit cast operators so that the compiler can automatically convert the types specified in the generic arguments to an instance of the union type. This has the added benefit of providing compile-time checking that a route handler actually only returns the results that it declares it does. Attempting to return a type that isn’t declared as one of the generic arguments to `Results<>` results in a compilation error.
+The `Results<TResult1, TResultN>` union types implement implicit cast operators so that the compiler can automatically convert the types specified in the generic arguments to an instance of the union type. This has the added benefit of providing compile-time checking that a route handler actually only returns the results that it declares it does. Attempting to return a type that isn't declared as one of the generic arguments to `Results<>` results in a compilation error.
 
 Consider the following code:
 
@@ -207,7 +207,7 @@ In the preceding action:
 
 :::moniker range="< aspnetcore-7.0"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/action-return-types/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/action-return-types/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ASP.NET Core offers the following options for web API controller action return types:
 
@@ -275,7 +275,7 @@ If the [`[ApiController]`](xref:Microsoft.AspNetCore.Mvc.ApiControllerAttribute)
 
 ## ActionResult vs IActionResult
 
-The following section compares `ActionResult` to  `IActionResult`
+The following section compares `ActionResult` to `IActionResult`.
 
 ### ActionResult\<T> type
 

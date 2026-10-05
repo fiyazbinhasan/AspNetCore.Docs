@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor file downloads
 author: guardrex
 description: Learn how to download files in Blazor apps.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/file-downloads
 ---
 # ASP.NET Core Blazor file downloads
@@ -205,7 +204,7 @@ The following example component downloads the file from the same origin that the
 
 For interactive components, the button in the preceding example calls the `DownloadFileFromURL` handler to invoke the JavaScript (JS) function `triggerFileDownload`.
 
-If the component adopts static server-side rendering (static SSR), add an event handler for the button ([`addEventListener` (MDN documentation)](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)) to call `triggerFileDownload` following the guidance in <xref:blazor/js-interop/ssr>.
+If the component adopts static server-side rendering (static SSR), add an event handler for the button ([`addEventListener`](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)) to call `triggerFileDownload` following the guidance in <xref:blazor/js-interop/ssr>.
 
 :::moniker-end
 
@@ -215,7 +214,7 @@ If the component adopts static server-side rendering (static SSR), add an event 
 
 For interactive components, the button in the preceding example calls the `DownloadFileFromURL` handler to invoke the JavaScript (JS) function `triggerFileDownload`.
 
-If the component adopts static server-side rendering (static SSR), add an event handler for the button ([`addEventListener` (MDN documentation)](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)) to call `triggerFileDownload` following the guidance in <xref:blazor/js-interop/ssr>.
+If the component adopts static server-side rendering (static SSR), add an event handler for the button ([`addEventListener`](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener)) to call `triggerFileDownload` following the guidance in <xref:blazor/js-interop/ssr>.
 
 :::moniker-end
 

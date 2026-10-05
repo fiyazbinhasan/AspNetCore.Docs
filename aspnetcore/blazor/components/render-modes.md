@@ -1,20 +1,16 @@
 ---
 title: ASP.NET Core Blazor render modes
+ai-usage: ai-assisted
 author: guardrex
 description: Learn about Blazor render modes and how to apply them in Blazor Web Apps.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 06/10/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/render-modes
 ---
 # ASP.NET Core Blazor render modes
 
-<!-- UPDATE 9.0 Activate after release and INCLUDE is updated
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article explains control of Razor component rendering in Blazor Web Apps, either at compile time or runtime.
 
@@ -22,7 +18,7 @@ This guidance doesn't apply to standalone Blazor WebAssembly apps. Blazor WebAss
 
 ## Render modes
 
-Every component in a Blazor Web App adopts a *render mode* to determine the hosting model that it uses, where it's rendered, and whether or not it's interactive.
+Every component in a Blazor Web App adopts a *render mode* to determine the hosting model that it uses, where it's rendered, and whether or not it's interactive. *Interactivity* makes it possible for users to interact with rendered components. This includes app responses to [Document Object Model (DOM)](https://developer.mozilla.org/docs/Web/API/Document_Object_Model/Introduction) events and state changes tied to C# members via Blazor's event handlers and binding.
 
 The following table shows the available render modes for rendering Razor components in a Blazor Web App. To apply a render mode to a component use the `@rendermode` directive on the component instance or on the component definition. Later in this article, examples are shown for each render mode scenario.
 
@@ -113,7 +109,7 @@ In the following example, interactive server-side rendering (interactive SSR) is
 ```
 
 > [!NOTE]
-> Blazor templates include a static `using` directive for <xref:Microsoft.AspNetCore.Components.Web.RenderMode> in the app's `_Imports` file (`Components/_Imports.razor`) for shorter `@rendermode` syntax:
+> Blazor templates include a static `using` directive for <xref:Microsoft.AspNetCore.Components.Web.RenderMode> in the app's imports file (`Components/_Imports.razor`) for shorter `@rendermode` syntax:
 >
 > ```razor
 > @using static Microsoft.AspNetCore.Components.Web.RenderMode
@@ -160,7 +156,7 @@ The <xref:Microsoft.AspNetCore.Components.Routing.Router> component propagates i
 
 You also typically must set the same interactive render mode on the [`HeadOutlet` component](xref:blazor/components/control-head-content#headoutlet-component), which is also found in the `App` component of a Blazor Web App generated from the project template:
 
-```
+```razor
 <HeadOutlet @rendermode="InteractiveServer" />
 ```
 
@@ -177,11 +173,11 @@ To enable global interactivity when creating a Blazor Web App:
 
 For more information, see <xref:blazor/tooling>.
 
-## Apply a render mode programatically
+## Apply a render mode programmatically
 
 Properties and fields can assign a render mode.
 
-The second approach described in this section, setting the render mode by component instance, is especially useful when your app specification calls for one or more components to adopt static SSR in a globally-interactive app. This scenario is covered in the [Static SSR pages in a globally-interactive app](#static-ssr-pages-in-a-globally-interactive-app) section later in this article.
+The second approach described in this section, setting the render mode by component instance, is especially useful when your app specification calls for one or more components to adopt static SSR in an otherwise interactive app. This scenario is covered in the [Static SSR pages in an interactive app](#static-ssr-pages-in-an-interactive-app) section later in this article.
 
 ### Set the render mode by component definition
 
@@ -211,7 +207,15 @@ The following example applies interactive server-side rendering (interactive SSR
 }
 ```
 
-Additional information on render mode propagation is provided in the [Render mode propagation](#render-mode-propagation) section later in this article. The [Static SSR pages in a globally-interactive app](#static-ssr-pages-in-a-globally-interactive-app) section shows how to use the preceding approach to adopt static SSR in a globally-interactive app.
+Additional information on render mode propagation is provided in the [Render mode propagation](#render-mode-propagation) section later in this article. The [Static SSR pages in an interactive app](#static-ssr-pages-in-an-interactive-app) section shows how to use the preceding approach to adopt static SSR in an otherwise interactive app.
+
+## Blazor documentation examples for Blazor Web Apps
+
+When using a Blazor Web App, most of the Blazor documentation example components ***require*** interactivity to function and demonstrate the concepts covered by the articles. When you test an example component provided by an article, make sure that either the app adopts global interactivity or the component adopts an interactive render mode.
+
+## Prerendering
+
+Interactive render modes (Interactive Server, Interactive WebAssembly, Interactive Auto) support prerendering by default, which initially renders the page content statically from the server to improve the initial load experience. For more information, see <xref:blazor/components/prerender>.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -225,12 +229,36 @@ The <xref:Microsoft.AspNetCore.Components.ComponentBase.RendererInfo?displayProp
   * `WebAssembly`: On the client (CSR) and capable of interactivity after prerendering.
   * `WebView`: On the native device and capable of interactivity after prerendering.
 * <xref:Microsoft.AspNetCore.Components.RendererInfo.IsInteractive?displayProperty=nameWithType> indicates if the component supports interactivity at the time of rendering. The value is `true` when rendering interactively or `false` when prerendering or for static SSR (<xref:Microsoft.AspNetCore.Components.RendererInfo.Name?displayProperty=nameWithType> of `Static`).
-* <xref:Microsoft.AspNetCore.Components.ComponentBase.AssignedRenderMode?displayProperty=nameWithType> exposes the component's assigned render mode:
-  * `InteractiveServer` for Interactive Server.
-  * `InteractiveAuto` for Interactive Auto.
-  * `InteractiveWebAssembly` for Interactive WebAssembly.
+* <xref:Microsoft.AspNetCore.Components.ComponentBase.AssignedRenderMode> exposes the component's assigned render mode:
+  * `InteractiveServerRenderMode` for Interactive Server.
+  * `InteractiveAutoRenderMode` for Interactive Auto.
+  * `InteractiveWebAssemblyRenderMode` for Interactive WebAssembly.
+  * `null` if a render mode isn't assigned.
 
-Components use these properties to render content depending on their location or interactivity status. For example, a form can be disabled during prerendering and enabled when the component becomes interactive:
+Components use these properties to render content depending on their location or interactivity status. The following examples demonstrate typical use cases.
+
+Display content until a component is interactive:
+
+```razor
+@if (!RendererInfo.IsInteractive)
+{
+    <p>Connecting to the assistant...</p>
+}
+else
+{
+    ...
+}
+```
+
+Disable a button until a component is interactive:
+
+```razor
+<button @onclick="Send" disabled="@(!RendererInfo.IsInteractive)">
+    Send
+</button>
+```
+
+Disable a form during prerendering and enable the form when the component is interactive:
 
 ```razor
 <EditForm Model="Movie" ...>
@@ -260,7 +288,7 @@ Components use these properties to render content depending on their location or
 }
 ```
 
-The next example shows how to render markup to support performing a regular HTML action if the component is statically rendered:
+Render markup to support performing a regular HTML action if the component is statically rendered:
 
 ```razor
 @if (AssignedRenderMode is null)
@@ -285,52 +313,6 @@ In the preceding example:
 * Otherwise, the render mode is any of `InteractiveServer`, `InteractiveWebAssembly`, or `InteractiveAuto`. The component is capable of using an event handler delegate (`FilterMovies`) and the value bound to the `<input>` element (`titleFilter`) to filter movies interactively over the background SignalR connection.
 
 :::moniker-end
-
-## Blazor documentation examples for Blazor Web Apps
-
-When using a Blazor Web App, most of the Blazor documentation example components ***require*** interactivity to function and demonstrate the concepts covered by the articles. When you test an example component provided by an article, make sure that either the app adopts global interactivity or the component adopts an interactive render mode.
-
-## Prerendering
-
-*Prerendering* is the process of initially rendering page content on the server without enabling event handlers for rendered controls. The server outputs the HTML UI of the page as soon as possible in response to the initial request, which makes the app feel more responsive to users. Prerendering can also improve [Search Engine Optimization (SEO)](https://developer.mozilla.org/docs/Glossary/SEO) by rendering content for the initial HTTP response that search engines use to calculate page rank.
-
-Prerendering is enabled by default for interactive components.
-
-Internal navigation for interactive routing doesn't involve requesting new page content from the server. Therefore, prerendering doesn't occur for internal page requests, including for [enhanced navigation](xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling). For more information, see [Static versus interactive routing](xref:blazor/fundamentals/routing#static-versus-interactive-routing), [Interactive routing and prerendering](xref:blazor/components/prerender#interactive-routing-and-prerendering), and [Enhanced navigation and form handling](xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling).
-
-<!-- UPDATE 10.0 Tracking https://github.com/dotnet/aspnetcore/issues/55635
-                 for .NET 10 work in this area. Update the following remark
-                 if changes are made to the framework. -->
-
-Disabling prerendering using the following techniques only takes effect for top-level render modes. If a parent component specifies a render mode, the prerendering settings of its children are ignored. This behavior is under investigation for possible changes with the release of .NET 10 in November, 2025.
-
-To disable prerendering for a *component instance*, pass the `prerender` flag with a value of `false` to the render mode:
-
-* `<... @rendermode="new InteractiveServerRenderMode(prerender: false)" />`
-* `<... @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />`
-* `<... @rendermode="new InteractiveAutoRenderMode(prerender: false)" />`
-
-To disable prerendering in a *component definition*:
-
-* `@rendermode @(new InteractiveServerRenderMode(prerender: false))`
-* `@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))`
-* `@rendermode @(new InteractiveAutoRenderMode(prerender: false))`
-
-To disable prerendering for the entire app, indicate the render mode at the highest-level interactive component in the app's component hierarchy that isn't a root component.
-
-For apps based on the Blazor Web App project template, a render mode assigned to the entire app is specified where the `Routes` component is used in the `App` component (`Components/App.razor`). The following example sets the app's render mode to Interactive Server with prerendering disabled:
-
-```razor
-<Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
-```
-
-Also, disable prerendering for the [`HeadOutlet` component](xref:blazor/components/control-head-content#headoutlet-component) in the `App` component:
-
-```razor
-<HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
-```
-
-Making a root component, such as the `App` component, interactive with the `@rendermode` directive at the top of the root component's definition file (`.razor`) isn't supported. Therefore, prerendering can't be disabled directly by the `App` component.
 
 ## Static server-side rendering (static SSR)
 
@@ -357,15 +339,25 @@ In the following example, there's no designation for the component's render mode
 
 If using the preceding component locally in a Blazor Web App, place the component in the server project's `Components/Pages` folder. The server project is the solution's project with a name that doesn't end in `.Client`. When the app is running, navigate to `/render-mode-1` in the browser's address bar.
 
+:::moniker range=">= aspnetcore-10.0"
+
+During static SSR, Razor component page requests are processed by server-side ASP.NET Core middleware pipeline request processing for authorization. Dedicated Blazor features for authorization aren't operational because Razor components aren't rendered during server-side request processing. Blazor router features in the `Routes` component that aren't available during static SSR include displaying [Not Authorized content (`<NotAuthorized>...</NotAuthorized>`)](xref:blazor/security/index#authorizeview-component) (<xref:Microsoft.AspNetCore.Components.Authorization.AuthorizeRouteView.NotAuthorized>). Blazor Web Apps typically process unauthorized requests on the server by [customizing the behavior of authorization middleware](xref:security/authorization/authorizationmiddlewareresulthandler).
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
+
 During static SSR, Razor component page requests are processed by server-side ASP.NET Core middleware pipeline request processing for routing and authorization. Dedicated Blazor features for routing and authorization aren't operational because Razor components aren't rendered during server-side request processing. Blazor router features in the `Routes` component that aren't available during static SSR include displaying:
 
-* [Not authorized content (`<NotAuthorized>...</NotAuthorized>`)](xref:blazor/security/index#authorizeview-component) (<xref:Microsoft.AspNetCore.Components.Authorization.AuthorizeRouteView.NotAuthorized>): Blazor Web Apps typically process unauthorized requests on the server by [customizing the behavior of Authorization Middleware](xref:security/authorization/authorizationmiddlewareresulthandler).
+* [Not Authorized content (`<NotAuthorized>...</NotAuthorized>`)](xref:blazor/security/index#authorizeview-component) (<xref:Microsoft.AspNetCore.Components.Authorization.AuthorizeRouteView.NotAuthorized>): Blazor Web Apps typically process unauthorized requests on the server by [customizing the behavior of authorization middleware](xref:security/authorization/authorizationmiddlewareresulthandler).
 
-* [Not found content (`<NotFound>...</NotFound>`)](xref:blazor/fundamentals/routing#provide-custom-content-when-content-isnt-found) (<xref:Microsoft.AspNetCore.Components.Routing.Router.NotFound>): Blazor Web Apps typically process bad URL requests on the server by either displaying the browser's built-in 404 UI or returning a custom 404 page (or other response) via ASP.NET Core middleware (for example, [`UseStatusCodePagesWithRedirects`](xref:fundamentals/error-handling#usestatuscodepageswithredirects) / [API documentation](xref:Microsoft.AspNetCore.Builder.StatusCodePagesExtensions.UseStatusCodePagesWithRedirects%2A)).
+* [Not Found content (`<NotFound>...</NotFound>`)](xref:blazor/fundamentals/routing#provide-custom-content-when-content-isnt-found) (<xref:Microsoft.AspNetCore.Components.Routing.Router.NotFound>): Blazor Web Apps typically process bad URL requests on the server by either displaying the browser's built-in 404 UI or returning a custom 404 page (or other response) via ASP.NET Core middleware (for example, [`UseStatusCodePagesWithRedirects`](xref:fundamentals/error-handling#usestatuscodepageswithredirects) / [API documentation](xref:Microsoft.AspNetCore.Builder.StatusCodePagesExtensions.UseStatusCodePagesWithRedirects%2A)).
+
+:::moniker-end
 
 If the app exhibits root-level interactivity, server-side ASP.NET Core request processing isn't involved after the initial static SSR, which means that the preceding Blazor features work as expected.
 
-[Enhanced navigation](xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling) with static SSR requires special attention when loading JavaScript. For more information, see <xref:blazor/js-interop/ssr>.
+[Enhanced navigation](xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling) with static SSR requires special attention when loading JavaScript. For more information, see <xref:blazor/js-interop/ssr>.
 
 ## Interactive server-side rendering (interactive SSR)
 
@@ -392,6 +384,8 @@ In the following example, the render mode is set interactive SSR by adding `@ren
 ```
 
 If using the preceding component in a Blazor Web App, place the component in the server project's `Components/Pages` folder. The server project is the solution's project with a name that doesn't end in `.Client`. When the app is running, navigate to `/render-mode-2` in the browser's address bar.
+
+[!INCLUDE[](~/blazor/includes/closure-of-circuits.md)]
 
 ## Client-side rendering (CSR)
 
@@ -516,7 +510,7 @@ In the following example, the `SharedMessage` component is interactive over a Si
 
 In the following example, both `SharedMessage` components are prerendered and appear when the page is displayed in the browser.
 
-* The first `SharedMessage` component with interactive server-side rendering (interactive SSR) is interactive after the SignalR circuit is established.
+* The first `SharedMessage` component with interactive server-side rendering (interactive SSR) is interactive after Blazor's SignalR circuit is established.
 * The second `SharedMessage` component with client-side rendering (CSR) is interactive *after* the Blazor app bundle is downloaded and the .NET runtime is active on the client.
 
 `RenderMode7.razor`:
@@ -555,6 +549,16 @@ Non-serializable component parameters, such as child content or a render fragmen
 <span aria-hidden="true">❌</span> **Error**:
 
 > :::no-loc text="System.InvalidOperationException: Cannot pass the parameter 'ChildContent' to component 'SharedMessage' with rendermode 'InteractiveServerRenderMode'. This is because the parameter is of the delegate type 'Microsoft.AspNetCore.Components.RenderFragment', which is arbitrary code and cannot be serialized.":::
+
+:::moniker range="< aspnetcore-11.0"
+
+<!-- UPDATE 11.0 - This is resolved in .NET 11 or later via 
+                   https://github.com/dotnet/aspnetcore/issues/52768.
+                   Determine if more work is needed here. -->
+
+The same thing happens if you attempt to adopt interactive rendering in a layout that inherits from <xref:Microsoft.AspNetCore.Components.LayoutComponentBase>, such as the app's `MainLayout` component, in an app that adopts per-page/component rendering. For more information, see <xref:blazor/components/layouts#statically-rendered-layout-components>.
+
+:::moniker-end
 
 To circumvent the preceding limitation, wrap the child component in another component that doesn't have the parameter. This is the approach taken in the Blazor Web App project template with the `Routes` component (`Components/Routes.razor`) to wrap the <xref:Microsoft.AspNetCore.Components.Routing.Router> component.
 
@@ -598,11 +602,11 @@ The following component results in a runtime error when the component is rendere
 
 > :::no-loc text="Cannot create a component of type 'BlazorSample.Components.SharedMessage' because its render mode 'Microsoft.AspNetCore.Components.Web.InteractiveWebAssemblyRenderMode' is not supported by Interactive Server rendering.":::
 
-## Static SSR pages in a globally-interactive app
+## Static SSR pages in an interactive app
 
 There are cases where the app's specification calls for components to adopt static server-side rendering (static SSR) and only run on the server, while the rest of the app uses an interactive render mode.
 
-This approach is only useful when the app has specific pages that can't work with interactive Server or WebAssembly rendering. For example, adopt this approach for pages that depend on reading/writing HTTP cookies and can only work in a request/response cycle instead of interactive rendering. For pages that work with interactive rendering, you shouldn't force them to use static SSR rendering, as it's less efficient and less responsive for the end user.
+This approach is only useful when the app has specific pages that can't work with interactive Server or WebAssembly rendering. For example, adopt this approach for pages that depend on reading/writing HTTP cookies and can only work in a request/response cycle instead of interactive rendering. For pages that work with interactive rendering, you shouldn't force them to use static SSR, as it's less efficient and less responsive for the end user.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -661,18 +665,22 @@ The following examples use the <xref:Microsoft.AspNetCore.Http.HttpContext> casc
 
 ### Area (folder) of static SSR components
 
-The approach described in this subsection is used by the Blazor Web App project template with individual authentication and global interactivity.
+*For an example of the approach in this section, see the [`BlazorWebAppAreaOfStaticSsrComponents` sample app](https://github.com/dotnet/blazor-samples/tree/main/9.0/BlazorWebAppAreaOfStaticSsrComponents). The technique described in this section is most appropriate for .NET 8 Blazor Web Apps, but the sample is implemented in .NET 9 using Blazor features that simplify demonstrating how the approach works.*
 
-An area (folder) of the app contains the components that must adopt static SSR and only run on the server. The components in the folder share the same route path prefix. For example, the Identity Razor components of the Blazor Web App project template are in the `Components/Account/Pages` folder and share the root path prefix `/Account`.
+The approach described in this subsection is used by the Blazor Web App project template with global interactivity.
 
-The folder also contains an `_Imports.razor` file, which applies a custom account layout to the components in the folder:
+An area (folder) of the app contains the components that must adopt static SSR and only run on the server. The components in the folder share the same route path prefix. For example, the Identity Razor components of the Blazor Web App project template are in the `Components/Account/Pages` folder and share the root path prefix `/account`.
+
+The app also contains an imports file (`_Imports.razor`) automatically applied to static SSR components in the `Components` folder, which applies a custom layout.
+
+`Components/Account/_Imports.razor`:
 
 ```razor
 @using BlazorSample.Components.Account.Shared
 @layout AccountLayout
 ```
 
-The `Shared` folder maintains the `AccountLayout` layout component. The component makes use of <xref:Microsoft.AspNetCore.Http.HttpContext> to determine if the component has adopted static SSR. Identity components must render on the server with static SSR because they set Identity cookies. If the value of <xref:Microsoft.AspNetCore.Http.HttpContext> is `null`, the component is rendering interactively, and a full-page reload is performed by calling <xref:Microsoft.AspNetCore.Components.NavigationManager.Refresh%2A?displayProperty=nameWithType> with `forceLoad` set to `true`. This forces a full rerender of the page using static SSR.
+The `Shared` folder maintains the `AccountLayout` layout component. The component makes use of <xref:Microsoft.AspNetCore.Http.HttpContext> to determine if the component has adopted static SSR. For example, Identity components must render on the server with static SSR because they set Identity cookies. If the value of <xref:Microsoft.AspNetCore.Http.HttpContext> is `null`, the component is rendering interactively, and a full-page reload is performed by calling <xref:Microsoft.AspNetCore.Components.NavigationManager.Refresh%2A?displayProperty=nameWithType> with `forceLoad` set to `true`. This forces a full rerender of the page using static SSR.
 
 `Components/Account/Shared/AccountLayout.razor`:
 
@@ -705,7 +713,7 @@ else
 ```
 
 > [!NOTE]
-> In the Blazor Web App project template, there's a second layout file (`ManageLayout.razor` in the `Components/Account/Shared` folder) for Identity components in the `Components/Account/Pages/Manage` folder. The `Manage` folder has its own `_Imports.razor` file to apply to the `ManageLayout` to components in the folder. In your own apps, using nested `_Imports.razor` files is a useful approach for applying custom layouts to groups of pages.
+> In the Blazor Web App project template for authentication scenarios, there's a second layout file (`ManageLayout.razor` in the `Components/Account/Shared` folder) for Identity components in the `Components/Account/Pages/Manage` folder. The `Manage` folder has its own imports file to apply to the `ManageLayout` to components in the folder. In your own apps, using nested imports files is a useful approach for applying custom layouts to groups of pages.
 
 In the `App` component, any request for a component in the `Account` folder applies a `null` render mode, which enforces static SSR. Other component requests receive a global application of the interactive SSR render mode (`InteractiveServer`).
 
@@ -726,7 +734,7 @@ In the `App` component, any request for a component in the `Account` folder appl
     private HttpContext HttpContext { get; set; } = default!;
 
     private IComponentRenderMode? RenderModeForPage => 
-        HttpContext.Request.Path.StartsWithSegments("/Account")
+        HttpContext.Request.Path.StartsWithSegments("/account")
             ? null
             : {INTERACTIVE RENDER MODE};
 }
@@ -734,9 +742,11 @@ In the `App` component, any request for a component in the `Account` folder appl
 
 In the preceding code, change the `{INTERACTIVE RENDER MODE}` placeholder to the appropriate value, depending on if the rest of the application should adopt global <xref:Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveServer>, <xref:Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveWebAssembly>, or <xref:Microsoft.AspNetCore.Components.Web.RenderMode.InteractiveAuto> rendering.
 
-The components that must adopt static SSR in the `Account` folder aren't required to set the layout, which is applied via the `_Imports.razor` file. The components don't set a render mode because they should render with static SSR. Nothing further must be done for the components in the `Account` folder to enforce static SSR.
+The components that must adopt static SSR in the `Account` folder aren't required to set the layout, which is applied via the imports file (`_Imports.razor`). The components don't set a render mode because they should render with static SSR. Nothing further must be done for the components in the `Account` folder to enforce static SSR.
 
 ### Static SSR components spread out across the app
+
+*For an example of the approach in this section, see the [`BlazorWebAppSpreadOutStaticSsrComponents` sample app](https://github.com/dotnet/blazor-samples/tree/main/9.0/BlazorWebAppSpreadOutStaticSsrComponents). The technique described in this section is most appropriate for .NET 8 Blazor Web Apps, but the sample is implemented in .NET 9 using Blazor features that simplify demonstrating how the approach works.*
 
 In the [preceding subsection](#area-folder-of-static-ssr-components), the app controls the render mode of the components by setting the render mode globally in the `App` component. Alternatively, the `App` component can also adopt ***per-component*** render modes for setting the render mode, which permits components spread around the app to enforce adoption of static SSR. This subsection describes the approach.
 
@@ -814,92 +824,17 @@ In the preceding code, change the `{INTERACTIVE RENDER MODE}` placeholder to the
 
 :::moniker-end
 
-## Client-side services fail to resolve during prerendering
-
-Assuming that prerendering isn't disabled for a component or for the app, a component in the `.Client` project is prerendered on the server. Because the server doesn't have access to registered client-side Blazor services, it isn't possible to inject these services into a component without receiving an error that the service can't be found during prerendering.
-
-For example, consider the following `Home` component in the `.Client` project in a Blazor Web App with [global Interactive WebAssembly or Interactive Auto rendering](#apply-a-render-mode-to-the-entire-app). The component attempts to inject <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment> to obtain the environment's name.
-
-```razor
-@page "/"
-@inject IWebAssemblyHostEnvironment Environment
-
-<PageTitle>Home</PageTitle>
-
-<h1>Home</h1>
-
-<p>
-    Environment: @Environment.Environment
-</p>
-```
-
-No compile time error occurs, but a runtime error occurs during prerendering:
-
-> :::no-loc text="Cannot provide a value for property 'Environment' on type 'BlazorSample.Client.Pages.Home'. There is no registered service of type 'Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment'.":::
-
-This error occurs because the component must compile and execute on the server during prerendering, but <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment> isn't a registered service on the server.
-
-If the app doesn't require the value during prerendering, this problem can be solved by injecting <xref:System.IServiceProvider> to obtain the service instead of the service type itself:
-
-```razor
-@page "/"
-@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
-@inject IServiceProvider Services
-
-<PageTitle>Home</PageTitle>
-
-<h1>Home</h1>
-
-<p>
-    <b>Environment:</b> @environmentName
-</p>
-
-@code {
-    private string? environmentName;
-
-    protected override void OnInitialized()
-    {
-        if (Services.GetService<IWebAssemblyHostEnvironment>() is { } env)
-        {
-            environmentName = env.Environment;
-        }
-    }
-}
-```
-
-However, the preceding approach isn't useful if your logic requires a value during prerendering.
-
-You can also avoid the problem if you [disable prerendering](#prerendering) for the component, but that's an extreme measure to take in many cases that may not meet your component's specifications.
-
-There are a three approaches that you can take to address this scenario. The following are listed from most recommended to least recommended:
-
-* *Recommended* for shared framework services: For shared framework services that merely aren't registered server-side in the main project, register the services in the main project, which makes them available during prerendering. For an example of this scenario, see the guidance for <xref:System.Net.Http.HttpClient> services in <xref:blazor/call-web-api?pivots=webassembly#client-side-services-for-httpclient-fail-during-prerendering>.
-
-* *Recommended* for services outside of the shared framework: Create a custom service implementation for the service on the server. Use the service normally in interactive components of the `.Client` project. For a demonstration of this approach, see <xref:blazor/fundamentals/environments#read-the-environment-client-side-in-a-blazor-web-app>.
-
-* Create a service abstraction and create implementations for the service in the `.Client` and server projects. Register the services in each project. Inject the custom service in the component.
-
-* You might be able to add a `.Client` project package reference to a server-side package and fall back to using the server-side API when prerendering on the server.
-
-## Discover components from additional assemblies
-
-Additional assemblies must be disclosed to the Blazor framework to discover routable Razor components in referenced projects. For more information, see <xref:blazor/fundamentals/routing#route-to-components-from-multiple-assemblies>.
-
-## Closure of circuits when there are no remaining Interactive Server components
-
-[!INCLUDE[](~/blazor/includes/closure-of-circuits.md)]
-
 ## Custom shorthand render modes
 
 The `@rendermode` directive takes a single parameter that's a static instance of type <xref:Microsoft.AspNetCore.Components.IComponentRenderMode>. The `@rendermode` directive attribute can take any render mode instance, static or not. The Blazor framework provides the <xref:Microsoft.AspNetCore.Components.Web.RenderMode> static class with some predefined render modes for convenience, but you can create your own.
 
-Normally, a component uses the following `@rendermode` directive to [disable prerendering](#prerendering):
+Normally, a component uses the following `@rendermode` directive to [disable prerendering](xref:blazor/components/prerender#disable-prerendering):
 
 ```razor
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 ```
 
-However, consider the following example that creates a shorthand interactive server-side render mode without prerendering via the app's `_Imports` file (`Components/_Imports.razor`):
+However, consider the following example that creates a shorthand interactive server-side render mode without prerendering via the app's imports file (`Components/_Imports.razor`):
 
 ```csharp
 public static IComponentRenderMode InteractiveServerWithoutPrerendering { get; } = 
@@ -927,13 +862,7 @@ Alternatively, a single component instance can define a custom render mode via a
 
 At the moment, the shorthand render mode approach is probably only useful for reducing the verbosity of specifying the `prerender` flag. The shorthand approach might be more useful in the future if additional flags become available for interactive rendering and you would like to create shorthand render modes with different combinations of flags.
 
-## Service injection via a top-level imports file (`_Imports.razor`)
 
-*This section only applies to Blazor Web Apps.*
-
-A top-level imports file in the `Components` folder (`Components/_Imports.razor`) injects its references into all of the components in the folder hierarchy, which includes the `App` component (`App.razor`). The `App` component is always rendered statically even if [prerendering](#prerendering) of a page component is disabled. Therefore, injecting services via the top-level imports file results in resolving *two instances* of the service in page components.
-
-To address this scenario, inject the service in a new imports file placed in the `Pages` folder (`Components/Pages/_Imports.razor`). From that location, the service is only resolved once in page components.
 
 ## Additional resources
 
@@ -941,17 +870,19 @@ To address this scenario, inject the service in a new imports file placed in the
 
 * WebSocket compression
   * <xref:blazor/fundamentals/signalr#websocket-compression-for-interactive-server-components>
-  * <xref:blazor/security/server/interactive-server-side-rendering#interactive-server-components-with-websocket-compression-enabled>
+  * <xref:blazor/security/interactive-server-side-rendering#interactive-server-components-with-websocket-compression-enabled>
 * <xref:blazor/js-interop/ssr>
-* [Cascading values/parameters and render mode boundaries](xref:blazor/components/cascading-values-and-parameters#cascading-valuesparameters-and-render-mode-boundaries): Also see the [Root-level cascading parameters](xref:blazor/components/cascading-values-and-parameters#root-level-cascading-parameters) section earlier in the article.
+* [Cascading values/parameters and render mode boundaries](xref:blazor/components/cascading-values-and-parameters#cascading-valuesparameters-and-render-mode-boundaries): Also see the [Root-level cascading values](xref:blazor/components/cascading-values-and-parameters#root-level-cascading-values) and [Root-level cascading values with notifications](xref:blazor/components/cascading-values-and-parameters#root-level-cascading-values-with-notifications) sections earlier in the article.
 * <xref:blazor/components/class-libraries-with-static-ssr>
+* [Secure data in Blazor Web Apps with Interactive Auto rendering](xref:blazor/security/index#secure-data-in-blazor-web-apps-with-interactive-auto-rendering)
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-9.0"
 
 * <xref:blazor/js-interop/ssr>
-* [Cascading values/parameters and render mode boundaries](xref:blazor/components/cascading-values-and-parameters#cascading-valuesparameters-and-render-mode-boundaries): Also see the [Root-level cascading parameters](xref:blazor/components/cascading-values-and-parameters#root-level-cascading-parameters) section earlier in the article.
+* [Cascading values/parameters and render mode boundaries](xref:blazor/components/cascading-values-and-parameters#cascading-valuesparameters-and-render-mode-boundaries): Also see the [Root-level cascading values](xref:blazor/components/cascading-values-and-parameters#root-level-cascading-values) and [Root-level cascading values with notifications](xref:blazor/components/cascading-values-and-parameters#root-level-cascading-values-with-notifications) sections earlier in the article.
 * <xref:blazor/components/class-libraries-with-static-ssr>
+* [Secure data in Blazor Web Apps with Interactive Auto rendering](xref:blazor/security/index#secure-data-in-blazor-web-apps-with-interactive-auto-rendering)
 
 :::moniker-end

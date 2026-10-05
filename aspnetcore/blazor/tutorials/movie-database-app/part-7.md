@@ -3,19 +3,14 @@ title: Build a Blazor movie database app (Part 7 - Add a new field)
 author: guardrex
 description: This part of the Blazor movie database app tutorial explains how to add a new field to the movie class, CRUD pages, and database.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tutorials/movie-database-app/part-7
 zone_pivot_groups: tooling
 ---
 # Build a Blazor movie database app (Part 7 - Add a new field)
 
-<!-- UPDATE 9.0 Activate after release
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article is the seventh part of the Blazor movie database app tutorial that teaches you the basics of building an ASP.NET Core Blazor Web App with features to manage a movie database.
 
@@ -362,7 +357,7 @@ To delete all of the records in the database, use one of the following approache
 
 :::zone-end
 
-> [!CAUTION]
+> [!WARNING]
 > Use extreme caution when deleting records from a database. Deleting records is permanent without taking additional data loss mitigation steps. Production databases often provision automatic backup copies of data, either instantaneously as the database is modified or periodically, including with off-site copies and permanent physical storage of data.
 
 After deleting all of the records, run the app. The initializer reseeds the database and includes the correct movie ratings for the `Rating` field based on the seeding code.

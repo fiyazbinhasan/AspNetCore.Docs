@@ -1,11 +1,11 @@
 ---
 title: ASP.NET Core Blazor forms binding
+ai-usage: ai-assisted
 author: guardrex
 description: Learn how to use binding in Blazor forms.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 09/23/2026
 uid: blazor/forms/binding
 ---
 # ASP.NET Core Blazor forms binding
@@ -57,6 +57,8 @@ Assignment to <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Model?display
 > Most of this article's form model examples bind forms to C# *properties*, but C# field binding is also supported.
 
 :::moniker-end
+
+When a different object instance is assigned to the <xref:Microsoft.AspNetCore.Components.Forms.EditForm.Model> parameter of `EditForm`, the form creates a new `EditContext`. The new context starts with no modified fields or validation messages.
 
 ## Context binding
 
@@ -123,6 +125,8 @@ Binding supports:
 * Enums
 
 You can also use the [`[DataMember]`](xref:System.Runtime.Serialization.DataMemberAttribute) and [`[IgnoreDataMember]`](xref:System.Runtime.Serialization.IgnoreDataMemberAttribute) attributes to customize model binding. Use these attributes to rename properties, ignore properties, and mark properties as required.
+
+When binding a type with constructor parameters, if a constructor parameter matches a property by name, the constructor parameter takes precedence. The mapper uses the property's explicit `DataMember.Name`, if present, as the form field name, but otherwise ignores the property's mapping attributes. Constructor parameters are always required.
 
 ## Additional binding options
 
@@ -228,6 +232,8 @@ The following `NamedFormsWithScope` component uses the library's `HelloFormFromL
 ## Supply a parameter from the form (`[SupplyParameterFromForm]`)
 
 The `[SupplyParameterFromForm]` attribute indicates that the value of the associated property should be supplied from the form data for the form. Data in the request that matches the name of the property is bound to the property. Inputs based on `InputBase<TValue>` generate form value names that match the names Blazor uses for model binding. Unlike component parameter properties (`[Parameter]`), properties annotated with `[SupplyParameterFromForm]` aren't required to be marked `public`.
+
+Blazor form mapping with [`[SupplyParameterFromForm]`](xref:Microsoft.AspNetCore.Components.SupplyParameterFromFormAttribute) doesn't use MVC model binding. Attributes in the <xref:Microsoft.AspNetCore.Mvc.ModelBinding?displayProperty=fullName> namespace, such as [`[BindNever]`](xref:Microsoft.AspNetCore.Mvc.ModelBinding.BindNeverAttribute) and [`[BindRequired]`](xref:Microsoft.AspNetCore.Mvc.ModelBinding.BindRequiredAttribute), aren't supported. Don't use these attributes to prevent overposting. Instead, use a dedicated form model, view model, or data transfer object (DTO) that includes only the properties users are allowed to modify. For more information, see [Mitigate overposting attacks](xref:blazor/forms/index#mitigate-overposting-attacks).
 
 You can specify the following form binding parameters to the [`[SupplyParameterFromForm]` attribute](xref:Microsoft.AspNetCore.Components.SupplyParameterFromFormAttribute):
 
@@ -399,6 +405,71 @@ Developers aren't expected to interact with <xref:Microsoft.AspNetCore.Component
 
 :::moniker-end
 
+## `InputText` based on the input event
+
+Use the <xref:Microsoft.AspNetCore.Components.Forms.InputText> component to create a custom component that uses the `oninput` event ([`input`](https://developer.mozilla.org/docs/Web/API/HTMLElement/input_event)) instead of the `onchange` event ([`change`](https://developer.mozilla.org/docs/Web/API/HTMLElement/change_event)). Use of the `input` event triggers field validation on each keystroke.
+
+The following `CustomInputText` component inherits the framework's `InputText` component and sets event binding to the `oninput` event ([`input`](https://developer.mozilla.org/docs/Web/API/HTMLElement/input_event)).
+
+`CustomInputText.razor`:
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/CustomInputText.razor":::
+
+The `CustomInputText` component can be used anywhere <xref:Microsoft.AspNetCore.Components.Forms.InputText> is used. The following  component uses the shared `CustomInputText` component.
+
+`Starship11.razor`:
+
+:::moniker range=">= aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/Starship11.razor":::
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/Starship11.razor":::
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
+```razor
+@page "/starship-11"
+@using System.ComponentModel.DataAnnotations
+@inject ILogger<Starship11> Logger
+
+<EditForm Model="Model" OnValidSubmit="Submit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <CustomInputText @bind-Value="Model!.Id" />
+    <button type="submit">Submit</button>
+</EditForm>
+
+<div>
+    CurrentValue: @Model?.Id
+</div>
+
+@code {
+    public Starship? Model { get; set; }
+
+    protected override void OnInitialized() => Model ??= new();
+
+    private void Submit()
+    {
+        Logger.LogInformation("Submit called: Processing the form");
+    }
+
+    public class Starship
+    {
+        [Required]
+        [StringLength(10, ErrorMessage = "Id is too long.")]
+        public string? Id { get; set; }
+    }
+}
+```
+
+:::moniker-end
+
 ## Custom input components
 
 For custom input processing scenarios, the following subsections demonstrate custom input components:
@@ -463,6 +534,15 @@ To use the preceding component in the [starship example form (`Starship3.razor`/
 - </div>
 + <EngineeringApprovalInputDerived @bind-Value="Model!.IsValidatedDesign" />
 ```
+
+If the component that inherits from <xref:Microsoft.AspNetCore.Components.Forms.InputBase%601> is ever statically rendered, assign the <xref:Microsoft.AspNetCore.Components.Forms.InputBase%601.NameAttributeValue?displayProperty=nameWithType> property to the `name` attribute of `<input>` elements:
+
+```razor
+<input @bind="CurrentValue" @bind:after="AfterChange" class="@CssClass"
+    type="checkbox" name="@NameAttributeValue" />
+```
+
+The preceding assignment isn't necessary if the component is guaranteed to always render interactively.
 
 ### Input component with full developer control
 

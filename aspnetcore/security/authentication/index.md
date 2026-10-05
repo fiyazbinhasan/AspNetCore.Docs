@@ -1,10 +1,10 @@
 ---
 title: Overview of ASP.NET Core Authentication
+ai-usage: ai-assisted
 author: mjrousos
 description: Learn about authentication in ASP.NET Core.
-ms.author: riande
-ms.custom: mvc
-ms.date: 10/18/2022
+ms.author: tdykstra
+ms.date: 09/18/2026
 uid: security/authentication/index
 ---
 # Overview of ASP.NET Core authentication
@@ -17,6 +17,8 @@ Authentication is the process of determining a user's identity. [Authorization](
 
 * Authenticating a user.
 * Responding when an unauthenticated user tries to access a restricted resource.
+
+Configuring authentication doesn't automatically restrict access to endpoints. To [require authenticated users by default](xref:security/authorization/policies#require-global-user-authentication) in a server-side app, configure a fallback authorization policy.
 
 The registered authentication handlers and their configuration options are called "schemes".
 
@@ -37,7 +39,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 The `AddAuthentication` parameter <xref:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme?displayProperty=nameWithType> is the name of the scheme to use by default when a specific scheme isn't requested.
 
-If multiple schemes are used, authorization policies (or authorization attributes) can [specify the authentication scheme (or schemes)](xref:security/authorization/limitingidentitybyscheme) they depend on to authenticate the user. In the example above, the cookie authentication scheme could be used by specifying its name (<xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme?displayProperty=nameWithType> by default, though a different name could be provided when calling `AddCookie`).
+If multiple schemes are used, authorization policies (or authorization attributes) can [specify the authentication scheme (or schemes)](xref:security/authorization/authorize-with-a-specific-scheme) they depend on to authenticate the user. In the example above, the cookie authentication scheme could be used by specifying its name (<xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme?displayProperty=nameWithType> by default, though a different name could be provided when calling `AddCookie`).
 
 In some cases, the call to `AddAuthentication` is automatically made by other extension methods. For example, when using [ASP.NET Core Identity](xref:security/authentication/identity), `AddAuthentication` is called internally.
 
@@ -66,7 +68,7 @@ To disable automatically using the single authentication scheme as the `DefaultS
 
 ### Authentication scheme
 
-The [authentication scheme](xref:security/authorization/limitingidentitybyscheme) can select which authentication handler is responsible for generating the correct set of claims. For more information, see [Authorize with a specific scheme](xref:security/authorization/limitingidentitybyscheme).
+The [authentication scheme](xref:security/authorization/authorize-with-a-specific-scheme) can select which authentication handler is responsible for generating the correct set of claims. For more information, see [Authorize with a specific scheme](xref:security/authorization/authorize-with-a-specific-scheme).
 
 An authentication scheme is a name that corresponds to:
 
@@ -110,7 +112,7 @@ An authentication scheme's authenticate action is responsible for constructing t
 
 ### Challenge
 
-An authentication challenge is invoked by Authorization when an unauthenticated user requests an endpoint that requires authentication. An authentication challenge is issued, for example, when an anonymous user requests a restricted resource or follows a login link. Authorization invokes a challenge using the specified authentication scheme(s), or the default if none is specified. See <xref:Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.ChallengeAsync%2A>. Authentication challenge examples include:
+An authentication challenge is invoked by Authorization when an unauthenticated user requests an endpoint that requires authentication. An authentication challenge is issued, for example, when an anonymous user requests a restricted resource or follows a login link. Authorization invokes a challenge using the specified authentication schemes, or the default if none is specified. See <xref:Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.ChallengeAsync%2A>. Authentication challenge examples include:
 
 * A cookie authentication scheme redirecting the user to a login page.
 * A JWT bearer scheme returning a 401 result with a `www-authenticate: bearer` header.
@@ -132,12 +134,12 @@ A forbid action can let the user know:
 
 See the following links for differences between challenge and forbid:
 
-* [Challenge and forbid with an operational resource handler](xref:security/authorization/resourcebased#challenge-and-forbid-with-an-operational-resource-handler).
+* [Resource-based authorization](xref:security/authorization/resource-based).
 * [Differences between challenge and forbid](xref:security/authorization/secure-data#challenge).
 
 ## Authentication providers per tenant
 
-ASP.NET Core doesn't have a built-in solution for multi-tenant authentication. While it's possible for customers to write one using the built-in features, we recommend customers consider [Orchard Core](https://www.orchardcore.net/), [ABP Framework](https://abp.io/), or [Finbuckle.MultiTenant](https://www.finbuckle.com/multitenant)  for multi-tenant authentication.
+ASP.NET Core doesn't have a built-in solution for multi-tenant authentication. While it's possible for customers to write one using the built-in features, we recommend customers consider [Orchard Core](https://www.orchardcore.net/), [ABP Framework](https://abp.io/), or [Finbuckle.MultiTenant](https://www.finbuckle.com/multitenant) for multi-tenant authentication.
 
 Orchard Core is:
 
@@ -156,13 +158,12 @@ Finbuckle.MultiTenant:
 * Provides data isolation
 * Configure app behavior uniquely for each tenant
 
-
 ## Additional resources
 
-* <xref:security/authorization/limitingidentitybyscheme>
+* <xref:security/authorization/authorize-with-a-specific-scheme>
 * <xref:security/authentication/policyschemes>
 * <xref:security/authorization/secure-data>
-* [Globally require authenticated users](xref:security/authorization/secure-data#rau)
+* [Globally require authenticated users](xref:security/authorization/policies#require-global-user-authentication)
 * [GitHub issue on using multiple authentication schemes](https://github.com/dotnet/aspnetcore/issues/26002)
 
 :::moniker-end
@@ -175,6 +176,8 @@ Authentication is the process of determining a user's identity. [Authorization](
 
 * Authenticating a user.
 * Responding when an unauthenticated user tries to access a restricted resource.
+
+Configuring authentication doesn't automatically restrict access to endpoints. To [require authenticated users by default](xref:security/authorization/policies#require-global-user-authentication) in a server-side app, configure a fallback authorization policy.
 
 The registered authentication handlers and their configuration options are called "schemes".
 
@@ -195,7 +198,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 The `AddAuthentication` parameter <xref:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme?displayProperty=nameWithType> is the name of the scheme to use by default when a specific scheme isn't requested.
 
-If multiple schemes are used, authorization policies (or authorization attributes) can [specify the authentication scheme (or schemes)](xref:security/authorization/limitingidentitybyscheme) they depend on to authenticate the user. In the example above, the cookie authentication scheme could be used by specifying its name (<xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme?displayProperty=nameWithType> by default, though a different name could be provided when calling `AddCookie`).
+If multiple schemes are used, authorization policies (or authorization attributes) can [specify the authentication scheme (or schemes)](xref:security/authorization/authorize-with-a-specific-scheme) they depend on to authenticate the user. In the example above, the cookie authentication scheme could be used by specifying its name (<xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme?displayProperty=nameWithType> by default, though a different name could be provided when calling `AddCookie`).
 
 In some cases, the call to `AddAuthentication` is automatically made by other extension methods. For example, when using [ASP.NET Core Identity](xref:security/authentication/identity), `AddAuthentication` is called internally.
 
@@ -215,7 +218,7 @@ There's no automatic probing of schemes. If the default scheme isn't specified, 
 
 ### Authentication scheme
 
-The [authentication scheme](xref:security/authorization/limitingidentitybyscheme) can select which authentication handler is responsible for generating the correct set of claims. For more information, see [Authorize with a specific scheme](xref:security/authorization/limitingidentitybyscheme).
+The [authentication scheme](xref:security/authorization/authorize-with-a-specific-scheme) can select which authentication handler is responsible for generating the correct set of claims. For more information, see [Authorize with a specific scheme](xref:security/authorization/authorize-with-a-specific-scheme).
 
 An authentication scheme is a name that corresponds to:
 
@@ -259,7 +262,7 @@ An authentication scheme's authenticate action is responsible for constructing t
 
 ### Challenge
 
-An authentication challenge is invoked by Authorization when an unauthenticated user requests an endpoint that requires authentication. An authentication challenge is issued, for example, when an anonymous user requests a restricted resource or follows a login link. Authorization invokes a challenge using the specified authentication scheme(s), or the default if none is specified. See <xref:Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.ChallengeAsync%2A>. Authentication challenge examples include:
+An authentication challenge is invoked by Authorization when an unauthenticated user requests an endpoint that requires authentication. An authentication challenge is issued, for example, when an anonymous user requests a restricted resource or follows a login link. Authorization invokes a challenge using the specified authentication schemes, or the default if none is specified. See <xref:Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.ChallengeAsync%2A>. Authentication challenge examples include:
 
 * A cookie authentication scheme redirecting the user to a login page.
 * A JWT bearer scheme returning a 401 result with a `www-authenticate: bearer` header.
@@ -281,12 +284,12 @@ A forbid action can let the user know:
 
 See the following links for differences between challenge and forbid:
 
-* [Challenge and forbid with an operational resource handler](xref:security/authorization/resourcebased#challenge-and-forbid-with-an-operational-resource-handler).
+* [Challenge and forbid with an operational resource handler](xref:razor-pages/security/authorization/resource-based#challenge-and-forbid-with-an-operational-resource-handler).
 * [Differences between challenge and forbid](xref:security/authorization/secure-data#challenge).
 
 ## Authentication providers per tenant
 
-ASP.NET Core doesn't have a built-in solution for multi-tenant authentication. While it's possible for customers to write one using the built-in features, we recommend customers to consider [Orchard Core](https://www.orchardcore.net/) or [ABP Framework](https://abp.io/) for multi-tenant authentication.
+ASP.NET Core doesn't have a built-in solution for multi-tenant authentication. While it's possible for customers to write one using the built-in features, we recommend customers consider [Orchard Core](https://www.orchardcore.net/) or [ABP Framework](https://abp.io/) for multi-tenant authentication.
 
 Orchard Core is:
 
@@ -299,10 +302,10 @@ See the [Orchard Core](https://github.com/OrchardCMS/OrchardCore) source for an 
 
 ## Additional resources
 
-* <xref:security/authorization/limitingidentitybyscheme>
+* <xref:security/authorization/authorize-with-a-specific-scheme>
 * <xref:security/authentication/policyschemes>
 * <xref:security/authorization/secure-data>
-* [Globally require authenticated users](xref:security/authorization/secure-data#rau)
+* [Globally require authenticated users](xref:security/authorization/policies#require-global-user-authentication)
 * [GitHub issue on using multiple authentication schemes](https://github.com/dotnet/aspnetcore/issues/26002)
 
 :::moniker-end
@@ -315,6 +318,8 @@ Authentication is the process of determining a user's identity. [Authorization](
 
 * Authenticating a user.
 * Responding when an unauthenticated user tries to access a restricted resource.
+
+Configuring authentication doesn't automatically restrict access to endpoints. To [require authenticated users by default](xref:security/authorization/policies#require-global-user-authentication) in a server-side app, configure a fallback authorization policy.
 
 The registered authentication handlers and their configuration options are called "schemes".
 
@@ -335,7 +340,7 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 The `AddAuthentication` parameter <xref:Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme?displayProperty=nameWithType> is the name of the scheme to use by default when a specific scheme isn't requested.
 
-If multiple schemes are used, authorization policies (or authorization attributes) can [specify the authentication scheme (or schemes)](xref:security/authorization/limitingidentitybyscheme) they depend on to authenticate the user. In the example above, the cookie authentication scheme could be used by specifying its name (<xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme?displayProperty=nameWithType> by default, though a different name could be provided when calling `AddCookie`).
+If multiple schemes are used, authorization policies (or authorization attributes) can [specify the authentication scheme (or schemes)](xref:security/authorization/authorize-with-a-specific-scheme) they depend on to authenticate the user. In the example above, the cookie authentication scheme could be used by specifying its name (<xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme?displayProperty=nameWithType> by default, though a different name could be provided when calling `AddCookie`).
 
 In some cases, the call to `AddAuthentication` is automatically made by other extension methods. For example, when using [ASP.NET Core Identity](xref:security/authentication/identity), `AddAuthentication` is called internally.
 
@@ -358,7 +363,7 @@ There's no automatic probing of schemes. If the default scheme isn't specified, 
 
 ### Authentication scheme
 
-The [authentication scheme](xref:security/authorization/limitingidentitybyscheme) can select which authentication handler is responsible for generating the correct set of claims. For more information, see [Authorize with a specific scheme](xref:security/authorization/limitingidentitybyscheme).
+The [authentication scheme](xref:security/authorization/authorize-with-a-specific-scheme) can select which authentication handler is responsible for generating the correct set of claims. For more information, see [Authorize with a specific scheme](xref:security/authorization/authorize-with-a-specific-scheme).
 
 An authentication scheme is a name that corresponds to:
 
@@ -402,7 +407,7 @@ An authentication scheme's authenticate action is responsible for constructing t
 
 ### Challenge
 
-An authentication challenge is invoked by Authorization when an unauthenticated user requests an endpoint that requires authentication. An authentication challenge is issued, for example, when an anonymous user requests a restricted resource or follows a login link. Authorization invokes a challenge using the specified authentication scheme(s), or the default if none is specified. See <xref:Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.ChallengeAsync%2A>. Authentication challenge examples include:
+An authentication challenge is invoked by Authorization when an unauthenticated user requests an endpoint that requires authentication. An authentication challenge is issued, for example, when an anonymous user requests a restricted resource or follows a login link. Authorization invokes a challenge using the specified authentication schemes, or the default if none is specified. See <xref:Microsoft.AspNetCore.Authentication.AuthenticationHttpContextExtensions.ChallengeAsync%2A>. Authentication challenge examples include:
 
 * A cookie authentication scheme redirecting the user to a login page.
 * A JWT bearer scheme returning a 401 result with a `www-authenticate: bearer` header.
@@ -424,28 +429,23 @@ A forbid action can let the user know:
 
 See the following links for differences between challenge and forbid:
 
-* [Challenge and forbid with an operational resource handler](xref:security/authorization/resourcebased#challenge-and-forbid-with-an-operational-resource-handler).
+* [Resource-based authorization](xref:security/authorization/resource-based).
 * [Differences between challenge and forbid](xref:security/authorization/secure-data#challenge).
 
 ## Authentication providers per tenant
 
-ASP.NET Core framework doesn't have a built-in solution for multi-tenant authentication.
-While it's possible for customers to write an app with multi-tenant authentication, we recommend using one of the following asp.net core application frameworks that support multi-tenant authentication:
+ASP.NET Core framework doesn't have a built-in solution for multi-tenant authentication. While it's possible for customers to write an app with multi-tenant authentication, we recommend using one of the following ASP.NET Core application frameworks that support multi-tenant authentication.
 
-### Orchard Core
+[Orchard Core](https://www.orchardcore.net/) is an open-source, modular, and multi-tenant app framework built with ASP.NET Core that also provides a content management system (CMS). See the [Orchard Core](https://github.com/OrchardCMS/OrchardCore) source for an example of authentication providers per tenant.
 
-[Orchard Core](https://orchardcore.net/). See the [Orchard Core](https://github.com/OrchardCMS/OrchardCore) source for an example of authentication providers per tenant.
-
-### ABP Framework
-
-[ABP Framework](https://abp.io/) supports various architectural patterns including modularity, microservices, domain driven design, and multi-tenancy. See [ABP Framework source on GitHub](https://github.com/abpframework/abp).
+[ABP Framework](https://abp.io/) supports various architectural patterns including modularity, microservices, domain-driven design, and multi-tenancy. See [ABP Framework source on GitHub](https://github.com/abpframework/abp).
 
 ## Additional resources
 
-* <xref:security/authorization/limitingidentitybyscheme>
+* <xref:security/authorization/authorize-with-a-specific-scheme>
 * <xref:security/authentication/policyschemes>
 * <xref:security/authorization/secure-data>
-* [Globally require authenticated users](xref:security/authorization/secure-data#rau)
+* [Globally require authenticated users](xref:security/authorization/policies#require-global-user-authentication)
 * [GitHub issue on using multiple authentication schemes](https://github.com/dotnet/aspnetcore/issues/26002)
 
 :::moniker-end

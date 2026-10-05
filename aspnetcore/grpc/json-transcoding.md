@@ -6,7 +6,6 @@ monikerRange: '>= aspnetcore-7.0'
 ms.author: wpickett
 ms.date: 05/10/2023
 uid: grpc/json-transcoding
-ms.custom: engagement-fy23
 ---
 # gRPC JSON transcoding in ASP.NET Core
 
@@ -170,7 +169,6 @@ For installation and usage of grpc-gateway, see the [grpc-gateway README](https:
 ## Additional resources
 
 * <xref:grpc/json-transcoding-binding>
-* <xref:grpc/json-transcoding-openapi>
 * <xref:grpc/browser>
 * <xref:grpc/grpcweb>
 

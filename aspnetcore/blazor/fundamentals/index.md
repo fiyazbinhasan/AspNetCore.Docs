@@ -1,11 +1,11 @@
 ---
 title: ASP.NET Core Blazor fundamentals
+ai-usage: ai-assisted
 author: guardrex
 description: Learn foundational concepts of the Blazor application framework.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 09/04/2026
 uid: blazor/fundamentals/index
 ---
 # ASP.NET Core Blazor fundamentals
@@ -22,10 +22,10 @@ Razor components are either *statically* rendered or *interactively* rendered.
 
 *Static* or *static rendering* is a server-side scenario that means the component is rendered without the capacity for interplay between the user and .NET/C# code. JavaScript and HTML DOM events remain unaffected, but no user events on the client can be processed with .NET running on the server.
 
-*Interactive* or *interactive rendering* means that the component has the capacity to process .NET events via C# code. The .NET events are either processed on the server by the ASP.NET Core runtime or in the browser on the client by the WebAssembly-based Blazor runtime.
+*Interactive*/*interactivity* or *interactive rendering* means that the component has the capacity to process .NET events and binding via C# code. The .NET events and binding are either processed on the server by the ASP.NET Core runtime or in the browser on the client by the WebAssembly-based Blazor runtime.
 
 > [!IMPORTANT]
-> When using a Blazor Web App, most of the Blazor documentation example components ***require*** interactivity to function and demonstrate the concepts covered by the articles. When you test an example component provided by an article, make sure that either the app adopts global interactivity or the component adopts an interactive render mode.
+> When using a Blazor Web App, most of the Blazor documentation example components ***require*** interactivity to function and demonstrate the concepts covered by the articles. When you test an example component provided by an article in a Blazor Web App, make sure that either the app adopts global interactivity or the component adopts an interactive render mode. More information on this subject is provided by <xref:blazor/components/render-modes> in the *Components* section, which appears later in the Blazor documentation set.
 
 More information on these concepts and how to control static and interactive rendering is found in the <xref:blazor/components/render-modes> article later in the Blazor documentation.
 
@@ -69,6 +69,7 @@ Blazor documentation adopts several conventions for showing and discussing compo
 * [Component parameter](xref:blazor/components/index#component-parameters) values lead with a [Razor reserved `@` symbol](xref:mvc/views/razor#razor-syntax), but it isn't required. Literals (for example, boolean values), keywords (for example, `this`), and `null` as component parameter values aren't prefixed with `@`, but this is also merely a documentation convention. Your own code can prefix literals with `@` if you wish.
 * C# classes use the [`this` keyword](/dotnet/csharp/language-reference/keywords/this) and avoid prefixing fields with an underscore (`_`) that are assigned to in constructors, which differs from the [ASP.NET Core framework engineering guidelines](https://github.com/dotnet/aspnetcore/wiki/Engineering-guidelines).
 * In examples that use [primary constructors (C# 12 or later)](/dotnet/csharp/whats-new/tutorials/primary-constructors), primary constructor parameters are typically used directly by class members.
+In article examples, code lines are split to reduce horizontal scrolling. These breaks don't affect execution but can be removed when pasting into your project.
 
 Additional information on Razor component syntax is provided in the *Razor syntax* section of <xref:blazor/components/index#razor-syntax>.
 
@@ -131,7 +132,7 @@ Articles in the *Fundamentals* node make reference to the concept of *render mod
 
 For the early references in this node of articles to render mode concepts, merely note the following at this time:
 
-Every component in a Blazor Web App adopts a *render mode* to determine the hosting model that it uses, where it's rendered, and whether or not it's rendered statically on the server, rendered with for user interactivity on the server, or rendered for user interactivity on the client (usually with prerendering on the server).
+Every component in a Blazor Web App adopts a *render mode* to determine the hosting model that it uses, where it's rendered, and whether or not it's rendered statically on the server, rendered for user interactivity on the server, or rendered for user interactivity on the client (usually with prerendering on the server).
 
 Blazor Server and Blazor WebAssembly apps for ASP.NET Core releases prior to .NET 8 remain fixated on *hosting model* concepts, not render modes. Render modes are conceptually applied to Blazor Web Apps in .NET 8 or later.
 
@@ -150,18 +151,9 @@ The preceding information on render modes is all that you need to know to unders
 
 :::moniker-end
 
-## Document Object Model (DOM)
-
-References to the *Document Object Model* use the abbreviation *DOM*.
-
-For more information, see the following resources:
-
-* [Introduction to the DOM (MDN documentation)](https://developer.mozilla.org/docs/Web/API/Document_Object_Model/Introduction)
-* [Level 1 Document Object Model Specification (W3C)](https://www.w3.org/TR/WD-DOM/)
-
 ## Subset of .NET APIs for Blazor WebAssembly apps
 
-A curated list of specific .NET APIs that are supported on the browser for Blazor WebAssembly isn't available. However, you can manually [search for a list of .NET APIs annotated with `[UnsupportedOSPlatform("browser")]`](https://source.dot.net/#System.Private.CoreLib/src/libraries/System.Private.CoreLib/src/System/Runtime/Versioning/PlatformAttributes.cs,34041602e232c616,references) to discover .NET APIs that aren't supported in WebAssembly.
+A curated list of specific .NET APIs that are supported on the browser for Blazor WebAssembly isn't available. However, you can manually <!--keep--> [search for a list of .NET APIs annotated with `[UnsupportedOSPlatform("browser")]`](https://source.dot.net/#System.Private.CoreLib/src/libraries/System.Private.CoreLib/src/System/Runtime/Versioning/PlatformAttributes.cs,34041602e232c616,references) to discover .NET APIs that aren't supported in WebAssembly.
 
 [!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
 
@@ -178,61 +170,61 @@ Documentation sample apps are available for inspection and download:
 
 Locate a sample app by first selecting the version folder that matches the version of .NET that you're working with.
 
+Sample apps only contain a subset of article examples for Blazor feature demonstrations. When a code example shown by an article isn't in one or more of the sample apps, you can usually place the example code into a local test app for a demonstration.
+
+:::moniker range=">= aspnetcore-9.0"
+
+Samples apps in the repository:
+
+* Blazor Web App
+* Blazor WebAssembly
+* Blazor Web App Movies tutorial sample (<xref:blazor/tutorials/movie-database-app/index>)
+* Blazor Web App with SignalR (<xref:blazor/tutorials/signalr-blazor>)
+* Two Blazor Web Apps and a Blazor WebAssembly app for calling web (server) APIs (<xref:blazor/call-web-api>)
+* Blazor Web App with OIDC (<xref:blazor/security/blazor-web-app-oidc>)
+* Blazor Web App with Entra (<xref:blazor/security/blazor-web-app-entra>)
+* Blazor WebAssembly scopes-enabled logging (<xref:blazor/fundamentals/logging#client-side-log-scopes>)
+* Blazor WebAssembly with ASP.NET Core Identity (<xref:blazor/security/webassembly/standalone-with-identity/index>)
+* .NET MAUI Blazor Hybrid app with a Blazor Web App and a shared UI provided by a Razor class library (RCL) (<xref:blazor/hybrid/tutorials/maui-blazor-web-app>)
+* Additional samples (see the [Blazor samples GitHub repository README file](https://github.com/dotnet/blazor-samples))
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+
+Samples apps in the repository:
+
+* Blazor Web App
+* Blazor WebAssembly
+* Blazor Web App Movies tutorial sample (<xref:blazor/tutorials/movie-database-app/index>)
+* Blazor Web App with SignalR (<xref:blazor/tutorials/signalr-blazor>)
+* Two Blazor Web Apps and a Blazor WebAssembly app for calling web (server) APIs (<xref:blazor/call-web-api>)
+* Blazor Web App with OIDC (BFF and non-BFF patterns) (<xref:blazor/security/blazor-web-app-oidc>)
+* Blazor WebAssembly scopes-enabled logging (<xref:blazor/fundamentals/logging#client-side-log-scopes>)
+* Blazor WebAssembly with ASP.NET Core Identity (<xref:blazor/security/webassembly/standalone-with-identity/index>)
+* .NET MAUI Blazor Hybrid app with a Blazor Web App and a shared UI provided by a Razor class library (RCL) (<xref:blazor/hybrid/tutorials/maui-blazor-web-app>)
+* Additional samples (see the [Blazor samples GitHub repository README file](https://github.com/dotnet/blazor-samples))
+
+:::moniker-end
+
 :::moniker range="< aspnetcore-8.0"
 
-The sample repo contains two types of samples:
+The sample repository contains two types of samples:
 
 * Snippet sample apps provide the code examples that appear in articles. These apps compile but aren't necessarily runnable apps. These apps are useful for merely obtaining example code that appears in articles.
 * Samples apps to accompany Blazor articles compile and run for the following scenarios:
-  * Blazor Server with EF Core
   * Blazor Server and Blazor WebAssembly with SignalR
   * Blazor WebAssembly scopes-enabled logging
 
 :::moniker-end
 
-For more information and a list of the samples in the repository, see the [Blazor samples GitHub repository README.md file](https://github.com/dotnet/blazor-samples).
+For more information, a list of the samples in the repository, and download instructions, see the [Blazor samples GitHub repository README file](https://github.com/dotnet/blazor-samples).
 
 The ASP.NET Core repository's Basic Test App is also a helpful set of samples for various Blazor scenarios:
 
 [`BasicTestApp` in ASP.NET Core reference source (`dotnet/aspnetcore`)](https://github.com/dotnet/aspnetcore/tree/main/src/Components/test/testassets/BasicTestApp)
 
 [!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
-
-To download the sample apps:
-
-* Download the [Blazor samples repository](https://github.com/dotnet/blazor-samples) ZIP file.
-* Unzip the file.
-
-## Byte multiples
-
-.NET byte sizes use metric prefixes for non-decimal multiples of bytes based on powers of 1024.
-
-| Name (abbreviation) | Size                    | Example                    |
-| ------------------- | ----------------------- | -------------------------- |
-| Kilobyte (KB)       | 1,024 bytes             | 1 KB = 1,024 bytes         |
-| Megabyte (MB)       | 1,024<sup>2</sup> bytes | 1 MB = 1,048,576 bytes     |
-| Gigabyte (GB)       | 1,024<sup>3</sup> bytes | 1 GB = 1,073,741,824 bytes |
-
-## Support requests
-
-Only documentation-related issues are appropriate for the `dotnet/AspNetCore.Docs` repository. ***For product support, don't open a documentation issue.*** Seek assistance through one or more of the following support channels:
-
-* [Stack Overflow (tagged: `blazor`)](https://stackoverflow.com/questions/tagged/blazor)
-* [General ASP.NET Core Slack Team](https://join.slack.com/t/aspnetcore/shared_invite/zt-1mv5487zb-EOZxJ1iqb0A0ajowEbxByQ)
-* [Blazor Gitter](https://gitter.im/aspnet/Blazor)
-
-For a potential bug in the framework or product feedback, open an issue for the ASP.NET Core product unit at [`dotnet/aspnetcore` issues](https://github.com/dotnet/aspnetcore/issues). Bug reports usually ***require*** the following:
-
-* **Clear explanation of the problem**: Follow the instructions in the GitHub issue template provided by the product unit when opening the issue.
-* **Minimal repro project**: Place a project on GitHub for the product unit engineers to download and run. Cross-link the project into the issue's opening comment.
-
-For a potential problem with a Blazor article, open a documentation issue. To open a documentation issue, use the **Open a documentation issue** feedback link at the bottom of the article. Metadata added to your issue provides tracking data and automatically pings the author of the article. If the subject was discussed with the product unit prior to opening the documentation issue, place a cross-link to the engineering issue in the documentation issue's opening comment.
-
-For problems or feedback on Visual Studio, use the [**Report a Problem**](/visualstudio/ide/how-to-report-a-problem-with-visual-studio) or [**Suggest a Feature**](/visualstudio/ide/suggest-a-feature) gestures from within Visual Studio, which open internal issues for Visual Studio. For more information, see [Visual Studio Feedback](https://developercommunity.visualstudio.com/home).
-
-For problems with Visual Studio Code, ask for support on community support forums. For bug reports and product feedback, open an issue on the [`microsoft/vscode` GitHub repo](https://github.com/microsoft/vscode/issues).
-
-GitHub issues for Blazor documentation are automatically marked for triage on the [`Blazor.Docs` project (`dotnet/AspNetCore.Docs` GitHub repository)](https://github.com/dotnet/AspNetCore.Docs/projects/35). Please wait a short while for a response, especially over weekends and holidays. Usually, documentation authors respond within 24 hours on weekdays.
 
 ## Community links to Blazor resources
 

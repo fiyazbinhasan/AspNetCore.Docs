@@ -1,21 +1,17 @@
 ---
 title: Build a Blazor movie database app (Part 3 - Learn about Razor components)
+ai-usage: ai-assisted
 author: guardrex
 description: This part of the Blazor movie database app tutorial explains the Razor components in the project that were scaffolded into the app. Improvements are made to the display of movie data.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 09/15/2026
 uid: blazor/tutorials/movie-database-app/part-3
 zone_pivot_groups: tooling
 ---
 # Build a Blazor movie database app (Part 3 - Learn about Razor components)
 
-<!-- UPDATE 9.0 Activate after release
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article is the third part of the Blazor movie database app tutorial that teaches you the basics of building an ASP.NET Core Blazor Web App with features to manage a movie database.
 
@@ -72,9 +68,73 @@ The `NavMenu` component (`Components/Layout/NavMenu.razor`) implements sidebar n
 
 A <xref:Microsoft.AspNetCore.Components.Routing.NavLink> component behaves like an `<a>` element, except it toggles an `active` CSS class based on whether its `href` matches the current URL. The `active` class helps a user understand which page is the active page among the navigation links displayed. <xref:Microsoft.AspNetCore.Components.Routing.NavLinkMatch.All?displayProperty=nameWithType> assigned to the <xref:Microsoft.AspNetCore.Components.Routing.NavLink.Match%2A> parameter configures the component to display an active CSS class when it matches the entire current URL.
 
-The <xref:Microsoft.AspNetCore.Components.Routing.NavLink> component built into the Blazor framework for any Blazor app to use, while the `NavMenu` component is only part of Blazor project templates.
+The <xref:Microsoft.AspNetCore.Components.Routing.NavLink> component is built into the Blazor framework for any Blazor app to use, while the `NavMenu` component is only part of Blazor project templates.
 
 `Components/Layout/NavMenu.razor`:
+
+:::moniker range=">= aspnetcore-11.0"
+
+```razor
+<script type="module" src="@Assets["Components/Layout/NavMenu.razor.js"]"></script>
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">BlazorWebAppMovies</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div id="nav-scrollable" class="nav-scrollable">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+    </nav>
+</div>
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-11.0"
+
+```razor
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">BlazorWebAppMovies</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+    </nav>
+</div>
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
 
 ```razor
 <div class="top-row ps-3 navbar navbar-dark">
@@ -102,6 +162,8 @@ The <xref:Microsoft.AspNetCore.Components.Routing.NavLink> component built into 
 </div>
 ```
 
+:::moniker-end
+
 Notice in the `NavMenu` component's first `<div>` element the brand link text (`<a>` element content). Change the brand from `BlazorWebAppMovies` to `Sci-fi Movies`:
 
 ```diff
@@ -120,6 +182,82 @@ To allow users to reach the movies `Index` page, add a navigation menu entry to 
 ```
 
 The final `NavMenu` component after making the preceding changes:
+
+:::moniker range=">= aspnetcore-11.0"
+
+```razor
+<script type="module" src="@Assets["Components/Layout/NavMenu.razor.js"]"></script>
+
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Sci-fi Movies</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div id="nav-scrollable" class="nav-scrollable">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="movies">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Movies
+            </NavLink>
+        </div>
+    </nav>
+</div>
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-11.0"
+
+```razor
+<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Sci-fi Movies</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="nav flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="weather">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="movies">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Movies
+            </NavLink>
+        </div>
+    </nav>
+</div>
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
 
 ```razor
 <div class="top-row ps-3 navbar navbar-dark">
@@ -153,6 +291,8 @@ The final `NavMenu` component after making the preceding changes:
 </div>
 ```
 
+:::moniker-end
+
 Run the app to see the updated brand at the top of the sidebar navigation and a link to reach the movies page (**Movies**):
 
 ![App running in a browser showing the brand at the top of the sidebar navigation as 'Sci-fi Movies' and a 'Movie' link in the sidebar](~/blazor/tutorials/movie-database-app/part-3/_static/updated-brand-and-added-link.png)
@@ -171,7 +311,7 @@ Stop the app by closing the browser's window and pressing <kbd>Shift</kbd>+<kbd>
 
 :::zone pivot="cli"
 
-Stop the app by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) in the command shell.
+Stop the app by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> in the command shell.
 
 :::zone-end
 
@@ -207,14 +347,15 @@ The `MainLayout` component adopts the following additional specifications:
 * The `<main>` element's content includes:
   * An **:::no-loc text="About":::** link that sends the user to the ASP.NET Core documentation landing page.
   * An `<article>` element with the <xref:Microsoft.AspNetCore.Components.LayoutComponentBase.Body%2A> (`@Body`) parameter, where components that use the layout are rendered.
+  * The error UI (`<div id="blazor-error-ui" ...>`), where a notice about an unhandled error is displayed.
 
-The default layout (`MainLayout` component) is specified in the `Routes` component (`Components/Pages/Routes.razor`):
+The default layout (`MainLayout` component) is specified in the `Routes` component (`Components/Routes.razor`):
 
 ```razor
 <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
 ```
 
-Individual components are free to set their own non-default layout, and a layout can be applied to whole folder of components via an `_Imports.razor` file in the same folder. These features are covered in detail in the Blazor documentation.
+Individual components are free to set their own non-default layout, and a layout can be applied to whole folder of components via an imports file (`_Imports.razor`) in the same folder. These features are covered in detail in the Blazor documentation.
 
 ## Create, Read, Update, Delete (CRUD) components
 
@@ -233,7 +374,7 @@ The `@page` directive's route template indicates the URL for the page is `/movie
 * `BlazorWebAppMovies.Models`
 * `BlazorWebAppMovies.Data`
 
-The database context factory (`IDbContextFactory<BlazorWebAppMoviesContext>`) is injected into the component with the `@inject` directive. The factory approach requires that a database context be disposed, so the component implements the <xref:System.IAsyncDisposable> interface with the `@implements` directive.
+The database context factory (`IDbContextFactory<T>`, where the type (`T`) is a `BlazorWebAppMoviesContext`) is injected into the component with the `@inject` directive. The factory approach requires that a database context be disposed, so the component implements the <xref:System.IAsyncDisposable> interface with the `@implements` directive.
 
 The page title is set via the Blazor framework's <xref:Microsoft.AspNetCore.Components.Web.PageTitle> component, and an H1 section heading is the first rendered element:
 
@@ -251,7 +392,7 @@ A link is rendered to navigate to the `Create` page at `/movies/create`:
 </p>
 ```
 
-The [`QuickGrid`](xref:Microsoft.AspNetCore.Components.QuickGrid) component displays movie entities. The item provider is a `DbSet<Movie>` obtained from the created database context (<xref:Microsoft.EntityFrameworkCore.IDbContextFactory%601.CreateDbContext%2A>) of the injected database context factory (`DbFactory`). For each movie entity, the component displays the movie's title, release date, genre, and price. A column also holds links to edit, see details, and delete each movie entity.
+The [`QuickGrid` component](xref:Microsoft.AspNetCore.Components.QuickGrid) displays movie entities. The item provider is a `DbSet<Movie>` obtained from the created database context (<xref:Microsoft.EntityFrameworkCore.IDbContextFactory%601.CreateDbContext%2A>) of the injected database context factory (`DbFactory`). For each movie entity, the component displays the movie's title, release date, genre, and price. A column also holds links to edit, see details, and delete each movie entity.
 
 ```razor
 <QuickGrid Class="table" Items="context.Movie">
@@ -289,7 +430,7 @@ Notice how the context (`Context`) parameter of the <xref:Microsoft.AspNetCore.C
 
 The at symbol (`@`) with parentheses (`@(...)`), which is called an *explicit Razor expression*, allows the `href` of each link to include the movie entity's `Id` property in the link query string as an *interpolated string* (`$...{...}...`). For a movie identifier (`Id`) of 7, the string value provided to the `href` to edit that movie is `movies/edit?id=7`. When the link is followed, the `id` field is read from the query string by the `Edit` component to load the movie.
 
-For the movie example from the last part of the tutorial series, *The Matrix*&copy;, the [`QuickGrid`](xref:Microsoft.AspNetCore.Components.QuickGrid) component renders the following HTML markup (some elements and attributes aren't present to simplify display). See how the explicit Razor expressions and interpolated strings produced the `href` values for the links to other pages. The movie's identifier in the database happens to be `3` for this example, so the `id` is `3` in the query strings for the `Edit`, `Details`, and `Delete` pages. You may see a different value when you run the app.
+For the movie example from the last part of the tutorial series, *The Matrix*&copy;, the [`QuickGrid` component](xref:Microsoft.AspNetCore.Components.QuickGrid) renders the following HTML markup (some elements and attributes aren't present to simplify display). See how the explicit Razor expressions and interpolated strings produced the `href` values for the links to other pages. The movie's identifier in the database happens to be `3` for this example, so the `id` is `3` in the query strings for the `Edit`, `Details`, and `Delete` pages. You may see a different value when you run the app.
 
 ```html
 <table>
@@ -320,8 +461,9 @@ For the movie example from the last part of the tutorial series, *The Matrix*&co
 
 The column names are taken from the `Movie` model properties, so the release date doesn't have a space between the words. Add a <xref:Microsoft.AspNetCore.Components.QuickGrid.ColumnBase%601.Title> to the <xref:Microsoft.AspNetCore.Components.QuickGrid.PropertyColumn%602> with a value that includes a space between the words:
 
-```razor
-<PropertyColumn Property="movie => movie.ReleaseDate" Title="Release Date" />
+```diff
+- <PropertyColumn Property="movie => movie.ReleaseDate" />
++ <PropertyColumn Property="movie => movie.ReleaseDate" Title="Release Date" />
 ```
 
 Run the app to see that the column displays two words for the release date.
@@ -340,7 +482,7 @@ Stop the app by closing the browser's window and pressing <kbd>Shift</kbd>+<kbd>
 
 :::zone pivot="cli"
 
-Stop the app by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) in the command shell.
+Stop the app by closing the browser's window and pressing <kbd>Ctrl</kbd>+<kbd>C</kbd> in the command shell.
 
 :::zone-end
 
@@ -401,6 +543,30 @@ Add a space to the content of the description term element (`<dt>`) for the movi
 
 Examine the C# of the component's `@code` block:
 
+:::moniker range=">= aspnetcore-10.0"
+
+```csharp
+private Movie? movie;
+
+[SupplyParameterFromQuery]
+private int Id { get; set; }
+
+protected override async Task OnInitializedAsync()
+{
+    using var context = DbFactory.CreateDbContext();
+    movie = await context.Movie.FirstOrDefaultAsync(m => m.Id == Id);
+
+    if (movie is null)
+    {
+        NavigationManager.NotFound();
+    }
+}
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
+
 ```csharp
 private Movie? movie;
 
@@ -419,17 +585,25 @@ protected override async Task OnInitializedAsync()
 }
 ```
 
+:::moniker-end
+
 The `movie` variable is a private field of type `Movie`, which is a null-reference type (`?`), meaning that `movie` might be set to `null`.
 
 The `Id` is a *component parameter* supplied from the component's query string due to the presence of the [`[SupplyParameterFromQuery]` attribute](xref:Microsoft.AspNetCore.Components.SupplyParameterFromQueryAttribute). If the identifier is missing, `Id` defaults to zero (`0`).
 
-`OnInitializedAsync` is the first component lifecycle method that we've seen. This method is executed when the component loads. <xref:Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync%2A> is called on the database set (`DbSet<Movie>`) to retrieve the movie entity with and `Id` equal to the `Id` parameter that was set by the query string. If `movie` is `null`, <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A?displayProperty=nameWithType> is used to navigate to a `notfound` endpoint.
+`OnInitializedAsync` is the first component lifecycle method that we've seen. This method is executed when the component loads. <xref:Microsoft.EntityFrameworkCore.EntityFrameworkQueryableExtensions.FirstOrDefaultAsync%2A> is called on the database set (`DbSet<Movie>`) to retrieve the movie entity with an `Id` equal to the `Id` parameter that was set by the query string. If `movie` is `null`, <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A?displayProperty=nameWithType> is used to navigate to a `notfound` endpoint.
 
-<!-- UPDATE 10.0 - See https://github.com/dotnet/aspnetcore/issues/45654 
-                   for .NET 10 work on handling a 404 with static SSR without \
-                   having to navigate to a non-existent endpoint. -->
+:::moniker range=">= aspnetcore-10.0"
 
-There isn't an actual `notfound` endpoint (Razor component) in the app. When adopting server-side rendering (SSR), Blazor doesn't have a mechanism to return a 404 (Not Found) status code. As a temporary workaround, a 404 is generated by navigating to a non-existent endpoint. This scaffolded code is for your further implementation of a suitable result when not finding an entity. For example, you could have the component direct the user to a page where they can file an inquiry with your support team, or you could remove the injected <xref:Microsoft.AspNetCore.Components.NavigationManager> and <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A?displayProperty=nameWithType> code and replace it with Razor markup and code that displays a message to the user that the entity wasn't found.
+When a movie isn't found, calling <xref:Microsoft.AspNetCore.Components.NavigationManager.NotFound%2A?displayProperty=nameWithType> renders the `NotFound` component, which produces a Not Found page in the browser with a 404 (Not Found) status code.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
+
+There isn't an actual `notfound` endpoint (Razor component) in the app. When adopting server-side rendering (SSR) in .NET 8 or .NET 9, the app doesn't have a mechanism to return a 404 (Not Found) status code. A 404 is generated by navigating to a non-existent endpoint. This scaffolded code is for your further implementation of a suitable result when not finding an entity in .NET 8/9. For example, you could have the component direct the user to a page where they can file an inquiry with your support team, or you could remove the injected <xref:Microsoft.AspNetCore.Components.NavigationManager> and <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A?displayProperty=nameWithType> code and replace it with Razor markup and code that displays a message to the user that the entity wasn't found. In .NET 10 or later, Blazor has a built-in Not Found feature. For more information, see the [.NET 10 version of this section](?view=aspnetcore-10.0&pivots=vs&preserve-view=true#details-component).
+
+:::moniker-end
 
 ### `Create` component
 
@@ -442,7 +616,7 @@ CSS classes aren't present in the following example to simplify the display:
 ```razor
 <EditForm method="post" Model="Movie" OnValidSubmit="AddMovie" FormName="create" Enhance>
     <DataAnnotationsValidator />
-    <ValidationSummary />
+    <ValidationSummary role="alert" />
     <div>
         <label for="title">Title:</label> 
         <InputText id="title" @bind-Value="Movie.Title" /> 
@@ -493,20 +667,41 @@ The `AddMovie` method:
 * <xref:Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync%2A> is called on the database context to save the movie.
 * <xref:Microsoft.AspNetCore.Components.NavigationManager> is used to return the user to the movies `Index` page.
 
-```csharp
-@code {
-    [SupplyParameterFromForm]
-    private Movie Movie { get; set; } = new();
+:::moniker range=">= aspnetcore-10.0"
 
-    private async Task AddMovie()
-    {
-        using var context = DbFactory.CreateDbContext();
-        context.Movie.Add(Movie);
-        await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/movies");
-    }
+```csharp
+[SupplyParameterFromForm]
+private Movie Movie { get; set; } = default!;
+
+protected override void OnInitialized() => Movie ??= new();
+
+private async Task AddMovie()
+{
+    using var context = DbFactory.CreateDbContext();
+    context.Movie.Add(Movie);
+    await context.SaveChangesAsync();
+    NavigationManager.NavigateTo("/movies");
 }
 ```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
+
+```csharp
+[SupplyParameterFromForm]
+private Movie Movie { get; set; } = new();
+
+private async Task AddMovie()
+{
+    using var context = DbFactory.CreateDbContext();
+    context.Movie.Add(Movie);
+    await context.SaveChangesAsync();
+    NavigationManager.NavigateTo("/movies");
+}
+```
+
+:::moniker-end
 
 > [!WARNING]
 > Although it isn't a concern for the app in this tutorial, binding form data to entity data models can be susceptible to overposting attacks. Additional information on this subject appears later in this article.
@@ -528,7 +723,7 @@ Examine the Razor markup for the submit button of the <xref:Microsoft.AspNetCore
 <button type="submit" disabled="@(movie is null)">Delete</button>
 ```
 
-The **:::no-loc text="Delete":::** button sets its [`disabled` HTML attribute (MDN documentation)](https://developer.mozilla.org/docs/Web/HTML/Attributes/disabled) based on the presence of the movie (not `null`) using an explicit Razor expression (`@(...)`).
+The **:::no-loc text="Delete":::** button sets its [`disabled` HTML attribute](https://developer.mozilla.org/docs/Web/HTML/Attributes/disabled) based on the presence of the movie (not `null`) using an explicit Razor expression (`@(...)`).
 
 In the C# code of the `@code` block, the `DeleteMovie` method removes the movie, saves the changes to the database, and navigates the user to the movies `Index` page. The exclamation point on the movie field (`movie!`) is the [null-forgiving operator (C# Language Reference)](/dotnet/csharp/language-reference/operators/null-forgiving), which suppresses nullable warnings for `movie`.
 
@@ -541,6 +736,12 @@ private async Task DeleteMovie()
     NavigationManager.NavigateTo("/movies");
 }
 ```
+
+:::moniker range=">= aspnetcore-10.0"
+
+When a movie isn't found, calling <xref:Microsoft.AspNetCore.Components.NavigationManager.NotFound%2A?displayProperty=nameWithType> renders the `NotFound` component, which produces a Not Found page in the browser with a 404 (Not Found) status code.
+
+:::moniker-end
 
 ### `Edit` component
 
@@ -562,6 +763,44 @@ The movie entity's identifier `Id` is stored in a hidden field of the form:
 ```
 
 Examine the C# code of the `@code` block:
+
+:::moniker range=">= aspnetcore-10.0"
+
+```csharp
+private async Task UpdateMovie()
+{
+    using var context = DbFactory.CreateDbContext();
+    context.Attach(Movie!).State = EntityState.Modified;
+
+    try
+    {
+        await context.SaveChangesAsync();
+    }
+    catch (DbUpdateConcurrencyException)
+    {
+        if (!MovieExists(Movie!.Id))
+        {
+            NavigationManager.NotFound();
+        }
+        else
+        {
+            throw;
+        }
+    }
+
+    NavigationManager.NavigateTo("/movies");
+}
+
+private bool MovieExists(int id)
+{
+    using var context = DbFactory.CreateDbContext();
+    return context.Movie.Any(e => e.Id == id);
+}
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
 
 ```csharp
 private async Task UpdateMovie()
@@ -595,9 +834,31 @@ private bool MovieExists(int id)
 }
 ```
 
+:::moniker-end
+
 The movie entity's <xref:Microsoft.EntityFrameworkCore.EntityState> is set to <xref:Microsoft.EntityFrameworkCore.EntityState.Modified>, which signifies that the entity is tracked by the context, exists in the database, and that some or all of its property values are modified.
 
+:::moniker range=">= aspnetcore-10.0"
+
+When a movie isn't found, calling <xref:Microsoft.AspNetCore.Components.NavigationManager.NotFound%2A?displayProperty=nameWithType> renders the `NotFound` component, which produces a Not Found page in the browser with a 404 (Not Found) status code.
+
+If there's a concurrency exception and the movie entity no longer exists at the time that changes are saved, the component redirects to the Not Found page, which results in returning a 404 (Not Found) status code. If the movie exists and a concurrency exception is thrown, for example when another user has already modified the entity, the exception is rethrown by the component with the [`throw` statement (C# Language Reference)](/dotnet/csharp/language-reference/statements/exception-handling-statements#the-throw-statement). Additional guidance on handling concurrency with EF Core in Blazor apps is provided by the Blazor documentation.
+
+<!-- UPDATE 11.0 - Remove the following NOTE after the scaffolder
+                   updates go public on 
+                   https://github.com/dotnet/Scaffolding/issues/3828.
+-->
+
+> [!NOTE]
+> Later, you're instructed to make a minor modification to the preceding code in the `Edit` component's `UpdateMovie` method, where a `return` statement is added after the call to <xref:Microsoft.AspNetCore.Components.NavigationManager.NotFound%2A>. Guidance on this change and information on why the change is required is provided in the *Concurrency exception handling* section of <xref:blazor/tutorials/movie-database-app/part-4>, which is the next article in this tutorial.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
+
 If there's a concurrency exception and the movie entity no longer exists at the time that changes are saved, the component redirects to the non-existent endpoint (`notfound`), which results in returning a 404 (Not Found) status code. You could change this code to notify the user that the movie no longer exists in the database or create a dedicated *Not Found* component and navigate the user to that endpoint. If the movie exists and a concurrency exception is thrown, for example when another user has already modified the entity, the exception is rethrown by the component with the [`throw` statement (C# Language Reference)](/dotnet/csharp/language-reference/statements/exception-handling-statements#the-throw-statement). Additional guidance on handling concurrency with EF Core in Blazor apps is provided by the Blazor documentation.
+
+:::moniker-end
 
 > [!WARNING]
 > Although it isn't a concern for the app in this tutorial, binding form data to entity data models can be susceptible to overposting attacks. Additional information on this subject appears in the next section.
@@ -616,7 +877,7 @@ To mitigate overposting, we recommend using a separate view model/data transfer 
 
 ## Additional resources
 
-* [`NavLink` component](xref:blazor/fundamentals/routing#navlink-component)
+* [`NavLink` component](xref:blazor/fundamentals/navigation#navlink-component)
 * <xref:blazor/components/layouts>
 * [Razor directives](xref:mvc/views/razor#directives) (Razor syntax article) / [Razor directives](xref:blazor/components/index#razor-syntax) (Blazor documentation)
 * <xref:blazor/components/quickgrid>

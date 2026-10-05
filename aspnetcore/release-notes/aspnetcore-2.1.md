@@ -1,9 +1,8 @@
 ---
 title: What's new in ASP.NET Core 2.1
-author: isaacrlevin
+author: wadepickett
 description: Learn about the new features in ASP.NET Core 2.1.
-ms.author: riande
-ms.custom: mvc
+ms.author: wpickett
 ms.date: 02/06/2023
 uid: aspnetcore-2.1
 ---
@@ -60,7 +59,7 @@ Run `dotnet dev-certs https --trust` to trust the certificate.
 
 Web apps typically need to listen on both HTTP and HTTPS, but then redirect all HTTP traffic to HTTPS. In 2.1, specialized HTTPS redirection middleware that intelligently redirects based on the presence of configuration or bound server ports has been introduced.
 
-Use of HTTPS can be further enforced using [HTTP Strict Transport Security Protocol (HSTS)](xref:security/enforcing-ssl#http-strict-transport-security-protocol-hsts). HSTS instructs browsers to always access the site via HTTPS. ASP.NET Core 2.1 adds HSTS middleware that supports options for max age, subdomains, and the HSTS preload list.
+Use of HTTPS can be further enforced using [HTTP Strict Transport Security (HSTS) protocol](xref:security/enforcing-ssl#http-strict-transport-security-hsts-protocol). HSTS instructs browsers to always access the site via HTTPS. ASP.NET Core 2.1 adds HSTS middleware that supports options for max age, subdomains, and the HSTS preload list.
 
 ### Configuration for production
 
@@ -166,8 +165,12 @@ For more information, see <xref:mvc/compatibility-version>.
 
 ## Migrate from 2.0 to 2.1
 
-See [Migrate from ASP.NET Core 2.0 to 2.1](xref:migration/20_21).
+See [Migrate from ASP.NET Core 2.0 to 2.1](xref:migration/20-to-21).
 
-## Additional information
+## Breaking changes
+
+Use the articles in [Breaking changes in .NET](/dotnet/core/compatibility/breaking-changes) to find breaking changes that might apply when upgrading an app to a newer version of .NET.
+
+## Additional resources
 
 For the complete list of changes, see the [ASP.NET Core 2.1 Release Notes](https://github.com/dotnet/aspnetcore/releases/tag/2.1.0).

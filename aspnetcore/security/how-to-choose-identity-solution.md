@@ -2,34 +2,29 @@
 title: Choose an identity management solution
 description: A guide to help choose the right identity management solution for a secure .NET web app.
 author: JeremyLikness
-ms.author: jeliknes
-ms.topic: how-to 
-ms.date: 07/25/2023
+ms.author: wpickett
+ms.reviewer: jeliknes
+ms.topic: how-to
+ms.date: 07/21/2026
 uid: security/how-to-choose-identity
 ---
-
 # Choose an identity management solution
 
 Most web apps support authentication to ensure that users are who they claim to be. A *user* might be a person or another app. Management of access ensures users are only able to see and modify the information they're authorized to see and modify. For example, an end user shouldn't have access to the administrative section of a website. Identity management solutions are built to handle the requirements of authentication and authorization-related tasks. To learn more about identity management, see [What is identity and access management?](/azure/active-directory/fundamentals/introduction-identity-access-management). Many [identity management solutions for .NET web apps](xref:security/identity-management-solutions) are available, each with different capabilities and requirements to use or install. This article provides guidance on how to choose the right solution.
 
 ## Basic identity management with ASP.NET Core Identity
 
-ASP.NET Core ships with a built-in authentication provider: [ASP.NET Core Identity](xref:security/authentication/identity). The provider includes the APIs, UI, and backend database configuration to support managing user identities, storing user credentials, and granting or revoking permissions. Other features it supports include:
+ASP.NET Core includes the built-in [ASP.NET Core Identity](xref:security/authentication/identity) authentication provider. The provider includes the APIs, UI, and backend database configuration to support managing user identities, storing user credentials, and granting or revoking permissions. Additional features include:
 
 * [External logins](xref:security/authentication/social/index)
-* [Two-factor authentication (2FA)](xref:security/authentication/2fa)
+* [Multi-factor authentication (MFA)](xref:security/authentication/mfa)
 * [Password management](xref:security/authentication/accconfirm)
 * Account lockout and reactivation
 * Authenticator apps
 
-For most scenarios, this may be the only provider needed.
+For most scenarios, this may be the only provider needed. In other scenarios, a server or service that manages authentication and identity may be beneficial.
 
-To learn more:
-
-* Read the [Introduction to Identity on ASP.NET Core](xref:security/authentication/identity)
-* Follow a tutorial to build your own secure .NET web app: [Secure a .NET web app with the ASP.NET Core Identity framework](/training/modules/secure-aspnet-core-identity/).
-
-In other scenarios, a server or service that manages authentication and identity may be beneficial.
+For more information, see <xref:security/authentication/identity>.
 
 ## Determine if an OIDC server is needed
 
@@ -66,7 +61,7 @@ Some solutions are free and open source, while others are commercially licensed.
 
 ## Disconnected scenarios
 
-Many solutions, such as [Microsoft Entra ID](/azure/active-directory/fundamentals/active-directory-whatis), are cloud-based and require an Internet connection to work. If your environment doesn't allow Internet connectivity, you won't be able to use the service. 
+Many solutions, such as [Microsoft Entra ID](/entra/fundamentals/what-is-entra), are cloud-based and require an Internet connection to work. If your environment doesn't allow Internet connectivity, you won't be able to use the service. 
 
 ASP.NET Core Identity works perfectly well in disconnected scenarios, such as:
 

@@ -4,8 +4,7 @@ author: tdykstra
 description: Learn about when to use a reverse proxy in front of Kestrel, the cross-platform web server for ASP.NET Core.
 monikerRange: '>= aspnetcore-5.0'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 04/01/2022
+ms.date: 02/06/2025
 uid: fundamentals/servers/kestrel/when-to-use-a-reverse-proxy
 ---
 
@@ -18,7 +17,7 @@ Kestrel can be used by itself or with a *reverse proxy server*. A reverse proxy 
 * [Internet Information Services (IIS)](https://www.iis.net/)
 * [Nginx](https://nginx.org)
 * [Apache](https://httpd.apache.org/)
-* [YARP: Yet Another Reverse Proxy](https://microsoft.github.io/reverse-proxy/)
+* [YARP: Yet Another Reverse Proxy](https://dotnet.github.io/yarp/)
 
 Kestrel used as an edge (Internet-facing) web server:
 
@@ -39,7 +38,7 @@ A reverse proxy:
 * Can limit the exposed public surface area of the apps that it hosts.
 * Provides an additional layer of configuration and defense-in-depth cybersecurity.
 * Might integrate better with existing infrastructure.
-* Simplifies load balancing and secure communication (HTTPS) configuration. Only the reverse proxy server requires the X.509 certificate for the public domain(s). That server can communicate with the app's servers on the internal network using plain HTTP or HTTPS with locally managed certificates. Internal HTTPS increases security but adds significant overhead.
+* Simplifies load balancing and secure communication (HTTPS) configuration. Only the reverse proxy server requires the X.509 certificate for the public domain. That server can communicate with the app's servers on the internal network using plain HTTP or HTTPS with locally managed certificates. Internal HTTPS increases security but adds significant overhead.
 
 > [!WARNING]
 > Hosting in a reverse proxy configuration requires [host filtering](xref:fundamentals/servers/kestrel/host-filtering).

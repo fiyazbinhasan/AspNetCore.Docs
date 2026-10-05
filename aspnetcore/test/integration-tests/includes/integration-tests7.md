@@ -1,8 +1,8 @@
 :::moniker range="> aspnetcore-5.0 <= aspnetcore-7.0"
 
-This article assumes a basic understanding of unit tests. If unfamiliar with test concepts, see the [Unit Testing in .NET Core and .NET Standard](/dotnet/core/testing/) article and its linked content.
+This article assumes a basic understanding of unit tests. If unfamiliar with test concepts, see the [Testing in .NET](/dotnet/core/testing/) article and its linked content.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs.Samples/tree/main/test/integration-tests/7.x/IntegrationTestsSample) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs.Samples/tree/main/test/integration-tests/7.x/IntegrationTestsSample) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 The sample app is a Razor Pages app and assumes a basic understanding of Razor Pages. If you're unfamiliar with Razor Pages, see the following articles:
 
@@ -35,7 +35,7 @@ Entity Framework Core is also used in the tests. See the [project file in GitHub
 
 ## SUT environment
 
-If the SUT's [environment](xref:fundamentals/environments) isn't set, the environment defaults to Development.
+If the SUT's [environment](xref:fundamentals/environments) isn't set, the environment defaults to `Development`.
 
 ## Basic tests with the default WebApplicationFactory
 
@@ -126,7 +126,9 @@ The `SendAsync` helper extension methods (`Helpers/HttpClientExtensions.cs`) and
 
 The [EF-Core in-memory database provider](/ef/core/testing/choosing-a-testing-strategy#in-memory-as-a-database-fake) can be used for limited and basic testing, however the ***[SQLite provider](/ef/core/testing/choosing-a-testing-strategy#sqlite-as-a-database-fake) is the recommended choice for in-memory testing***.
 
-See [Extend Startup with startup filters](xref:fundamentals/startup#IStartupFilter) which shows how to configure middleware using <xref:Microsoft.AspNetCore.Hosting.IStartupFilter>, which is useful when a test requires a custom service or middleware.
+When a test requires a custom middleware, you can use an <xref:Microsoft.AspNetCore.Hosting.IStartupFilter>. For more information, see <xref:fundamentals/startup#startup-filters>.
+
+When a test requires a custom service, see the [Inject mock services](#inject-mock-services) section.
 
 ## Customize the client with WithWebHostBuilder
 
@@ -149,7 +151,7 @@ Create the `WebApplicationFactoryClientOptions` class and pass it to the <xref:M
 
 [!code-csharp[](~/../AspNetCore.Docs.Samples/test/integration-tests/7.x/IntegrationTestsSample/tests/RazorPagesProject.Tests/IntegrationTests/IndexPageTests.cs?name=snippet1)]
 
-***NOTE:*** To avoid HTTPS redirection warnings in logs when using HTTPS Redirection Middleware, set `BaseAddress = new Uri("https://localhost")`
+***NOTE:*** To avoid HTTPS redirection warnings in logs when using HTTPS redirection middleware, set `BaseAddress = new Uri("https://localhost")`
 
 ## Inject mock services
 
@@ -212,7 +214,7 @@ Tests in the `AuthTests` class check that a secure endpoint:
 * Redirects an unauthenticated user to the app's sign in page.
 * Returns content for an authenticated user.
 
-In the SUT, the `/SecurePage` page uses an <xref:Microsoft.Extensions.DependencyInjection.PageConventionCollectionExtensions.AuthorizePage%2A> convention to apply an <xref:Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter> to the page. For more information, see [Razor Pages authorization conventions](xref:security/authorization/razor-pages-authorization#require-authorization-to-access-a-page).
+In the SUT, the `/SecurePage` page uses an <xref:Microsoft.Extensions.DependencyInjection.PageConventionCollectionExtensions.AuthorizePage%2A> convention to apply an <xref:Microsoft.AspNetCore.Mvc.Authorization.AuthorizeFilter> to the page. For more information, see [Razor Pages authorization conventions](xref:razor-pages/security/authorization/conventions#require-authorization-to-access-a-page).
 
 [!code-csharp[](~/../AspNetCore.Docs.Samples/test/integration-tests/7.x/IntegrationTestsSample/src/RazorPagesProject/Program.cs?name=snippet1)]
 
@@ -237,7 +239,7 @@ For more information on `WebApplicationFactoryClientOptions`, see the [Client op
 
 ### Basic tests for authentication middleware
 
-See [this GitHub repository](https://github.com/blowdart/idunno.Authentication/tree/dev/test/idunno.Authentication.Basic.Test) for basic tests of authentication middleware. It contains a [test server](https://github.com/blowdart/idunno.Authentication/blob/dev/test/idunno.Authentication.Basic.Test/BasicAuthenticationTests.cs#L331) that’s specific to the test scenario.
+See [this GitHub repository](https://github.com/blowdart/idunno.Authentication/tree/dev/test/idunno.Authentication.Basic.Test) for basic tests of authentication middleware. It contains a [test server](https://github.com/blowdart/idunno.Authentication/blob/dev/test/idunno.Authentication.Basic.Test/BasicAuthenticationTests.cs#L331) that's specific to the test scenario.
 
 ## Set the environment
 

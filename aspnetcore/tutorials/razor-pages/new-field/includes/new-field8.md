@@ -13,7 +13,7 @@ When using EF Code First to automatically create and track a database, Code Firs
 
 Automatic verification that the schema and model are in sync makes it easier to find inconsistent database code issues.
 
-## Adding a Rating Property to the Movie Model
+## Add a `Rating` property to the `Movie` model
 <!-- Update code in working project (which becomes clean finished sample) to compile and verify steps, then copy to snapshot sample folder. -->
 
 1. Open the `Models/Movie.cs` file and add a `Rating` property:
@@ -62,10 +62,6 @@ From the *View* menu, select *Terminal* and enter the following command:
 dotnet build
 ```
 
-### [Visual Studio for Mac](#tab/visual-studio-mac)
-
-Press <kbd>⌘</kbd>+<kbd>B</kbd>
-
 ---
 
 # [Visual Studio](#tab/visual-studio)
@@ -107,7 +103,7 @@ Another option is to delete the database and use migrations to re-create the dat
    Update-Database
    ```
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 ### Add a migration for rating
 Use the following commands to add a migration for the rating field:

@@ -1,11 +1,11 @@
 ---
 title: ASP.NET Core Blazor WebAssembly build tools and ahead-of-time (AOT) compilation
+ai-usage: ai-assisted
 author: guardrex
 description: Learn about the WebAssembly build tools and how to compile a Blazor WebAssembly app ahead of deployment with ahead-of-time (AOT) compilation.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 04/12/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tooling/webassembly
 ---
 # ASP.NET Core Blazor WebAssembly build tools and ahead-of-time (AOT) compilation
@@ -14,25 +14,40 @@ uid: blazor/tooling/webassembly
 
 This article describes the build tools for standalone Blazor WebAssembly apps and how to compile an app ahead of deployment with ahead-of-time (AOT) compilation.
 
-Although the article primarily focuses on standalone Blazor WebAssembly apps, the section on [heap size for some mobile device browsers](#heap-size-for-some-mobile-device-browsers) also applies to the client-side project (`.Client`) of a Blazor Web App.
-
 ## .NET WebAssembly build tools
 
-The .NET WebAssembly build tools are based on [Emscripten](https://emscripten.org/), a compiler toolchain for the web platform. To install the build tools, use ***either*** of the following approaches:
+The .NET WebAssembly build tools are based on [Emscripten](https://emscripten.org/), a compiler toolchain for the web platform.
 
-* For the **ASP.NET and web development** workload in the Visual Studio installer, select the **.NET WebAssembly build tools** option from the list of optional components.
-* Execute `dotnet workload install wasm-tools` in an administrative command shell.
+To install the build tools as a .NET workload, use ***either*** of the following approaches:
 
-> [!NOTE]
-> .NET WebAssembly build tools for .NET 6 projects
->
-> The `wasm-tools` workload installs the build tools for the latest release. However, the current version of the build tools are incompatible with existing projects built with .NET 6. Projects using the build tools that must support both .NET 6 and a later release must use multi-targeting.
->
-> Use the `wasm-tools-net6` workload for .NET 6 projects when developing apps with the .NET 7 SDK. To install the `wasm-tools-net6` workload, execute the following command from an administrative command shell:
->
-> ```dotnetcli
-> dotnet workload install wasm-tools-net6
-> ```
+* For the **ASP.NET and web development** workload in the Visual Studio installer, select the **.NET WebAssembly build tools** option from the list of optional components. The option ensures the following:
+  * The workload is installed for the latest .NET SDK.
+  * When a new version of Visual Studio is released and it contains a new .NET SDK, the option installs the workload for the new SDK.
+* Alternatively, execute the following command in an *administrative command shell* to install the latest workload to the latest .NET SDK available on the system:
+
+  ```dotnetcli
+  dotnet workload install wasm-tools
+  ```
+
+To target a prior .NET release with a given .NET SDK, install the `wasm-tools-net{MAJOR VERSION}` workload:
+
+* The `{MAJOR VERSION}` placeholder is replaced with the major version number of the .NET release you want to target (for example, `wasm-tools-net8` for .NET 8).
+* Workloads are installed per .NET SDK. Installing the `wasm-tools` workload for one SDK doesn't make it available to other SDKs on the system.
+* You must install the appropriate workload for each .NET SDK version you intend to use.
+
+The following list shows which workload to install for each .NET SDK, depending on the apps that you plan to target. Although multiple rows may contain the same workload name, the workloads always differ slightly for each particular .NET SDK.
+
+* Using the .NET 10 SDK
+  * Targeting .NET 10 requires `wasm-tools`.
+  * Targeting .NET 9 requires `wasm-tools-net9`.
+  * Targeting .NET 8 requires `wasm-tools-net8`.
+* Using the .NET 9 SDK
+  * Targeting .NET 9 requires `wasm-tools`.
+  * Targeting .NET 8 requires `wasm-tools-net8`.
+* Using the .NET 8 SDK: Targeting .NET 8 requires `wasm-tools`.
+
+The Emscripten compiler toolchain depends on [Python](https://www.python.org/), which is bundled by default with the .NET WebAssembly build tools workload on Windows and macOS.
+Python isn't bundled for Linux users, resulting in "unable to find python in $PATH" errors if Python isn't available. Linux users should install Python through their package manager or [download Python for Linux/Unix](https://www.python.org/downloads/source/) and manually install it on their system so that it is available in `$PATH`.
 
 ## Ahead-of-time (AOT) compilation
 
@@ -80,81 +95,14 @@ The size of an AOT-compiled Blazor WebAssembly app is generally larger than the 
 > [!NOTE]
 > For [Mono](https://github.com/mono/mono)/WebAssembly MSBuild properties and targets, see [`WasmApp.Common.targets` (`dotnet/runtime` GitHub repository)](https://github.com/dotnet/runtime/blob/main/src/mono/wasm/build/WasmApp.Common.targets). Official documentation for common MSBuild properties is planned per [Document blazor msbuild configuration options (`dotnet/docs` #27395)](https://github.com/dotnet/docs/issues/27395).
 
-:::moniker range=">= aspnetcore-8.0"
+## Performance
 
-## Trim .NET IL after ahead-of-time (AOT) compilation
+For performance guidance, see <xref:blazor/performance/webassembly-runtime-performance>:
 
-The `WasmStripILAfterAOT` MSBuild option enables removing the .NET Intermediate Language (IL) for compiled methods after performing AOT compilation to WebAssembly, which reduces the size of the `_framework` folder.
-
-In the app's project file:
-
-```xml
-<PropertyGroup>
-  <RunAOTCompilation>true</RunAOTCompilation>
-  <WasmStripILAfterAOT>true</WasmStripILAfterAOT>
-</PropertyGroup>
-```
-
-This setting trims away the IL code for most compiled methods, including methods from libraries and methods in the app. Not all compiled methods can be trimmed, as some are still required by the .NET interpreter at runtime.
-
-To report a problem with the trimming option, [open an issue on the `dotnet/runtime` GitHub repository](https://github.com/dotnet/runtime/issues).
-
-Disable the trimming property if it prevents your app from running normally:
-
-```xml
-<WasmStripILAfterAOT>false</WasmStripILAfterAOT>
-```
-
-:::moniker-end
-
-## Heap size for some mobile device browsers
-
-When building a Blazor app that runs on the client and targets mobile device browsers, especially Safari on iOS, decreasing the maximum memory for the app with the MSBuild property `EmccMaximumHeapSize` may be required. For more information, see <xref:blazor/host-and-deploy/webassembly#decrease-maximum-heap-size-for-some-mobile-device-browsers>.
-
-## Runtime relinking
-
-One of the largest parts of a Blazor WebAssembly app is the WebAssembly-based .NET runtime (`dotnet.wasm`) that the browser must download when the app is first accessed by a user's browser. Relinking the .NET WebAssembly runtime trims unused runtime code and thus improves download speed.
-
-Runtime relinking requires installation of the .NET WebAssembly build tools. For more information, see <xref:blazor/tooling#net-webassembly-build-tools>.
-
-With the .NET WebAssembly build tools installed, runtime relinking is performed automatically when an app is **published** in the `Release` configuration. The size reduction is particularly dramatic when disabling globalization. For more information, see <xref:blazor/globalization-localization#invariant-globalization>.
-
-> [!IMPORTANT]
-> Runtime relinking trims class instance JavaScript-invokable .NET methods unless they're protected. For more information, see <xref:blazor/js-interop/call-dotnet-from-javascript#avoid-trimming-javascript-invokable-net-methods>.
-
-## Single Instruction, Multiple Data (SIMD)
-
-:::moniker range=">= aspnetcore-8.0"
-
-Blazor uses [WebAssembly Single Instruction, Multiple Data (SIMD)](https://wikipedia.org/wiki/Single_instruction,_multiple_data) to improve the throughput of vectorized computations by performing an operation on multiple pieces of data in parallel using a single instruction.
-
-To disable SIMD, for example when targeting old browsers or browsers on mobile devices that don't support SIMD, set the `<WasmEnableSIMD>` property to `false` in the app's project file (`.csproj`):
-
-```xml
-<PropertyGroup>
-  <WasmEnableSIMD>false</WasmEnableSIMD>
-</PropertyGroup>
-```
-
-For more information, see [Configuring and hosting .NET WebAssembly applications: SIMD - Single instruction, multiple data](https://aka.ms/dotnet-wasm-features#simd---single-instruction-multiple-data) and note that the guidance isn't versioned and applies to the latest public release.
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-8.0"
-
-Blazor uses [WebAssembly Single Instruction, Multiple Data (SIMD)](https://wikipedia.org/wiki/Single_instruction,_multiple_data) to improve the throughput of vectorized computations by performing an operation on multiple pieces of data in parallel using a single instruction.
-
-To enable SIMD, add the `<WasmEnableSIMD>` property set to `true` in the app's project file (`.csproj`):
-
-```xml
-<PropertyGroup>
-  <WasmEnableSIMD>true</WasmEnableSIMD>
-</PropertyGroup>
-```
-
-For more information, see [Configuring and hosting .NET WebAssembly applications: SIMD - Single instruction, multiple data](https://aka.ms/dotnet-wasm-features#simd---single-instruction-multiple-data) and note that the guidance isn't versioned and applies to the latest public release.
-
-:::moniker-end
+* Heap size for some mobile device browsers
+* Runtime relinking
+* Single Instruction, Multiple Data (SIMD)
+* Trim .NET IL after ahead-of-time (AOT) compilation (.NET 8 or later)
 
 ## Exception handling
 
@@ -189,5 +137,6 @@ For more information, see the following resources:
 
 ## Additional resources
 
+* <xref:blazor/performance/webassembly-runtime-performance>
 * <xref:blazor/webassembly-native-dependencies>
-* [Webcil packaging format for .NET assemblies](xref:blazor/host-and-deploy/webassembly#webcil-packaging-format-for-net-assemblies)
+* [Webcil packaging format for .NET assemblies](xref:blazor/host-and-deploy/webassembly/index#webcil-packaging-format-for-net-assemblies)

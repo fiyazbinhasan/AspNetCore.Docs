@@ -3,19 +3,14 @@ title: Build a Blazor movie database app (Part 1 - Create a Blazor Web App)
 author: guardrex
 description: This part of the Blazor movie database app tutorial explains how to create a Blazor Web App that adopts static server-side rendering (static SSR), where content is only rendered on the server.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tutorials/movie-database-app/part-1
 zone_pivot_groups: tooling
 ---
 # Build a Blazor movie database app (Part 1 - Create a Blazor Web App)
 
-<!-- UPDATE 9.0 Activate after release
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article is the first part of the Blazor movie database app tutorial that teaches you the basics of building an ASP.NET Core Blazor Web App with features to manage a movie database.
 
@@ -63,35 +58,17 @@ In Visual Studio:
 
 * Confirm that the **Location** for the app is suitable. Set the **Place solution and project in the same directory** checkbox to match your preferred solution file location. Select the **Next** button.
 
-:::moniker range=">= aspnetcore-9.0"
-
 * In the **Additional information** dialog, use the following settings:
 
-  * **Framework**: Select **.NET 9.0 (Standard Term Support)**.
+  * **Framework**: Confirm that the [latest framework](https://dotnet.microsoft.com/download/dotnet) is selected. If Visual Studio's **Framework** dropdown list doesn't include the latest available .NET framework, [update Visual Studio](/visualstudio/install/update-visual-studio) and restart the tutorial.
   * **Authentication type**: **None**
   * **Configure for HTTPS**: Selected
   * **Interactive render mode**: **Server**
   * **Interactivity location**: **Per page/component**
   * **Include sample pages**: Selected
   * **Do not use top-level statements**: Not selected
+  * **Use the .dev.localhost TLD in the application URL**: Not selected
   * Select **Create**.
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-9.0"
-
-* In the **Additional information** dialog, use the following settings:
-
-  * **Framework**: Select **.NET 8.0 (Long Term Support)**.
-  * **Authentication type**: **None**
-  * **Configure for HTTPS**: Selected
-  * **Interactive render mode**: **Server**
-  * **Interactivity location**: **Per page/component**
-  * **Include sample pages**: Selected
-  * **Do not use top-level statements**: Not selected
-  * Select **Create**.
-
-:::moniker-end
 
 The Visual Studio instructions in parts of this tutorial series use EF Core commands to add database migrations and update the database. EF Core commands are issued using [Visual Studio Connected Services](/visualstudio/azure/overview-connected-services). More information is provided later in this tutorial series.
 
@@ -115,7 +92,7 @@ Create a new project:
 
 * In the **Command Palette**, name the project `BlazorWebAppMovies`, including matching the capitalization. Using this exact project name is important to ensure that the namespaces match for code that you copy from the tutorial into the app that you're building.
 
-* Select **Create project** from the **Command Palette**.
+* Select **Create project** to create the app.
 
 :::zone-end
 
@@ -185,6 +162,8 @@ The app is compiled and run. The app is launched at `http://localhost:{PORT}`, w
 
 Navigate the pages of the app to confirm that the app is working normally.
 
+[!INCLUDE[](~/includes/default-launch-profile-for-dotnet-cli.md)]
+
 :::zone-end
 
 ## Stop the app
@@ -219,7 +198,7 @@ Stop the app using the following approach:
 Stop the app using the following approach:
 
 1. Close the browser window.
-2. In the command shell, press <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS).
+2. In the command shell, press <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
 :::zone-end
 
@@ -253,10 +232,13 @@ The `Components/Layout` folder contains the following layout components and styl
 * `MainLayout.razor.css`: Stylesheet for the app's main layout.
 * `NavMenu` component (`NavMenu.razor`): Implements sidebar navigation. This component uses several `NavLink` components to render navigation links to other Razor components.
 * `NavMenu.razor.css`: Stylesheet for the app's navigation menu.
+* `ReconnectModal` component (`ReconnectModal.razor`): Reflects the server-side connection state in the UI.
+* `ReconnectModal.razor.css`: Stylesheet for the `ReconnectModal` component.
+* `ReconnectModal.razor.js`: JavaScript file for the `ReconnectModal` component.
 
 ### `Components/_Imports.razor` file
 
-The `_Imports` file (`_Imports.razor`) includes common *Razor directives* to include in the app's Razor components. Razor directives are reserved keywords prefixed with `@` that appear in Razor markup and change the way component markup or component elements are compiled or function.
+The imports file (`_Imports.razor`) includes common *Razor directives* to include in the app's Razor components. Razor directives are reserved keywords prefixed with `@` that appear in Razor markup and change the way component markup or component elements are compiled or function.
 
 ### `Components/App.razor` file
 
@@ -290,10 +272,11 @@ A <xref:Microsoft.AspNetCore.Builder.WebApplicationBuilder> creates the app with
 var builder = WebApplication.CreateBuilder(args);
 ```
 
-Razor component services are added to the app by calling <xref:Microsoft.Extensions.DependencyInjection.RazorComponentsServiceCollectionExtensions.AddRazorComponents%2A>, which enables Razor components to render and execute code on the server:
+Razor component services are added to the app by calling <xref:Microsoft.Extensions.DependencyInjection.RazorComponentsServiceCollectionExtensions.AddRazorComponents%2A>, which enables Razor components to render and execute code on the server, and <xref:Microsoft.Extensions.DependencyInjection.ServerRazorComponentsBuilderExtensions.AddInteractiveServerComponents%2A> adds services to support rendering Interactive Server components:
 
 ```csharp
-builder.Services.AddRazorComponents();
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 ```
 
 The <xref:Microsoft.AspNetCore.Builder.WebApplication> (held by the `app` variable in the following code) is built:
@@ -304,10 +287,10 @@ var app = builder.Build();
 
 Next, the HTTP request pipeline is configured.
 
-In the development environment:
+When the app isn't running in the `Development` environment:
 
-* Exception Handler Middleware (<xref:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler%2A>) processes errors and displays a developer exception page during development app runs.
-* [HTTP Strict Transport Security Protocol (HSTS) Middleware](xref:security/enforcing-ssl#http-strict-transport-security-protocol-hsts) (<xref:Microsoft.AspNetCore.Builder.HstsBuilderExtensions.UseHsts%2A>) processes [HSTS](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html).
+* Exception handler middleware (<xref:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler%2A>) processes errors and displays a custom error page.
+* [HTTP Strict Transport Security (HSTS) protocol middleware](xref:security/enforcing-ssl#http-strict-transport-security-hsts-protocol) (<xref:Microsoft.AspNetCore.Builder.HstsBuilderExtensions.UseHsts%2A>) processes [HSTS](https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html).
 
 ```csharp
 if (!app.Environment.IsDevelopment())
@@ -317,13 +300,24 @@ if (!app.Environment.IsDevelopment())
 }
 ```
 
-HTTPS Redirection Middleware (<xref:Microsoft.AspNetCore.Builder.HttpsPolicyBuilderExtensions.UseHttpsRedirection%2A>) enforces the HTTPS protocol by redirecting HTTP requests to HTTPS if an HTTPS port is available:
+:::moniker range=">= aspnetcore-10.0"
+
+By default, an ASP.NET Core app doesn't provide a status code page for HTTP error status codes, such as *404 - Not Found*. When the app sets an HTTP 400-599 error status code without a body, it returns the status code and an empty response body. However, an app generated from the Blazor Web App project template calls <xref:Microsoft.AspNetCore.Builder.StatusCodePagesExtensions.UseStatusCodePagesWithReExecute%2A> to add status code pages middleware to the request pipeline for pages that aren't found, which generates the response body by re-executing the request pipeline using the path to the Not Found error page (`/not-found`): 
+
+```csharp
+app.UseStatusCodePagesWithReExecute("/not-found", 
+    createScopeForStatusCodePages: true);
+```
+
+:::moniker-end
+
+HTTPS redirection middleware (<xref:Microsoft.AspNetCore.Builder.HttpsPolicyBuilderExtensions.UseHttpsRedirection%2A>) enforces the HTTPS protocol by redirecting HTTP requests to HTTPS if an HTTPS port is available:
 
 ```csharp
 app.UseHttpsRedirection();
 ```
 
-Antiforgery Middleware (<xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A>) enforces antiforgery protection for form processing:
+Antiforgery middleware (<xref:Microsoft.AspNetCore.Builder.AntiforgeryApplicationBuilderExtensions.UseAntiforgery%2A>) enforces antiforgery protection for form processing:
 
 ```csharp
 app.UseAntiforgery();
@@ -341,7 +335,7 @@ app.MapStaticAssets();
 
 :::moniker range="< aspnetcore-9.0"
 
-Static File Middleware (<xref:Microsoft.AspNetCore.Builder.StaticFileExtensions.UseStaticFiles%2A>) serves static files, such as images, scripts, and stylesheets from the `wwwroot` folder:
+Static file middleware (<xref:Microsoft.AspNetCore.Builder.StaticFileExtensions.UseStaticFiles%2A>) serves static files, such as images, scripts, and stylesheets from the `wwwroot` folder:
 
 ```csharp
 app.UseStaticFiles();
@@ -349,11 +343,15 @@ app.UseStaticFiles();
 
 :::moniker-end
 
-<xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointRouteBuilderExtensions.MapRazorComponents%2A> maps components defined in the root `App` component to the given .NET assembly and renders routable components:
+<xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointRouteBuilderExtensions.MapRazorComponents%2A> maps components defined in the root `App` component to the given .NET assembly and renders routable components, and <xref:Microsoft.AspNetCore.Builder.ServerRazorComponentsEndpointConventionBuilderExtensions.AddInteractiveServerRenderMode%2A> configures interactive server-side rendering (interactive SSR) support for the app:
 
 ```csharp
-app.MapRazorComponents<App>();
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 ```
+
+> [!NOTE]
+> The extension methods <xref:Microsoft.Extensions.DependencyInjection.ServerRazorComponentsBuilderExtensions.AddInteractiveServerComponents%2A> on <xref:Microsoft.Extensions.DependencyInjection.RazorComponentsServiceCollectionExtensions.AddRazorComponents%2A> and <xref:Microsoft.AspNetCore.Builder.ServerRazorComponentsEndpointConventionBuilderExtensions.AddInteractiveServerRenderMode%2A> on <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointRouteBuilderExtensions.MapRazorComponents%2A> make the app capable of adopting interactive SSR, which isn't relevant until the last part of the tutorial series on interactivity. Over the next several articles, the app's components only adopt static SSR.
 
 The app is run by calling <xref:Microsoft.AspNetCore.Builder.WebApplication.Run%2A> on the <xref:Microsoft.AspNetCore.Builder.WebApplication> (`app`):
 

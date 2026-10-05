@@ -3,9 +3,8 @@ title: Reuse Razor components in ASP.NET Core Blazor Hybrid apps
 author: guardrex
 description: Learn how to author and organize Razor components for the web and Web Views in Blazor Hybrid apps.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: "mvc"
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/hybrid/reuse-razor-components
 ---
 # Reuse Razor components in ASP.NET Core Blazor Hybrid
@@ -75,12 +74,9 @@ For an example, see <xref:blazor/hybrid/tutorials/maui-blazor-web-app#using-inte
 
 :::moniker-end
 
-<!-- UPDATE 9.0 Ask Beth on a replacement for this
-
 ## Additional resources
 
-* .NET MAUI Blazor podcast sample app
-  * [Source code (`microsoft/dotnet-podcasts` GitHub repository)](https://github.com/microsoft/dotnet-podcasts)
-  * [Live app](https://dotnetpodcasts.azurewebsites.net/)
-
--->
+* <xref:blazor/hybrid/class-libraries-best-practices>
+* eShop Reference Application (AdventureWorks): The .NET MAUI Blazor Hybrid app is in the `src/HybridApp` folder.
+  * For Azure hosting: [`Azure-Samples/eShopOnAzure` GitHub repository](https://github.com/Azure-Samples/eShopOnAzure)
+  * For general non-Azure hosting: [`dotnet/eShop` GitHub repository](https://github.com/dotnet/eShop).

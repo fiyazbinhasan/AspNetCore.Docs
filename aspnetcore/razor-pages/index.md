@@ -1,14 +1,14 @@
 ---
-title: Introduction to Razor Pages in ASP.NET Core
+title: Razor Pages architecture and concepts in ASP.NET Core
 author: tdykstra
-description: Explains how Razor Pages in ASP.NET Core makes coding page-focused scenarios easier and more productive than using MVC.
+description: Learn the architecture, concepts, and patterns of Razor Pages in ASP.NET Core for building page-focused web applications.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.date: 8/28/2023
+ms.date: 08/27/2025
 uid: razor-pages/index
 ---
 
-# Introduction to Razor Pages in ASP.NET Core
+# Razor Pages architecture and concepts in ASP.NET Core
 
 By [Rick Anderson](https://twitter.com/RickAndMSFT), [Dave Brock](https://twitter.com/daveabrock), and [Kirk Larkin](https://twitter.com/serpent5)
 
@@ -19,7 +19,7 @@ Razor Pages can make coding page-focused scenarios easier and more productive th
 
 If you're looking for a tutorial that uses the Model-View-Controller approach, see [Get started with ASP.NET Core MVC](xref:tutorials/first-mvc-app/start-mvc).
 
-This document provides an introduction to Razor Pages. It's not a step by step tutorial. If you find some of the sections too advanced, see [Get started with Razor Pages](xref:tutorials/razor-pages/razor-pages-start). For an overview of ASP.NET Core, see the [Introduction to ASP.NET Core](xref:index).
+This article covers the architecture, concepts, and patterns that make Razor Pages effective for building page-focused web applications. It explains how Razor Pages work, their key components, and best practices for implementation. If you prefer hands-on learning with step-by-step instructions, see [Tutorial: Create a Razor Pages web app with ASP.NET Core](xref:tutorials/razor-pages/index). For an overview of ASP.NET Core, see the [Introduction to ASP.NET Core](xref:index).
 
 ## Prerequisites
 
@@ -32,10 +32,6 @@ This document provides an introduction to Razor Pages. It's not a step by step t
 # [Visual Studio Code](#tab/visual-studio-code)
 
 [!INCLUDE[](~/includes/net-prereqs-vsc-6.0.md)]
-
-# [Visual Studio for Mac](#tab/visual-studio-mac)
-
-[!INCLUDE[](~/includes/net-prereqs-mac-6.0.md)]
 
 ---
 
@@ -50,10 +46,6 @@ See [Get started with Razor Pages](xref:tutorials/razor-pages/razor-pages-start)
 # [Visual Studio Code](#tab/visual-studio-code)
 
 Run `dotnet new webapp` from the command line.
-
-# [Visual Studio for Mac](#tab/visual-studio-mac)
-
-See [Get started with Razor Pages](xref:tutorials/razor-pages/razor-pages-start) for detailed instructions on how to create a Razor Pages project.
 
 ---
 
@@ -85,7 +77,7 @@ The `Pages/Index2.cshtml.cs` page model:
 
 By convention, the `PageModel` class file has the same name as the Razor Page file with `.cs` appended. For example, the previous Razor Page is `Pages/Index2.cshtml`. The file containing the `PageModel` class is named `Pages/Index2.cshtml.cs`.
 
-The associations of URL paths to pages are determined by the page's location in the file system. The following table shows a Razor Page path and the matching URL:
+The associations of URL paths to pages are determined by the page's location in the file system. The following table shows a Razor Page path and the matching URL.
 
 | File name and path               | matching URL |
 | ----------------- | ------------ |
@@ -587,7 +579,7 @@ The configuration and settings in following sections is not required by most app
 To configure advanced options, use the <xref:Microsoft.Extensions.DependencyInjection.MvcServiceCollectionExtensions.AddRazorPages%2A> overload that configures <xref:Microsoft.AspNetCore.Mvc.RazorPages.RazorPagesOptions>:
 [!code-csharp[](~/razor-pages/index/6.0sample/RazorPagesContacts/Program.cs?name=snippet_ac&highlight=5-9)]
 
-Use the <xref:Microsoft.AspNetCore.Mvc.RazorPages.RazorPagesOptions> to set the root directory for pages, or add application model conventions for pages. For more information on conventions, see [Razor Pages authorization conventions](xref:security/authorization/razor-pages-authorization).
+Use the <xref:Microsoft.AspNetCore.Mvc.RazorPages.RazorPagesOptions> to set the root directory for pages, or add application model conventions for pages. For more information on conventions, see [Razor Pages authorization conventions](xref:razor-pages/security/authorization/conventions).
 
 To precompile views, see [Razor view compilation](xref:mvc/views/view-compilation).
 
@@ -606,13 +598,13 @@ Add <xref:Microsoft.Extensions.DependencyInjection.MvcRazorPagesMvcCoreBuilderEx
 ## Additional resources
 
 * See [Get started with Razor Pages](xref:tutorials/razor-pages/razor-pages-start), which builds on this introduction.
-* [Authorize attribute and Razor Pages](xref:security/authorization/simple#aarp)
+* [`[Authorize]` attribute in Razor Pages apps](xref:razor-pages/security/authorization/simple#authorize-attribute-in-razor-pages-apps)
 * [Download or view sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/index/6.0sample)
 * <xref:index>
 * <xref:mvc/views/razor>
 * <xref:mvc/controllers/areas>
 * <xref:tutorials/razor-pages/razor-pages-start>
-* <xref:security/authorization/razor-pages-authorization>
+* <xref:razor-pages/security/authorization/conventions>
 * <xref:razor-pages/razor-pages-conventions>
 * <xref:test/razor-pages-tests>
 * <xref:mvc/views/partial>

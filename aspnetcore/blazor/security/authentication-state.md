@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor authentication state
 author: guardrex
 description: Learn how to create a custom authentication state provider and receive notifications of user authentication state changes.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 09/23/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/security/authentication-state
 zone_pivot_groups: blazor-app-models
 ---
@@ -199,7 +198,7 @@ builder.Services.AddSingleton<AuthenticationStateProvider, CustomAuthStateProvid
 
 :::zone-end
 
-If it isn't present, add an [`@using`](xref:mvc/views/razor#using) statement to the `_Imports.razor` file to make the <xref:Microsoft.AspNetCore.Components.Authorization?displayProperty=fullName> namespace available across components:
+If it isn't present, add an [`@using`](xref:mvc/views/razor#using) statement to the imports file (`_Imports.razor`) to make the <xref:Microsoft.AspNetCore.Components.Authorization?displayProperty=fullName> namespace available across components:
 
 ```razor
 @using Microsoft.AspNetCore.Components.Authorization;
@@ -471,19 +470,19 @@ The following component's `SignIn` method creates a claims principal for the use
 
 :::moniker range=">= aspnetcore-8.0"
 
-* [Server-side unauthorized content display while prerendering with a custom `AuthenticationStateProvider`](xref:blazor/security/server/index#unauthorized-content-display-while-prerendering-with-a-custom-authenticationstateprovider)
-* [How to access an `AuthenticationStateProvider` from a `DelegatingHandler` set up using an `IHttpClientFactory`](xref:blazor/security/server/additional-scenarios#access-authenticationstateprovider-in-outgoing-request-middleware)
+* [Server-side unauthorized content display while prerendering with a custom `AuthenticationStateProvider`](xref:blazor/security/index#unauthorized-content-display-while-prerendering-with-a-custom-authenticationstateprovider)
+* [How to access an `AuthenticationStateProvider` from a `DelegatingHandler` set up using an `IHttpClientFactory`](xref:blazor/security/additional-scenarios#access-authenticationstateprovider-in-outgoing-request-middleware)
 * <xref:blazor/security/blazor-web-app-oidc>
-* <xref:blazor/security/webassembly/standalone-with-identity>
+* <xref:blazor/security/webassembly/standalone-with-identity/index>
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-8.0"
 
-* [Server-side unauthorized content display while prerendering with a custom `AuthenticationStateProvider`](xref:blazor/security/server/index#unauthorized-content-display-while-prerendering-with-a-custom-authenticationstateprovider)
-* [How to access an `AuthenticationStateProvider` from a `DelegatingHandler` set up using an `IHttpClientFactory`](xref:blazor/security/server/additional-scenarios#access-authenticationstateprovider-in-outgoing-request-middleware)
+* [Server-side unauthorized content display while prerendering with a custom `AuthenticationStateProvider`](xref:blazor/security/index#unauthorized-content-display-while-prerendering-with-a-custom-authenticationstateprovider)
+* [How to access an `AuthenticationStateProvider` from a `DelegatingHandler` set up using an `IHttpClientFactory`](xref:blazor/security/additional-scenarios#access-authenticationstateprovider-in-outgoing-request-middleware)
 * <xref:blazor/security/blazor-web-app-oidc>
-* <xref:blazor/security/webassembly/standalone-with-identity>
+* <xref:blazor/security/webassembly/standalone-with-identity/index>
 [Prerendering with authentication in hosted Blazor WebAssembly apps](xref:blazor/security/webassembly/additional-scenarios#prerendering-with-authentication)
 
 :::moniker-end

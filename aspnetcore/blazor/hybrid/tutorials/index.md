@@ -1,11 +1,11 @@
 ---
 title: ASP.NET Core Blazor Hybrid tutorials
+ai-usage: ai-assisted
 author: guardrex
 description: Learn how to build Blazor Hybrid apps with the tutorials listed in this article.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 08/31/2026
 uid: blazor/hybrid/tutorials/index
 ---
 # ASP.NET Core Blazor Hybrid tutorials
@@ -14,7 +14,7 @@ uid: blazor/hybrid/tutorials/index
 
 The following tutorials provide a basic working experience for building a Blazor Hybrid app:
 
-* <xref:blazor/hybrid/tutorials/maui>
+* [Build your first app](/dotnet/maui/get-started/first-app)
 
 :::moniker range=">= aspnetcore-8.0"
 

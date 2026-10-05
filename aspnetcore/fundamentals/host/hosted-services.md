@@ -1,11 +1,11 @@
 ---
 title: Background tasks with hosted services in ASP.NET Core
+ai-usage: ai-assisted
 author: tdykstra
 description: Learn how to implement background tasks with hosted services in ASP.NET Core.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 5/10/2024
+ms.date: 09/18/2026
 uid: fundamentals/host/hosted-services
 ---
 # Background tasks with hosted services in ASP.NET Core
@@ -56,6 +56,15 @@ The <xref:Microsoft.Extensions.Hosting.IHostedService> interface defines two met
 
 `StartAsync` should be limited to short running tasks because hosted services are run sequentially, and no further services are started until `StartAsync` runs to completion.
 
+Hosted service instances start in the order that they're registered in the dependency injection container unless the app opts into concurrent startup by setting <xref:Microsoft.Extensions.Hosting.HostOptions.ServicesStartConcurrently> to `true`:
+
+```csharp
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.ServicesStartConcurrently = true;
+});
+```
+
 ### `StopAsync`
 
 * [StopAsync(CancellationToken)](xref:Microsoft.Extensions.Hosting.IHostedService.StopAsync%2A) is triggered when the host is performing a graceful shutdown. `StopAsync` contains the logic to end the background task. Implement <xref:System.IDisposable> and [finalizers (destructors)](/dotnet/csharp/programming-guide/classes-and-structs/destructors) to dispose of any unmanaged resources.
@@ -76,11 +85,34 @@ To extend the default 30 second shutdown timeout, set:
 
 The hosted service is activated once at app startup and gracefully shut down at app shutdown. If an error is thrown during background task execution, `Dispose` should be called even if `StopAsync` isn't called.
 
+Hosted service instances stop in the reverse order that they're registered in the dependency injection container unless the app opts into concurrent shutdown behavior by setting <xref:Microsoft.Extensions.Hosting.HostOptions.ServicesStopConcurrently> to `true`:
+
+```csharp
+builder.Services.Configure<HostOptions>(options =>
+{
+    options.ServicesStopConcurrently = true;
+});
+```
+
 ## BackgroundService base class
 
 <xref:Microsoft.Extensions.Hosting.BackgroundService> is a base class for implementing a long running <xref:Microsoft.Extensions.Hosting.IHostedService>.
 
+:::moniker-end
+
+:::moniker range=">= aspnetcore-10.0"
+
+[ExecuteAsync(CancellationToken)](xref:Microsoft.Extensions.Hosting.BackgroundService.ExecuteAsync%2A) is called on the thread pool to run the background service. The implementation returns a <xref:System.Threading.Tasks.Task> that represents the entire lifetime of the background service. The host blocks in [StopAsync(CancellationToken)](xref:Microsoft.Extensions.Hosting.BackgroundService.StopAsync%2A) waiting for `ExecuteAsync` to complete.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-10.0"
+
 [ExecuteAsync(CancellationToken)](xref:Microsoft.Extensions.Hosting.BackgroundService.ExecuteAsync%2A) is called to run the background service. The implementation returns a <xref:System.Threading.Tasks.Task> that represents the entire lifetime of the background service. No further services are started until [ExecuteAsync becomes asynchronous](https://github.com/dotnet/extensions/issues/2149), such as by calling `await`. Avoid performing long, blocking initialization work in `ExecuteAsync`. The host blocks in [StopAsync(CancellationToken)](xref:Microsoft.Extensions.Hosting.BackgroundService.StopAsync%2A) waiting for `ExecuteAsync` to complete.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 The cancellation token is triggered when [IHostedService.StopAsync](xref:Microsoft.Extensions.Hosting.IHostedService.StopAsync%2A) is called. Your implementation of `ExecuteAsync` should finish promptly when the cancellation token is fired in order to gracefully shut down the service. Otherwise, the service ungracefully shuts down at the shutdown timeout. For more information, see the [IHostedService interface](#ihostedservice-interface) section.
 
@@ -119,7 +151,7 @@ The services are registered in `IHostBuilder.ConfigureServices` (`Program.cs`). 
 
 ## Queued background tasks
 
-A background task queue is based on the .NET 4.x <xref:System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem%2A>:
+A background task queue is based on the .NET Framework 4.x <xref:System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem%2A>:
 
 :::code language="csharp" source="~/fundamentals/host/hosted-services/samples/6.0/BackgroundTasksSample/Services/BackgroundTaskQueue.cs" id="snippet1":::
 
@@ -169,16 +201,6 @@ The Worker Service templates support [.NET native ahead-of-time (AOT)](/dotnet/c
   1. Check the **Enable Native AOT publish** checkbox.
   1. Select **Create**.
 
-<!--
-# [Visual Studio for Mac](#tab/visual-studio-mac)
-
-1. Create a new project.
-1. Select **App** under **.NET Core** in the sidebar.
-1. Select **Worker** under **ASP.NET Core**. Select **Next**.
-1. Select **.NET Core 3.1** or later for the **Target Framework**. Select **Next**.
-1. Provide a name in the **Project Name** field. Select **Create**.
--->
-
 # [.NET CLI](#tab/net-cli)
 
 Use the Worker Service (`worker`) template with the [dotnet new](/dotnet/core/tools/dotnet-new) command from a command shell with the AOT option:
@@ -213,7 +235,7 @@ The AOT option adds `<PublishAot>true</PublishAot>` to the project file:
 ## Additional resources
 
 * [Background services unit tests on GitHub](https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.Hosting/tests/UnitTests/BackgroundServiceTests.cs).
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/host/hosted-services/samples/) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/host/hosted-services/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * [Implement background tasks in microservices with IHostedService and the BackgroundService class](/dotnet/standard/microservices-architecture/multi-container-microservice-net-applications/background-tasks-with-ihostedservice)
 * [Run background tasks with WebJobs in Azure App Service](/azure/app-service/webjobs-create)
 * <xref:System.Threading.Timer>

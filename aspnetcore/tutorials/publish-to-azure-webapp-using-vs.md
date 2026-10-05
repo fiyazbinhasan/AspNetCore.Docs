@@ -4,7 +4,7 @@ author: wadepickett
 description: Learn how to publish an ASP.NET Core app to Azure App Service using Visual Studio.
 monikerRange: '>= aspnetcore-7.0'
 ms.author: wpickett
-ms.custom: "devx-track-csharp, mvc, engagement-fy23"
+ms.custom: devx-track-csharp, sfi-image-nochange
 ms.date: 02/03/2023
 uid: tutorials/publish-to-azure-webapp-using-vs
 ---
@@ -16,7 +16,7 @@ To troubleshoot an App Service deployment issue, see <xref:test/troubleshoot-azu
 
 ## Set up
 
-Open a [free Azure account](https://azure.microsoft.com/free/dotnet/) if you don't have one.
+Open a [free Azure account](https://azure.microsoft.com/pricing/purchase-options/azure-account?cid=msft_learn) if you don't have one.
 
 ## Create a web app
 
@@ -183,11 +183,11 @@ When you have finished testing the app, go to the [Azure portal](https://portal.
 
 * Select **Resource groups**, then select the resource group you created.
 
-![Azure Portal: Resource Groups in sidebar menu](publish-to-azure-webapp-using-vs/_static/portalrg.png)
+![Azure portal: Resource Groups in sidebar menu](publish-to-azure-webapp-using-vs/_static/portalrg.png)
 
 * In the **Resource group** page, select **Delete resource group**.
 
-![Azure Portal: Resource Groups page](publish-to-azure-webapp-using-vs/_static/rdg.png)
+![Azure portal: Resource Groups page](publish-to-azure-webapp-using-vs/_static/rdg.png)
 
 * Enter the name of the resource group and select **Delete**. Your app and all other resources created in this tutorial are now deleted from Azure.
 

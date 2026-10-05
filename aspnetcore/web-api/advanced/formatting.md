@@ -1,11 +1,11 @@
 ---
 title: Format response data in ASP.NET Core Web API
+ai-usage: ai-assisted
 author: tdykstra
 description: Learn how to format response data in ASP.NET Core Web API.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.custom: H1Hack27Feb2017
-ms.date: 04/08/2022
+ms.date: 03/22/2026
 uid: web-api/advanced/formatting
 ---
 # Format response data in ASP.NET Core Web API
@@ -97,7 +97,7 @@ If the Accept header contains `*/*`, the Header is ignored unless `RespectBrowse
 Unlike typical API clients, web browsers supply `Accept` headers. Web browsers specify many formats, including wildcards. By default, when the framework detects that the request is coming from a browser:
 
 * The `Accept` header is ignored.
-* The content is returned in JSON, unless otherwise configured.
+* The content is returned using the first registered output formatter that can handle the response type, unless otherwise configured.
 
 This approach provides a more consistent experience across browsers when consuming APIs.
 
@@ -212,7 +212,7 @@ Built-in features provide a limited range of polymorphic serialization but no su
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/formatting/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/formatting/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 :::moniker-end
 
@@ -220,7 +220,7 @@ Built-in features provide a limited range of polymorphic serialization but no su
 
 ASP.NET Core MVC has support for formatting response data. Response data can be formatted using specific formats or in response to client requested format.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/formatting/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/formatting/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Format-specific Action Results
 
@@ -294,7 +294,7 @@ If the Accept header contains `*/*`, the Header is ignored unless `RespectBrowse
 Unlike typical API clients, web browsers supply `Accept` headers. Web browsers specify many formats, including wildcards. By default, when the framework detects that the request is coming from a browser:
 
 * The `Accept` header is ignored.
-* The content is returned in JSON, unless otherwise configured.
+* The content is returned using the first registered output formatter that can handle the response type, unless otherwise configured.
 
 This approach provides a more consistent experience across browsers when consuming APIs.
 
@@ -529,7 +529,7 @@ If the Accept header contains `*/*`, the Header is ignored unless `RespectBrowse
 Unlike typical API clients, web browsers supply `Accept` headers. Web browsers specify many formats, including wildcards. By default, when the framework detects that the request is coming from a browser:
 
 * The `Accept` header is ignored.
-* The content is returned in JSON, unless otherwise configured.
+* The content is returned using the first registered output formatter that can handle the response type, unless otherwise configured.
 
 This approach provides a more consistent experience across browsers when consuming APIs.
 
@@ -674,6 +674,6 @@ Built-in features provide a limited range of polymorphic serialization but no su
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/formatting/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/formatting/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 :::moniker-end

@@ -1,5 +1,22 @@
 :::moniker range="= aspnetcore-8.0"
 
+## Introduction
+
+This part of the tutorial series focuses on working with a SQL database in your ASP.NET Core MVC application.
+
+You'll learn how to:
+
+- Register and configure the Entity Framework Core database context for your ASP.NET Core MVC app.
+- Work with database connection strings for local development.
+- Use SQL Server Express LocalDB for development and examine your database and data using SQL Server Object Explorer.
+- Seed your database with initial sample data.
+
+## Prerequisite
+
+This tutorial uses a database you set up in the previous step: <xref:tutorials/first-mvc-app/adding-model>.
+
+## Working with the database context
+
 The `MvcMovieContext` object handles the task of connecting to the database and mapping `Movie` objects to database records. The database context is registered with the [Dependency Injection](xref:fundamentals/dependency-injection) container in the `Program.cs` file:
 
 # [Visual Studio](#tab/visual-studio)
@@ -10,7 +27,7 @@ The ASP.NET Core [Configuration](xref:fundamentals/configuration/index) system r
 
 [!code-json[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie80/appsettings.json?highlight=2&range=9-11)]
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 [!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie80/Program.cs?name=snippet_FirstSQLite&highlight=3-4)]
 
@@ -52,7 +69,7 @@ Right-click on the `Movie` table **> View Data**
 ![Movie table open showing table data](~/tutorials/first-mvc-app/working-with-sql/_static/8/vd_vs22_17.8.0.png)
 -->
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 [!INCLUDE[](~/includes/rp/sqlite.md)]
 [!INCLUDE[](~/includes/RP-mvc-shared/sqlite-warn.md)]
@@ -89,7 +106,7 @@ Delete all the records in the database. You can do this with the delete links in
 
 Test the app. Force the app to initialize, calling the code in the `Program.cs` file, so the seed method runs. To force initialization, close the command prompt window that Visual Studio opened, and restart by pressing Ctrl+F5.
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 Update `Program.cs` with the following highlighted code:
 
@@ -104,6 +121,8 @@ Test the app. Stop it and restart it so the `SeedData.Initialize` method runs an
 The app shows the seeded data.
 
 ![MVC Movie app open in Microsoft Edge showing movie data](~/tutorials/first-mvc-app/working-with-sql/_static/m80.png)
+
+[!INCLUDE[](~/includes/localization/currency.md)]
 
 > [!div class="step-by-step"]
 > [Previous: Adding a model](~/tutorials/first-mvc-app/adding-model.md)

@@ -1,10 +1,9 @@
 ---
 title: Host ASP.NET Core SignalR in background services
-author: bradygaster
-description: Learn how to send messages to SignalR clients from .NET Core BackgroundService classes.
+author: wadepickett
+description: Learn how to send messages to SignalR clients from .NET BackgroundService classes.
 monikerRange: '>= aspnetcore-2.2'
 ms.author: wpickett
-ms.custom: mvc
 ms.date: 11/12/2019
 uid: signalr/background-services
 ---
@@ -15,11 +14,11 @@ By [Dave Pringle](https://github.com/UncleDave) and [Brady Gaster](https://twitt
 This article provides guidance for:
 
 * Hosting SignalR Hubs using a background worker process hosted with ASP.NET Core.
-* Sending messages to connected clients from within a .NET Core [BackgroundService](xref:Microsoft.Extensions.Hosting.BackgroundService).
+* Sending messages to connected clients from within a .NET <xref:Microsoft.Extensions.Hosting.BackgroundService>.
 
 :::moniker range=">= aspnetcore-6.0"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/background-service/samples/6.0) [(how to download)](xref:index#how-to-download-a-sample)
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/background-service/samples/6.0) [(how to download)](xref:fundamentals/index#how-to-download-a-sample)
 
 ## Enable SignalR at app startup
 
@@ -30,7 +29,7 @@ Hosting ASP.NET Core SignalR Hubs in the context of a background worker process 
 
 In the preceding example, the `ClockHub` class implements the `Hub<T>` class to create a strongly typed Hub. The `ClockHub` has been configured in `Program.cs` to respond to requests at the endpoint `/hubs/clock`.
 
-For more information on strongly typed Hubs, see [Use hubs in SignalR for ASP.NET Core](xref:signalr/hubs#strongly-typed-hubs).
+For more information on strongly typed Hubs, see [Use hubs in SignalR for ASP.NET Core](xref:signalr/hubs#use-strongly-typed-hubs).
 
 > [!NOTE]
 > This functionality isn't limited to the [Hub\<T>](xref:Microsoft.AspNetCore.SignalR.Hub`1) class. Any class that inherits from [Hub](xref:Microsoft.AspNetCore.SignalR.Hub), such as [DynamicHub](xref:Microsoft.AspNetCore.SignalR.DynamicHub), works.
@@ -83,7 +82,7 @@ During the `IHostedService.StopAsync` method, the `HubConnection` is disposed of
 
 :::moniker range=">= aspnetcore-3.0 < aspnetcore-6.0"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/background-service/samples/3.x) [(how to download)](xref:index#how-to-download-a-sample)
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/background-service/samples/3.x) [(how to download)](xref:fundamentals/index#how-to-download-a-sample)
 
 ## Enable SignalR in startup
 
@@ -93,7 +92,7 @@ Hosting ASP.NET Core SignalR Hubs in the context of a background worker process 
 
 In the preceding example, the `ClockHub` class implements the `Hub<T>` class to create a strongly typed Hub. The `ClockHub` has been configured in the `Startup` class to respond to requests at the endpoint `/hubs/clock`.
 
-For more information on strongly typed Hubs, see [Use hubs in SignalR for ASP.NET Core](xref:signalr/hubs#strongly-typed-hubs).
+For more information on strongly typed Hubs, see [Use hubs in SignalR for ASP.NET Core](xref:signalr/hubs#use-strongly-typed-hubs).
 
 > [!NOTE]
 > This functionality isn't limited to the [Hub\<T>](xref:Microsoft.AspNetCore.SignalR.Hub`1) class. Any class that inherits from [Hub](xref:Microsoft.AspNetCore.SignalR.Hub), such as [DynamicHub](xref:Microsoft.AspNetCore.SignalR.DynamicHub), works.
@@ -146,17 +145,17 @@ During the `IHostedService.StopAsync` method, the `HubConnection` is disposed of
 
 :::moniker range="<= aspnetcore-2.2"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/background-service/samples/2.2) [(how to download)](xref:index#how-to-download-a-sample)
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/background-service/samples/2.2) [(how to download)](xref:fundamentals/index#how-to-download-a-sample)
 
 ## Enable SignalR in startup
 
-Hosting ASP.NET Core SignalR Hubs in the context of a background worker process is identical to hosting a Hub in an ASP.NET Core web app. In the `Startup.ConfigureServices` method, calling `services.AddSignalR` adds the required services to the ASP.NET Core Dependency Injection (DI) layer to support SignalR. In `Startup.Configure`, the `UseSignalR` method is called to connect the Hub endpoint(s) in the ASP.NET Core request pipeline.
+Hosting ASP.NET Core SignalR Hubs in the context of a background worker process is identical to hosting a Hub in an ASP.NET Core web app. In the `Startup.ConfigureServices` method, calling `services.AddSignalR` adds the required services to the ASP.NET Core Dependency Injection (DI) layer to support SignalR. In `Startup.Configure`, the `UseSignalR` method is called to connect the Hub endpoints in the ASP.NET Core request pipeline.
 
 [!code-csharp[Startup](background-service/samples/2.2/Server/Startup.cs?name=Startup)]
 
 In the preceding example, the `ClockHub` class implements the `Hub<T>` class to create a strongly typed Hub. The `ClockHub` has been configured in the `Startup` class to respond to requests at the endpoint `/hubs/clock`.
 
-For more information on strongly typed Hubs, see [Use hubs in SignalR for ASP.NET Core](xref:signalr/hubs#strongly-typed-hubs).
+For more information on strongly typed Hubs, see [Use hubs in SignalR for ASP.NET Core](xref:signalr/hubs#use-strongly-typed-hubs).
 
 > [!NOTE]
 > This functionality isn't limited to the [Hub\<T>](xref:Microsoft.AspNetCore.SignalR.Hub`1) class. Any class that inherits from [Hub](xref:Microsoft.AspNetCore.SignalR.Hub), such as [DynamicHub](xref:Microsoft.AspNetCore.SignalR.DynamicHub), works.
@@ -212,4 +211,4 @@ During the `IHostedService.StopAsync` method, the `HubConnection` is disposed of
 * [Get started](xref:tutorials/signalr)
 * [Hubs](xref:signalr/hubs)
 * [Publish to Azure](xref:signalr/publish-to-azure-web-app)
-* [Strongly typed Hubs](xref:signalr/hubs#strongly-typed-hubs)
+* [Strongly typed Hubs](xref:signalr/hubs#use-strongly-typed-hubs)

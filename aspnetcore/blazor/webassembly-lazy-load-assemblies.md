@@ -3,9 +3,8 @@ title: Lazy load assemblies in ASP.NET Core Blazor WebAssembly
 author: guardrex
 description: Discover how to lazy load assemblies in Blazor WebAssembly apps.
 monikerRange: '>= aspnetcore-5.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/webassembly-lazy-load-assemblies
 ---
 # Lazy load assemblies in ASP.NET Core Blazor WebAssembly
@@ -24,7 +23,7 @@ Lazy loading shouldn't be used for core runtime assemblies, which might be trimm
 
 :::moniker range=">= aspnetcore-8.0"
 
-Assembly files use the [Webcil packaging format for .NET assemblies](xref:blazor/host-and-deploy/webassembly#webcil-packaging-format-for-net-assemblies) with a `.wasm` file extension.
+Assembly files use the [Webcil packaging format for .NET assemblies](xref:blazor/host-and-deploy/webassembly/index#webcil-packaging-format-for-net-assemblies) with a `.wasm` file extension.
 
 Throughout the article, the `{FILE EXTENSION}` placeholder represents "`wasm`".
 
@@ -71,7 +70,7 @@ Blazor's <xref:Microsoft.AspNetCore.Components.Routing.Router> component designa
 Logic is implemented inside <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> to determine the assemblies to load with <xref:Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader>. Options for how to structure the logic include:
 
 * Conditional checks inside the <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> method.
-* A lookup table that maps routes to assembly names, either injected into the component or implemented within the [`@code`](xref:mvc/views/razor#code) block.
+* A lookup table that maps routes to assembly names, either injected into the component or implemented within the component's code.
 
 In the following example:
 
@@ -82,7 +81,42 @@ In the following example:
 
 `App.razor`:
 
-:::moniker range=">= aspnetcore-6.0"
+:::moniker range=">= aspnetcore-8.0"
+
+```razor
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using Microsoft.Extensions.Logging
+@inject LazyAssemblyLoader AssemblyLoader
+@inject ILogger<App> Logger
+
+<Router AppAssembly="typeof(App).Assembly" 
+    OnNavigateAsync="OnNavigateAsync">
+    ...
+</Router>
+
+@code {
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        try
+           {
+               if (args.Path == "{PATH}")
+               {
+                   var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                       [ {LIST OF ASSEMBLIES} ]);
+               }
+           }
+           catch (Exception ex)
+           {
+               Logger.LogError("Error: {Message}", ex.Message);
+           }
+    }
+}
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
 
 ```razor
 @using Microsoft.AspNetCore.Components.Routing
@@ -173,7 +207,47 @@ In the following example:
 
 `App.razor`:
 
-:::moniker range=">= aspnetcore-6.0"
+:::moniker range=">= aspnetcore-8.0"
+
+```razor
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using Microsoft.Extensions.Logging
+@inject ILogger<App> Logger
+@inject LazyAssemblyLoader AssemblyLoader
+
+<Router AppAssembly="typeof(App).Assembly" 
+    AdditionalAssemblies="lazyLoadedAssemblies" 
+    OnNavigateAsync="OnNavigateAsync">
+    ...
+</Router>
+
+@code {
+    private List<Assembly> lazyLoadedAssemblies = [];
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        try
+        {
+            if (args.Path == "{PATH}")
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    [ {LIST OF ASSEMBLIES} ]);
+                lazyLoadedAssemblies.AddRange(assemblies);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Error: {Message}", ex.Message);
+        }
+    }
+}
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
 
 ```razor
 @using System.Reflection
@@ -195,18 +269,18 @@ In the following example:
     private async Task OnNavigateAsync(NavigationContext args)
     {
         try
-           {
-               if (args.Path == "{PATH}")
-               {
-                   var assemblies = await AssemblyLoader.LoadAssembliesAsync(
-                       new[] { {LIST OF ASSEMBLIES} });
-                   lazyLoadedAssemblies.AddRange(assemblies);
-               }
-           }
-           catch (Exception ex)
-           {
-               Logger.LogError("Error: {Message}", ex.Message);
-           }
+        {
+            if (args.Path == "{PATH}")
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    new[] { {LIST OF ASSEMBLIES} });
+                lazyLoadedAssemblies.AddRange(assemblies);
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Error: {Message}", ex.Message);
+        }
     }
 }
 ```
@@ -276,14 +350,18 @@ The <xref:Microsoft.AspNetCore.Components.Routing.NavigationContext> object pass
 
 For more information, see <xref:blazor/fundamentals/routing#handle-cancellations-in-onnavigateasync>.
 
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-8.0"
+
 ## `OnNavigateAsync` events and renamed assembly files
 
-The resource loader relies on the assembly names that are defined in the `blazor.boot.json` file. If [assemblies are renamed](xref:blazor/host-and-deploy/webassembly#change-the-file-name-extension-of-dll-files), the assembly names used in an <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback and the assembly names in the `blazor.boot.json` file are out of sync.
+The resource loader relies on the assembly names that are defined in the boot manifest file. If [assemblies are renamed](xref:blazor/host-and-deploy/webassembly/index#change-the-file-name-extension-of-dll-files), the assembly names used in an <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback and the assembly names in the boot manifest file are out of sync.
 
 To rectify this:
 
 * Check to see if the app is running in the `Production` environment when determining which assembly names to use.
 * Store the renamed assembly names in a separate file and read from that file to determine what assembly name to use with the <xref:Microsoft.AspNetCore.Components.WebAssembly.Services.LazyAssemblyLoader> service and <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> callback.
+
+:::moniker-end
 
 :::moniker range="< aspnetcore-8.0"
 
@@ -336,12 +414,8 @@ Create a standalone Blazor WebAssembly app to demonstrate lazy loading of a Razo
 
 Add an ASP.NET Core class library project to the solution: 
 
-* Visual Studio: Right-click the solution file in **Solution Explorer** and select **Add** > **New project**. From the dialog of new project types, select **Razor Class Library**. Name the project `GrantImaharaRobotControls`. Do **not** select the **Support pages and view** checkbox.
+* Visual Studio: Right-click the solution file in **Solution Explorer** and select **Add** > **New project**. From the dialog of new project types, select **Razor Class Library**. Name the project `GrantImaharaRobotControls`. Do **not** select the **Support pages and views** checkbox.
 * Visual Studio Code/.NET CLI: Execute `dotnet new razorclasslib -o GrantImaharaRobotControls` from a command prompt. The `-o|--output` option creates a folder and names the project `GrantImaharaRobotControls`.
-
-The example component presented later in this section uses a [Blazor form](xref:blazor/forms/index). In the RCL project, add the [`Microsoft.AspNetCore.Components.Forms`](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Forms) package to the project.
-
-[!INCLUDE[](~/includes/package-reference.md)]
 
 Create a `HandGesture` class in the RCL with a `ThumbUp` method that hypothetically makes a robot perform a thumbs-up gesture. The method accepts an argument for the axis, `Left` or `Right`, as an [`enum`](/dotnet/csharp/language-reference/builtin-types/enum). The method returns `true` on success.
 
@@ -566,7 +640,61 @@ The assembly is assigned to <xref:Microsoft.AspNetCore.Components.Routing.Router
 
 `App.razor`:
 
-:::moniker range=">= aspnetcore-6.0"
+:::moniker range=">= aspnetcore-8.0"
+
+```razor
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using Microsoft.Extensions.Logging
+@inject ILogger<App> Logger
+@inject LazyAssemblyLoader AssemblyLoader
+
+<Router AppAssembly="typeof(App).Assembly"
+        AdditionalAssemblies="lazyLoadedAssemblies" 
+        OnNavigateAsync="OnNavigateAsync">
+    <Navigating>
+        <div style="padding:20px;background-color:blue;color:white">
+            <p>Loading the requested page&hellip;</p>
+        </div>
+    </Navigating>
+    <Found Context="routeData">
+        <RouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(MainLayout)">
+            <p>Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>
+
+@code {
+    private List<Assembly> lazyLoadedAssemblies = [];
+    private bool grantImaharaRobotControlsAssemblyLoaded;
+
+    private async Task OnNavigateAsync(NavigationContext args)
+    {
+        try
+        {
+            if ((args.Path == "robot") && !grantImaharaRobotControlsAssemblyLoaded)
+            {
+                var assemblies = await AssemblyLoader.LoadAssembliesAsync(
+                    [ "GrantImaharaRobotControls.{FILE EXTENSION}" ]);
+                lazyLoadedAssemblies.AddRange(assemblies);
+                grantImaharaRobotControlsAssemblyLoaded = true;
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError("Error: {Message}", ex.Message);
+        }
+    }
+}
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
 
 ```razor
 @using System.Reflection
@@ -596,16 +724,18 @@ The assembly is assigned to <xref:Microsoft.AspNetCore.Components.Routing.Router
 
 @code {
     private List<Assembly> lazyLoadedAssemblies = new();
+    private bool grantImaharaRobotControlsAssemblyLoaded;
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
         try
         {
-            if (args.Path == "robot")
+            if ((args.Path == "robot") && !grantImaharaRobotControlsAssemblyLoaded)
             {
                 var assemblies = await AssemblyLoader.LoadAssembliesAsync(
                     new[] { "GrantImaharaRobotControls.{FILE EXTENSION}" });
                 lazyLoadedAssemblies.AddRange(assemblies);
+                grantImaharaRobotControlsAssemblyLoaded = true;
             }
         }
         catch (Exception ex)
@@ -648,16 +778,18 @@ The assembly is assigned to <xref:Microsoft.AspNetCore.Components.Routing.Router
 
 @code {
     private List<Assembly> lazyLoadedAssemblies = new List<Assembly>();
+    private bool grantImaharaRobotControlsAssemblyLoaded;
 
     private async Task OnNavigateAsync(NavigationContext args)
     {
         try
         {
-            if (args.Path == "robot")
+            if ((args.Path == "robot") && !grantImaharaRobotControlsAssemblyLoaded)
             {
                 var assemblies = await AssemblyLoader.LoadAssembliesAsync(
                     new[] { "GrantImaharaRobotControls.{FILE EXTENSION}" });
                 lazyLoadedAssemblies.AddRange(assemblies);
+                grantImaharaRobotControlsAssemblyLoaded = true;
             }
         }
         catch (Exception ex)
@@ -689,4 +821,4 @@ When the `Robot` component from the RCL is requested at `/robot`, the `GrantImah
 ## Additional resources
 
 * [Handle asynchronous navigation events with `OnNavigateAsync`](xref:blazor/fundamentals/routing#handle-asynchronous-navigation-events-with-onnavigateasync)
-* <xref:blazor/performance>
+* <xref:blazor/performance/index>

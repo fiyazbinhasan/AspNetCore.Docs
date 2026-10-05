@@ -2,27 +2,305 @@ items:
   - name: ASP.NET Core documentation
     href: index.yml
   - name: Overview
-    items:
-      - name: About ASP.NET Core
-        uid: index
-      - name: Compare ASP.NET Core and ASP.NET
-        uid: fundamentals/choose-between-aspnet-and-aspnetcore
-      - name: Compare .NET and .NET Framework
-        href: /dotnet/standard/choosing-core-framework-server?toc=/aspnet/core/toc.json&bc=/aspnet/core/breadcrumb/toc.json
+    uid: index
   - name: Get started
-    uid: getting-started
+    uid: get-started
   - name: What's new
     items:
-      - name: What's new in 9
-        uid: aspnetcore-9
-      - name: What's new in 8
-        uid: aspnetcore-8
-      - name: What's new in 7
-        uid: aspnetcore-7
-      - name: What's new in 6
-        uid: aspnetcore-6.0
-      - name: What's new in 5
-        uid: aspnetcore-5.0
+      - name: ASP.NET Core 11
+        items:
+          - name: What's new in 11
+            uid: aspnetcore-11
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/11/overview.md
+              - name: Blazor custom event registration throws when name matches a browser event
+                href: breaking-changes/11/blazor-custom-event-name-collision.md
+              - name: Blazor enhanced navigation no longer preloads resources
+                href: breaking-changes/11/blazor-enhanced-nav-preloading-disabled.md
+              - name: Blazor server-side rendering defers antiforgery validation to middleware
+                href: breaking-changes/11/blazor-server-side-rendering-deferred-cross-site-request-forgery-protection.md
+              - name: ConcurrencyLimiter middleware removed
+                href: breaking-changes/11/concurrencylimiter-removed.md
+              - name: Hosting emits OpenTelemetry HTTP semantic-convention tags by default
+                href: breaking-changes/11/http-activity-otel-semconv.md
+              - name: Kestrel tightens HTTP protocol compliance
+                href: breaking-changes/11/kestrel-strict-protocol-compliance.md
+              - name: Microsoft.OpenApi upgraded to 3.x
+                href: breaking-changes/11/microsoft-openapi-3x.md
+              - name: MVC compatibility options removed
+                href: breaking-changes/11/mvc-compatibility-options-removed.md
+              - name: Obsolete Blazor APIs removed
+                href: breaking-changes/11/blazor-obsolete-apis-removed.md
+              - name: Obsolete ImageTagHelper members removed
+                href: breaking-changes/11/image-tag-helper-obsolete-members-removed.md
+              - name: Obsolete ModelMetadataIdentity.ForProperty overload removed
+                href: breaking-changes/11/modelmetadataidentity-forproperty-removed.md
+              - name: OpenAPI document includes all ProducesResponseType entries per status code
+                href: breaking-changes/11/openapi-multiple-produces-per-status.md
+              - name: OpenAPI server URL no longer has a trailing slash when PathBase is empty
+                href: breaking-changes/11/openapi-server-url-trailing-slash.md
+              - name: OpenApiVersion defaults to OpenApi3_2
+                href: breaking-changes/11/openapi-version-default-3-2.md
+              - name: Passkey sign-in enforces email/phone confirmation and lockout
+                href: breaking-changes/11/passkey-signin-enforces-confirmation-lockout.md
+              - name: QuickGrid sorting and pagination controls render as links
+                href: breaking-changes/11/quickgrid-controls-render-as-links.md
+              - name: Response compression always emits Vary, Accept-Encoding
+                href: breaking-changes/11/response-compression-always-vary.md
+              - name: SqlClient Active Directory authentication moved to a separate package
+                href: breaking-changes/11/sqlclient-azure-extensions-required.md
+              - name: WebAssemblyHostBuilder loads environment variables into IConfiguration
+                href: breaking-changes/11/wasm-env-vars-in-configuration.md
+      - name: ASP.NET Core 10
+        items:
+          - name: What's new in 10
+            uid: aspnetcore-10
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/10/overview.md
+              - name: Cookie login redirects disabled for known API endpoints
+                href: breaking-changes/10/cookie-authentication-api-endpoints.md
+              - name: Deprecation of WithOpenApi extension method
+                href: breaking-changes/10/withopenapi-deprecated.md
+              - name: Exception diagnostics suppressed when TryHandleAsync returns true
+                href: breaking-changes/10/exception-handler-diagnostics-suppressed.md
+              - name: IActionContextAccessor and ActionContextAccessor are obsolete
+                href: breaking-changes/10/iactioncontextaccessor-obsolete.md
+              - name: IncludeOpenAPIAnalyzers property and MVC API analyzers are deprecated
+                href: breaking-changes/10/openapi-analyzers-deprecated.md
+              - name: IPNetwork and ForwardedHeadersOptions.KnownNetworks are obsolete
+                href: breaking-changes/10/ipnetwork-knownnetworks-obsolete.md
+              - name: Microsoft.Extensions.ApiDescription.Client package deprecated
+                href: breaking-changes/10/apidescription-client-deprecated.md
+              - name: Razor run-time compilation is obsolete
+                href: breaking-changes/10/razor-runtime-compilation-obsolete.md
+              - name: WebHostBuilder, IWebHost, and WebHost are obsolete
+                href: breaking-changes/10/webhostbuilder-deprecated.md
+      - name: ASP.NET Core 9
+        items:
+          - name: What's new in 9
+            uid: aspnetcore-9
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/9/overview.md
+              - name: DefaultKeyResolution.ShouldGenerateNewKey has altered meaning
+                href: breaking-changes/9/key-resolution.md
+              - name: Dev cert export no longer creates folder
+                href: breaking-changes/9/certificate-export.md
+              - name: Forwarded Headers Middleware ignores X-Forwarded-* headers from unknown proxies
+                href: breaking-changes/8/forwarded-headers-unknown-proxies.md
+              - name: HostBuilder enables ValidateOnBuild/ValidateScopes in development environment
+                href: breaking-changes/9/hostbuilder-validation.md
+              - name: Legacy Mono and Emscripten APIs not exported to global namespace
+                href: breaking-changes/9/legacy-apis.md
+              - name: Middleware types with multiple constructors
+                href: breaking-changes/9/middleware-constructors.md
+      - name: ASP.NET Core 8
+        items:
+          - name: What's new in 8
+            uid: aspnetcore-8
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/8/overview.md
+              - name: ConcurrencyLimiterMiddleware is obsolete
+                href: breaking-changes/8/concurrencylimitermiddleware-obsolete.md
+              - name: Custom converters for serialization removed
+                href: breaking-changes/8/problemdetails-custom-converters.md
+              - name: Forwarded Headers Middleware ignores X-Forwarded-* headers from unknown proxies
+                href: breaking-changes/8/forwarded-headers-unknown-proxies.md
+              - name: HTTP logging middleware requires AddHttpLogging()
+                href: breaking-changes/8/httplogging-addhttplogging-requirement.md
+              - name: ISystemClock is obsolete
+                href: breaking-changes/8/isystemclock-obsolete.md
+              - name: "Minimal APIs: IFormFile parameters require anti-forgery checks"
+                href: breaking-changes/8/antiforgery-checks.md
+              - name: Rate-limiting middleware requires AddRateLimiter
+                href: breaking-changes/8/addratelimiter-requirement.md
+              - name: Security token events return a JsonWebToken
+                href: breaking-changes/8/securitytoken-events.md
+              - name: TrimMode defaults to full for Web SDK projects
+                href: breaking-changes/8/trimmode-full.md
+      - name: ASP.NET Core 7
+        items:
+          - name: What's new in 7
+            uid: aspnetcore-7
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/7/overview.md
+              - name: API controller actions try to infer parameters from DI
+                href: breaking-changes/7/api-controller-action-parameters-di.md
+              - name: ASPNET-prefixed environment variable precedence
+                href: breaking-changes/7/environment-variable-precedence.md
+              - name: AuthenticateAsync for remote auth providers
+                href: breaking-changes/7/authenticateasync-anonymous-request.md
+              - name: Authentication in WebAssembly apps
+                href: breaking-changes/7/wasm-app-authentication.md
+              - name: Default authentication scheme
+                href: breaking-changes/7/default-authentication-scheme.md
+              - name: Event IDs for some Microsoft.AspNetCore.Mvc.Core log messages changed
+                href: breaking-changes/7/microsoft-aspnetcore-mvc-core-log-event-ids.md
+              - name: Fallback file endpoints
+                href: breaking-changes/7/fallback-file-endpoints.md
+              - name: IHubClients and IHubCallerClients hide members
+                href: breaking-changes/7/ihubclients-ihubcallerclients.md
+              - name: "Kestrel: Default HTTPS binding removed"
+                href: breaking-changes/7/https-binding-kestrel.md
+              - name: Microsoft.AspNetCore.Server.Kestrel.Transport.Libuv and libuv.dll removed
+                href: breaking-changes/7/libuv-transport-dll-removed.md
+              - name: Microsoft.Data.SqlClient updated to 4.0.1
+                href: breaking-changes/7/microsoft-data-sqlclient-updated-to-4-0-1.md
+              - name: Middleware no longer defers to endpoint with null request delegate
+                href: breaking-changes/7/middleware-null-requestdelegate.md
+              - name: MVC's detection of an empty body in model binding changed
+                href: breaking-changes/7/mvc-empty-body-model-binding.md
+              - name: Output caching API changes
+                href: breaking-changes/7/output-caching-renames.md
+              - name: SignalR Hub methods try to resolve parameters from DI
+                href: breaking-changes/7/signalr-hub-method-parameters-di.md
+      - name: ASP.NET Core 6
+        items:
+          - name: What's new in 6
+            uid: aspnetcore-6.0
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/6/overview.md
+              - name: ActionResult<T> sets StatusCode to 200
+                href: breaking-changes/6/actionresult-statuscode.md
+              - name: AddDataAnnotationsValidation method made obsolete
+                href: breaking-changes/6/adddataannotationsvalidation-obsolete.md
+              - name: Assemblies removed from shared framework
+                href: breaking-changes/6/assemblies-removed-from-shared-framework.md
+              - name: "Blazor: Parameter name changed in RequestImageFileAsync method"
+                href: breaking-changes/6/blazor-parameter-name-changed-in-method.md
+              - name: "Blazor: WebEventDescriptor.EventArgsType property replaced"
+                href: breaking-changes/6/blazor-eventargstype-property-replaced.md
+              - name: "Blazor: Byte-array interop"
+                href: breaking-changes/6/byte-array-interop.md
+              - name: ClientCertificate doesn't trigger renegotiation
+                href: breaking-changes/6/clientcertificate-doesnt-trigger-renegotiation.md
+              - name: EndpointName metadata not set automatically
+                href: breaking-changes/6/endpointname-metadata.md
+              - name: "Identity: Default Bootstrap version of UI changed"
+                href: breaking-changes/6/identity-bootstrap4-to-5.md
+              - name: "Kestrel: Log message attributes changed"
+                href: breaking-changes/6/kestrel-log-message-attributes-changed.md
+              - name: "MessagePack: Library changed in @microsoft/signalr-protocol-msgpack"
+                href: breaking-changes/6/messagepack-library-change.md
+              - name: Microsoft.AspNetCore.Http.Features split
+                href: breaking-changes/6/microsoft-aspnetcore-http-features-package-split.md
+              - name: "Middleware: HTTPS Redirection Middleware throws exception on ambiguous HTTPS ports"
+                href: breaking-changes/6/middleware-ambiguous-https-ports-exception.md
+              - name: "Middleware: New Use overload"
+                href: breaking-changes/6/middleware-new-use-overload.md
+              - name: Minimal API renames in RC 1
+                href: breaking-changes/6/rc1-minimal-api-renames.md
+              - name: Minimal API renames in RC 2
+                href: breaking-changes/6/rc2-minimal-api-renames.md
+              - name: MVC doesn't buffer IAsyncEnumerable types
+                href: breaking-changes/6/iasyncenumerable-not-buffered-by-mvc.md
+              - name: Nullable reference type annotations changed
+                href: breaking-changes/6/nullable-reference-type-annotations-changed.md
+              - name: Obsoleted and removed APIs
+                href: breaking-changes/6/obsolete-removed-apis.md
+              - name: PreserveCompilationContext not configured by default
+                href: breaking-changes/6/preservecompilationcontext-not-set-by-default.md
+              - name: "Razor: Compiler generates single assembly"
+                href: breaking-changes/6/razor-compiler-doesnt-produce-views-assembly.md
+              - name: "Razor: Logging ID changes"
+                href: breaking-changes/6/razor-pages-logging-ids.md
+              - name: "Razor: RazorEngine APIs marked obsolete"
+                href: breaking-changes/6/razor-engine-apis-obsolete.md
+              - name: "SignalR: Java Client updated to RxJava3"
+                href: breaking-changes/6/signalr-java-client-updated.md
+              - name: TryParse and BindAsync methods are validated
+                href: breaking-changes/6/tryparse-bindasync-validation.md
+      - name: ASP.NET Core 5
+        items:
+          - name: What's new in 5
+            uid: aspnetcore-5.0
+          - name: Breaking changes
+            items:
+              - name: Overview
+                href: breaking-changes/5/overview.md
+              - name: ASP.NET Core apps deserialize quoted numbers
+                href: /dotnet/core/compatility/serialization/5.0/jsonserializer-allows-reading-numbers-as-strings
+              - name: AzureAD.UI and AzureADB2C.UI APIs obsolete
+                href: breaking-changes/5/authentication-aad-packages-obsolete.md
+              - name: BinaryFormatter serialization methods are obsolete
+                href: /dotnet/core/compatility/serialization/5.0/binaryformatter-serialization-obsolete
+              - name: Resource in endpoint routing is HttpContext
+                href: breaking-changes/5/authorization-resource-in-endpoint-routing.md
+              - name: Microsoft-prefixed Azure integration packages removed
+                href: breaking-changes/5/azure-integration-packages-removed.md
+              - name: "Blazor: Route precedence logic changed in Blazor apps"
+                href: breaking-changes/5/blazor-routing-logic-changed.md
+              - name: "Blazor: Updated browser support"
+                href: breaking-changes/5/blazor-browser-support-updated.md
+              - name: "Blazor: Insignificant whitespace trimmed by compiler"
+                href: breaking-changes/5/blazor-components-trim-insignificant-whitespace.md
+              - name: "Blazor: JSObjectReference and JSInProcessObjectReference types are internal"
+                href: breaking-changes/5/blazor-jsobjectreference-to-internal.md
+              - name: "Blazor: Target framework of NuGet packages changed"
+                href: breaking-changes/5/blazor-packages-target-framework-changed.md
+              - name: "Blazor: ProtectedBrowserStorage feature moved to shared framework"
+                href: breaking-changes/5/blazor-protectedbrowserstorage-moved.md
+              - name: "Blazor: RenderTreeFrame readonly public fields are now properties"
+                href: breaking-changes/5/blazor-rendertreeframe-fields-become-properties.md
+              - name: "Blazor: Updated validation logic for static web assets"
+                href: breaking-changes/5/blazor-static-web-assets-validation-logic-updated.md
+              - name: Cryptography APIs not supported on browser
+                href: /dotnet/core/compatility/cryptography/5.0/cryptography-apis-not-supported-on-blazor-webassembly
+              - name: "Extensions: Package reference changes"
+                href: breaking-changes/5/extensions-package-reference-changes.md
+              - name: Kestrel and IIS BadHttpRequestException types are obsolete
+                href: breaking-changes/5/http-badhttprequestexception-obsolete.md
+              - name: HttpClient instances created by IHttpClientFactory log integer status codes
+                href: breaking-changes/5/http-httpclient-instances-log-integer-status-codes.md
+              - name: "HttpSys: Client certificate renegotiation disabled by default"
+                href: breaking-changes/5/httpsys-client-certificate-renegotiation-disabled-by-default.md
+              - name: "IIS: UrlRewrite middleware query strings are preserved"
+                href: breaking-changes/5/iis-urlrewrite-middleware-query-strings-are-preserved.md
+              - name: "Kestrel: Configuration changes detected by default"
+                href: breaking-changes/5/kestrel-configuration-changes-at-run-time-detected-by-default.md
+              - name: "Kestrel: Default supported TLS protocol versions changed"
+                href: breaking-changes/5/kestrel-default-supported-tls-protocol-versions-changed.md
+              - name: "Kestrel: HTTP/2 disabled over TLS on incompatible Windows versions"
+                href: breaking-changes/5/kestrel-disables-http2-over-tls.md
+              - name: "Kestrel: Libuv transport marked as obsolete"
+                href: breaking-changes/5/kestrel-libuv-transport-obsolete.md
+              - name: Obsolete properties on ConsoleLoggerOptions
+                href: /dotnet/core/compatility/core-libraries/5.0/obsolete-consoleloggeroptions-properties
+              - name: ResourceManagerWithCultureStringLocalizer class and WithCulture interface member removed
+                href: breaking-changes/5/localization-members-removed.md
+              - name: Pubternal APIs removed
+                href: breaking-changes/5/localization-pubternal-apis-removed.md
+              - name: Obsolete constructor removed in request localization middleware
+                href: breaking-changes/5/localization-requestlocalizationmiddleware-constructor-removed.md
+              - name: "Middleware: Database error page marked as obsolete"
+                href: breaking-changes/5/middleware-database-error-page-obsolete.md
+              - name: Exception handler middleware throws original exception
+                href: breaking-changes/5/middleware-exception-handler-throws-original-exception.md
+              - name: ObjectModelValidator calls a new overload of Validate
+                href: breaking-changes/5/mvc-objectmodelvalidator-calls-new-overload.md
+              - name: Cookie name encoding removed
+                href: breaking-changes/5/security-cookie-name-encoding-removed.md
+              - name: IdentityModel NuGet package versions updated
+                href: breaking-changes/5/security-identitymodel-nuget-package-versions-updated.md
+              - name: "SignalR: MessagePack Hub Protocol options type changed"
+                href: breaking-changes/5/signalr-messagepack-hub-protocol-options-changed.md
+              - name: "SignalR: MessagePack Hub Protocol moved"
+                href: breaking-changes/5/signalr-messagepack-package.md
+              - name: UseSignalR and UseConnections methods removed
+                href: breaking-changes/5/signalr-usesignalr-useconnections-removed.md
+              - name: CSV content type changed to standards-compliant
+                href: breaking-changes/5/static-files-csv-content-type-changed.md
       - name: What's new in 3.1
         uid: aspnetcore-3.1
       - name: What's new in 3.0
@@ -35,8 +313,6 @@ items:
         uid: aspnetcore-2.0
       - name: What's new in 1.1
         uid: aspnetcore-1.1
-      - name: What's new in docs
-        href: whats-new/index.yml
   - name: Tutorials
     displayName: tutorial
     items:
@@ -92,6 +368,11 @@ items:
             uid: blazor/tutorials/index
       - name: APIs
         items:
+        - name: Minimal APIs
+          items:
+          - name: Create a minimal web API
+            displayName: API tutorial
+            uid: tutorials/min-web-api
         - name: Controller-based APIs
           items:
           - name: Create a controller-based web API
@@ -109,11 +390,6 @@ items:
           - name: Publish to Azure API Management
             displayName: tutorial
             uid: tutorials/publish-to-azure-api-management-using-vs
-        - name: Minimal APIs
-          items:
-          - name: Create a minimal web API
-            displayName: API tutorial
-            uid: tutorials/min-web-api
       - name: Real-time web apps
         items:
           - name: SignalR with JavaScript
@@ -180,9 +456,6 @@ items:
           - name: Web apps >>
             displayName: tutorial, razor, razor pages, ui
             href: /training/modules/create-razor-pages-aspnet-core/
-          - name: Web APIs >>
-            displayName: tutorial
-            href: /training/modules/build-web-api-aspnet-core/
           - name: Cloud-native microservices
             items:
               - name: Create and deploy >>
@@ -209,9 +482,6 @@ items:
           - name: Data access >>
             displayName: tutorial, ef, entity framework
             href: /training/modules/persist-data-ef-core/
-          - name: Web app security >>
-            displayName: tutorial, identity
-            href: /training/modules/secure-aspnet-core-identity/
   - name: Fundamentals
     items:
       - name: Overview
@@ -231,40 +501,14 @@ items:
           - name: Request Delegate Generator
             displayName: aot, RDG, Request Delegate Generator
             uid: fundamentals/aot/rdg
-          - name: RDG diagnostics
-            displayName: aot, RDG diagnostics
-            uid: fundamentals/aot/request-delegate-generator/rdg-ids
-            items:
-              - name: RDG002
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg002
-              - name: RDG004
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg004
-              - name: RDG005
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg005
-              - name: RDG006
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg006
-              - name: RDG007
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg007
-              - name: RDG008
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg008
-              - name: RDG009
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg009
-              - name: RDG010
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg010
-              - name: RDG011
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg011
-              - name: RDG012
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg012
-              - name: RDG013
-                uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg013
       - name: Middleware
         items:
           - name: Middleware overview
             uid: fundamentals/middleware/index
           - name: Rate limiting middleware
             uid: performance/rate-limit
-          - name: Middleware in Minimal API apps
-            uid: fundamentals/minimal-apis/middleware
+          - name: Rate limiting samples
+            uid: performance/rate-limit-sample
           - name: Test middleware
             uid: test/middleware
           - name: Response caching middleware
@@ -301,16 +545,16 @@ items:
             uid: fundamentals/logging/index
           - name: HTTP logging
             uid: fundamentals/http-logging/index
+          - name: Enrich HTTP request logs in ASP.NET Core
+            uid: fundamentals/http-logging/http-log-enricher
           - name: W3C logger
             uid: fundamentals/w3c-logger/index
           - name: Health checks
             displayName: logging, monitoring
             uid: host-and-deploy/health-checks
-          - name: Metrics overview
+          - name: Metrics
             displayName: logging, monitoring
-            uid: log-mon/metrics/metrics
-          - name: Built-in metrics >>
-            href: /dotnet/core/diagnostics/built-in-metrics-aspnetcore
+            uid: metrics/overview
       - name: HttpContext
         uid: fundamentals/use-httpcontext
       - name: Routing
@@ -322,13 +566,17 @@ items:
         uid: fundamentals/http-requests
       - name: Static files
         uid: fundamentals/static-files
+      - name: Validation
+        uid: fundamentals/validation
+      - name: dotnet-scaffold telemetry
+        uid: fundamentals/dotnet-scaffold-telemetry
   - name: Web apps
     items:
       - name: Choose an ASP.NET Core UI
         uid: tutorials/choose-web-ui
       - name: Razor Pages
         items:
-          - name: Introduction
+          - name: Architecture and concepts
             uid: razor-pages/index
           - name: Tutorial
             items:
@@ -354,6 +602,22 @@ items:
             uid: razor-pages/filter
           - name: Route and app conventions
             uid: razor-pages/razor-pages-conventions
+          - name: Security and Identity
+            items:
+              - name: Authorization
+                items:
+                  - name: Simple authorization
+                    uid: razor-pages/security/authorization/simple
+                  - name: Authorization conventions
+                    uid: razor-pages/security/authorization/conventions
+                  - name: Role-based authorization
+                    uid: razor-pages/security/authorization/roles
+                  - name: Claim-based authorization
+                    uid: razor-pages/security/authorization/claims
+                  - name: Policy-based authorization
+                    uid: razor-pages/security/authorization/policies
+                  - name: Resource-based authorization
+                    uid: razor-pages/security/authorization/resource-based
       - name: MVC
         items:
           - name: Overview
@@ -394,6 +658,24 @@ items:
             uid: mvc/views/dependency-injection
           - name: Unit test
             uid: mvc/controllers/testing
+          - name: Security and Identity
+            items:
+              - name: Authorization
+                items:
+                  - name: Simple authorization
+                    uid: mvc/security/authorization/simple
+                  - name: Custom authorization with IAuthorizationRequirementData
+                    uid: mvc/security/authorization/iard
+                  - name: Role-based authorization
+                    uid: mvc/security/authorization/roles
+                  - name: Claim-based authorization
+                    uid: mvc/security/authorization/claims
+                  - name: Policy-based authorization
+                    uid: mvc/security/authorization/policies
+                  - name: Resource-based authorization
+                    uid: mvc/security/authorization/resource-based
+                  - name: View-based authorization
+                    uid: mvc/security/authorization/views
       - name: Blazor
         items:
           - name: Overview
@@ -446,8 +728,8 @@ items:
                 items:
                   - name: Overview
                     uid: blazor/hybrid/tutorials/index
-                  - name: .NET MAUI
-                    uid: blazor/hybrid/tutorials/maui
+                  - name: Build your first app
+                    href: /dotnet/maui/get-started/first-app
                   - name: .NET MAUI with Blazor Web App
                     uid: blazor/hybrid/tutorials/maui-blazor-web-app
                   - name: Windows Forms
@@ -464,6 +746,8 @@ items:
                 uid: blazor/hybrid/reuse-razor-components
               - name: Class libraries
                 uid: blazor/hybrid/class-libraries
+              - name: Class libraries best practices
+                uid: blazor/hybrid/class-libraries-best-practices
               - name: Root component parameters
                 uid: blazor/hybrid/root-component-parameters
               - name: Security and Identity
@@ -472,6 +756,8 @@ items:
                     uid: blazor/hybrid/security/index
                   - name: Security considerations
                     uid: blazor/hybrid/security/security-considerations
+                  - name: .NET MAUI with Blazor Web App and Identity sample
+                    uid: blazor/hybrid/security/maui-blazor-web-identity
               - name: Publish
                 uid: blazor/hybrid/publish/index
               - name: Troubleshoot
@@ -482,8 +768,10 @@ items:
             items:
               - name: Overview
                 uid: blazor/fundamentals/index
-              - name: Routing and navigation
+              - name: Routing
                 uid: blazor/fundamentals/routing
+              - name: Navigation
+                uid: blazor/fundamentals/navigation
               - name: Configuration
                 uid: blazor/fundamentals/configuration
               - name: Dependency injection
@@ -508,6 +796,8 @@ items:
                 uid: blazor/components/render-modes
               - name: Prerender components
                 uid: blazor/components/prerender
+              - name: IHttpContextAccessor and HttpContext
+                uid: blazor/components/httpcontext
               - name: Generic type support
                 uid: blazor/components/generic-type-support
               - name: Synchronization context
@@ -532,6 +822,8 @@ items:
                 uid: blazor/components/data-binding
               - name: Lifecycle
                 uid: blazor/components/lifecycle
+              - name: Component disposal
+                uid: blazor/components/component-disposal
               - name: Virtualization
                 uid: blazor/components/virtualization
               - name: Rendering
@@ -544,14 +836,16 @@ items:
                 uid: blazor/components/dynamiccomponent
               - name: QuickGrid component
                 uid: blazor/components/quickgrid
-              - name: Prerender and integrate components
-                uid: blazor/components/prerendering-and-integration
-              - name: Integrate components
+              - name: Integrate with MVC/Razor Pages
                 uid: blazor/components/integration
+              - name: Integrate with MVC/Razor Pages (hosted WebAssembly)
+                uid: blazor/components/integration-hosted-webassembly
               - name: Class libraries
                 uid: blazor/components/class-libraries
               - name: Class libraries with static SSR
                 uid: blazor/components/class-libraries-with-static-ssr
+              - name: Return component HTML from a web API
+                uid: blazor/components/return-component-html-from-a-web-api
               - name: JavaScript apps and SPA frameworks
                 uid: blazor/components/js-spa-frameworks
               - name: Components outside of ASP.NET Core
@@ -570,6 +864,10 @@ items:
                 uid: blazor/forms/binding
               - name: Validation
                 uid: blazor/forms/validation
+              - name: Advanced validation
+                uid: blazor/forms/validation-advanced
+              - name: Client-side validation (static SSR)
+                uid: blazor/forms/validation-client-side
               - name: Troubleshoot
                 uid: blazor/forms/troubleshoot
           - name: File uploads
@@ -600,26 +898,18 @@ items:
                 uid: blazor/security/index
               - name: Authentication state
                 uid: blazor/security/authentication-state
-              - name: Server
-                items:
-                  - name: Overview
-                    uid: blazor/security/server/index
-                  - name: Static server-side rendering threats
-                    uid: blazor/security/server/static-server-side-rendering
-                  - name: Interactive server-side rendering threats
-                    uid: blazor/security/server/interactive-server-side-rendering
-                  - name: Account confirmation and password recovery
-                    uid: blazor/security/server/account-confirmation-and-password-recovery
-                  - name: QR code generation
-                    uid: blazor/security/server/qrcodes-for-authenticator-apps
-                  - name: Additional scenarios
-                    uid: blazor/security/server/additional-scenarios
               - name: Blazor WebAssembly
                 items:
                   - name: Overview
                     uid: blazor/security/webassembly/index
                   - name: Standalone with Identity
-                    uid: blazor/security/webassembly/standalone-with-identity
+                    items:
+                      - name: Overview
+                        uid: blazor/security/webassembly/standalone-with-identity/index
+                      - name: Account confirmation and password recovery
+                        uid: blazor/security/webassembly/standalone-with-identity/account-confirmation-and-password-recovery
+                      - name: QR codes with TOTP
+                        uid: blazor/security/webassembly/standalone-with-identity/qrcodes-for-authenticator-apps
                   - name: Standalone with Authentication library
                     uid: blazor/security/webassembly/standalone-with-authentication-library
                   - name: Standalone with Microsoft Accounts
@@ -646,44 +936,106 @@ items:
                 uid: blazor/security/blazor-web-app-entra
               - name: Blazor Web App with OIDC
                 uid: blazor/security/blazor-web-app-oidc
+              - name: Blazor Web App with Windows Auth
+                uid: blazor/security/blazor-web-app-windows-authentication
+              - name: Static server-side rendering threats
+                uid: blazor/security/static-server-side-rendering
+              - name: Interactive server-side rendering threats
+                uid: blazor/security/interactive-server-side-rendering
+              - name: Account confirmation and password recovery
+                uid: blazor/security/account-confirmation-and-password-recovery
+              - name: QR codes with TOTP
+                uid: blazor/security/qrcodes-for-authenticator-apps
               - name: Content Security Policy
                 uid: blazor/security/content-security-policy
+              - name: EU General Data Protection Regulation (GDPR) support
+                uid: blazor/security/gdpr
+              - name: Server-side and Blazor Web App additional scenarios
+                uid: blazor/security/additional-scenarios
           - name: State management
-            uid: blazor/state-management
+            items:
+              - name: Overview
+                uid: blazor/state-management/index
+              - name: Prerendered state persistence
+                uid: blazor/state-management/prerendered-state-persistence
+              - name: Server
+                uid: blazor/state-management/server
+              - name: WebAssembly
+                uid: blazor/state-management/webassembly
+              - name: Protected browser storage
+                uid: blazor/state-management/protected-browser-storage
           - name: Debug
             uid: blazor/debug
           - name: Lazy load assemblies with WebAssembly
             uid: blazor/webassembly-lazy-load-assemblies
           - name: WebAssembly native dependencies
             uid: blazor/webassembly-native-dependencies
+          - name: Blazor with .NET on Web Workers
+            uid: blazor/blazor-web-workers
           - name: Performance
-            uid: blazor/performance
+            items:
+              - name: Overview
+                uid: blazor/performance/index
+              - name: Rendering speed
+                uid: blazor/performance/rendering
+              - name: App download size
+                uid: blazor/performance/app-download-size
+              - name: JavaScript interop
+                uid: blazor/performance/js-interop
+              - name: WebAssembly runtime performance
+                uid: blazor/performance/webassembly-runtime-performance
+              - name: WebAssembly browser developer tools diagnostics
+                uid: blazor/performance/webassembly-browser-developer-tools
+              - name: WebAssembly Event Pipe diagnostics
+                uid: blazor/performance/webassembly-event-pipe
           - name: Test components
             uid: blazor/test
           - name: Progressive Web Applications
-            uid: blazor/progressive-web-app
+            items:
+              - name: Overview
+                uid: blazor/progressive-web-app/index
+              - name: Push notifications
+                uid: blazor/progressive-web-app/push-notifications
           - name: Host and deploy
             items:
               - name: Overview
                 uid: blazor/host-and-deploy/index
+              - name: App base path
+                uid: blazor/host-and-deploy/app-base-path
               - name: Server
-                uid: blazor/host-and-deploy/server
-              - name: Blazor WebAssembly
-                uid: blazor/host-and-deploy/webassembly
-              - name: WebAssembly caching
                 items:
                   - name: Overview
-                    uid: blazor/host-and-deploy/webassembly-caching/index
+                    uid: blazor/host-and-deploy/server/index
+                  - name: Memory management
+                    uid: blazor/host-and-deploy/server/memory-management
+              - name: Blazor WebAssembly
+                items:
+                  - name: Overview
+                    uid: blazor/host-and-deploy/webassembly/index
+                  - name: Deploy to IIS
+                    uid: blazor/host-and-deploy/webassembly/iis
+                  - name: Deploy to Azure Static Web Apps
+                    uid: blazor/host-and-deploy/webassembly/azure-static-web-apps
+                  - name: Deploy to Azure Storage
+                    uid: blazor/host-and-deploy/webassembly/azure-storage
+                  - name: Deploy to Nginx
+                    uid: blazor/host-and-deploy/webassembly/nginx
+                  - name: Deploy to Apache
+                    uid: blazor/host-and-deploy/webassembly/apache
+                  - name: Deploy to GitHub Pages
+                    uid: blazor/host-and-deploy/webassembly/github-pages
+                  - name: Bundle caching and integrity check failures
+                    uid: blazor/host-and-deploy/webassembly/bundle-caching-and-integrity-check-failures
                   - name: HTTP caching issues
-                    uid: blazor/host-and-deploy/webassembly-caching/http-caching-issues
+                    uid: blazor/host-and-deploy/webassembly/http-caching-issues
+                  - name: Multiple hosted WebAssembly apps
+                    uid: blazor/host-and-deploy/webassembly/multiple-hosted-webassembly
+                  - name: Deployment layout
+                    uid: blazor/host-and-deploy/webassembly/deployment-layout
               - name: Configure the Linker
                 uid: blazor/host-and-deploy/configure-linker
               - name: Configure the Trimmer
                 uid: blazor/host-and-deploy/configure-trimmer
-              - name: WebAssembly deployment layout
-                uid: blazor/host-and-deploy/webassembly-deployment-layout
-              - name: Multiple hosted WebAssembly apps
-                uid: blazor/host-and-deploy/multiple-hosted-webassembly
           - name: Blazor with EF Core
             uid: blazor/blazor-ef-core
           - name: Advanced scenarios
@@ -722,6 +1074,8 @@ items:
                 uid: client-side/dotnet-interop/index
               - name: JS interop (WebAssembly Browser App)
                 uid: client-side/dotnet-interop/wasm-browser-app
+          - name: .NET on Web Workers
+            uid: client-side/dotnet-on-webworkers
           - name: Grunt
             uid: client-side/using-grunt
           - name: Bundle and minify
@@ -797,6 +1151,10 @@ items:
             uid: mvc/controllers/filters
           - name: Razor SDK
             uid: razor-pages/sdk
+          - name: Razor breaking changes since .NET 8
+            href: ../_razor/docs/Compiler%20Breaking%20Changes%20-%20DotNet%208.md
+          - name: Razor breaking changes since .NET 9
+            href: ../_razor/docs/Compiler%20Breaking%20Changes%20-%20DotNet%209.md
           - name: View components
             uid: mvc/views/view-components
           - name: View compilation
@@ -814,62 +1172,28 @@ items:
     items:
       - name: Overview
         uid: fundamentals/apis
-      - name: Controller-based APIs
-        items:
-        - name: Overview
-          uid: web-api/index
-        - name: Tutorials
-          items:
-            - name: Create a web API with controllers
-              uid: tutorials/first-web-api
-            - name: Web API with MongoDB
-              uid: tutorials/first-mongo-app
-        - name: Action return types
-          uid: web-api/action-return-types
-        - name: Handle JSON Patch requests
-          uid: web-api/jsonpatch
-        - name: Format response data
-          uid: web-api/advanced/formatting
-        - name: Custom formatters
-          uid: web-api/advanced/custom-formatters
-        - name: Analyzers
-          uid: web-api/advanced/analyzers
-        - name: Conventions
-          uid: web-api/advanced/conventions
-        - name: Handle errors
-          uid: web-api/handle-errors
-        - name: Test with HttpRepl
-          items:
-            - name: Overview
-              uid: web-api/http-repl
-            - name: Telemetry
-              uid: web-api/http-repl/telemetry
-      - name: Minimal APIs
-        items:
-        - name: Overview
-          uid: fundamentals/minimal-apis/overview
-        - name: "Tutorial: Create a minimal API"
-          uid: tutorials/min-web-api
-        - name: Minimal APIs quick reference
-          uid: fundamentals/minimal-apis
-        - name: WebApplication and WebApplicationBuilder
-          uid: fundamentals/minimal-apis/webapplication
-        - name: Route Handlers
-          uid: fundamentals/minimal-apis/route-handlers
-        - name: Parameter binding
-          uid: fundamentals/minimal-apis/parameter-binding
-        - name: Create responses
-          uid: fundamentals/minimal-apis/responses
-        - name: Filters
-          uid: fundamentals/minimal-apis/min-api-filters
-        - name: Unit and integration tests
-          uid: fundamentals/minimal-apis/test-min-api
-        - name: Middleware
-          uid: fundamentals/minimal-apis/middleware
-        - name: Handle errors
-          uid: fundamentals/minimal-apis/handle-errors
-        - name: Authentication and authorization
-          uid: fundamentals/minimal-apis/security
+      - name: "Tutorial: Create a Minimal API"
+        uid: tutorials/min-web-api
+      - name: Minimal APIs quick reference
+        uid: fundamentals/minimal-apis
+      - name: WebApplication and WebApplicationBuilder
+        uid: fundamentals/minimal-apis/webapplication
+      - name: Route Handlers
+        uid: fundamentals/minimal-apis/route-handlers
+      - name: Parameter binding
+        uid: fundamentals/minimal-apis/parameter-binding
+      - name: Create responses
+        uid: fundamentals/minimal-apis/responses
+      - name: Filters
+        uid: fundamentals/minimal-apis/min-api-filters
+      - name: Unit and integration tests
+        uid: fundamentals/minimal-apis/test-min-api
+      - name: Handle JSON Patch requests
+        uid: web-api/jsonpatch
+      - name: Handle errors
+        uid: fundamentals/error-handling-api
+      - name: Authentication and authorization
+        uid: fundamentals/minimal-apis/security
       - name: OpenAPI
         items:
           - name: Overview
@@ -878,6 +1202,8 @@ items:
             uid: fundamentals/openapi/aspnetcore-openapi
           - name: Include OpenAPI metadata
             uid: fundamentals/openapi/include-metadata
+          - name: XML doc comment support
+            uid: fundamentals/openapi/aspnet-openapi-xml
           - name: Customize OpenAPI documents
             uid: fundamentals/openapi/customize-openapi
           - name: Use OpenAPI documents
@@ -892,6 +1218,32 @@ items:
                 uid: tutorials/get-started-with-swashbuckle
               - name: Get started with NSwag
                 uid: tutorials/get-started-with-nswag
+      - name: Controller-based APIs
+        items:
+        - name: Overview
+          uid: web-api/index
+        - name: Tutorials
+          items:
+            - name: Create a web API with controllers
+              uid: tutorials/first-web-api
+            - name: Web API with MongoDB
+              uid: tutorials/first-mongo-app
+        - name: Action return types
+          uid: web-api/action-return-types
+        - name: Format response data
+          uid: web-api/advanced/formatting
+        - name: Custom formatters
+          uid: web-api/advanced/custom-formatters
+        - name: Analyzers
+          uid: web-api/advanced/analyzers
+        - name: Conventions
+          uid: web-api/advanced/conventions
+        - name: Test with HttpRepl
+          items:
+            - name: Overview
+              uid: web-api/http-repl
+            - name: Telemetry
+              uid: web-api/http-repl/telemetry
   - name: Real-time apps
     displayName: signalr
     items:
@@ -909,8 +1261,14 @@ items:
           - name: SignalR with Blazor
             uid: blazor/tutorials/signalr-blazor
       - name: Samples
-        href: https://github.com/aspnet/SignalR-samples
         displayName: signalr
+        items:
+          - name: AI-powered group chat
+            uid: tutorials/ai-powered-group-chat
+            displayName: signalr
+          - name: SignalR samples repository
+            href: https://github.com/aspnet/SignalR-samples
+            displayName: signalr
       - name: Server concepts
         displayName: signalr
         items:
@@ -953,6 +1311,9 @@ items:
           - name: JavaScript API reference
             href: /javascript/api/@microsoft/signalr/
             displayName: signalr
+          - name: Swift client
+            uid: signalr/swift-client
+            displayName: signalr
       - name: Host and scale
         displayName: signalr
         items:
@@ -969,6 +1330,9 @@ items:
             uid: signalr/background-services
       - name: Configuration
         uid: signalr/configuration
+        displayName: signalr
+      - name: IHttpContextAccessor and HttpContext
+        uid: signalr/httpcontext
         displayName: signalr
       - name: Authentication and authorization
         uid: signalr/authn-and-authz
@@ -1053,8 +1417,6 @@ items:
                 uid: grpc/json-transcoding
               - name: HTTP rules and JSON
                 uid: grpc/json-transcoding-binding
-              - name: Swagger / OpenAPI
-                uid: grpc/json-transcoding-openapi
       - name: Configuration
         uid: grpc/configuration
       - name: Authentication and authorization
@@ -1097,14 +1459,14 @@ items:
         href: https://github.com/grpc/grpc-dotnet/tree/master/examples
       - name: Troubleshoot
         uid: grpc/troubleshoot
-  - name: Best practices
-    displayName: performance
-    uid: fundamentals/best-practices
   - name: Servers
     items:
       - name: Overview
         displayName: kestrel, iis, http.sys, httpsys, servers
         uid: fundamentals/servers/index
+      - name: HTTP.sys
+        displayName: deploy, publish, server, httpsys
+        uid: fundamentals/servers/httpsys
       - name: Kestrel
         items:
           - name: Overview
@@ -1119,6 +1481,9 @@ items:
           - name: Diagnostics
             displayName: diagnostics
             uid: fundamentals/servers/kestrel/diagnostics
+          - name: Memory management
+            displayName: memory, pool, kestrel
+            uid: fundamentals/servers/kestrel/memory-management
           - name: HTTP/2
             displayName: deploy, publish, server, Kestrel
             uid: fundamentals/servers/kestrel/http2
@@ -1137,6 +1502,9 @@ items:
           - name: Request draining
             displayName: deploy, publish, server, Kestrel
             uid: fundamentals/servers/kestrel/request-draining
+          - name: Security considerations
+            displayName: deploy, publish, server, Kestrel, security
+            uid: fundamentals/servers/kestrel/security-considerations
       - name: IIS
         items:
           - name: Overview
@@ -1184,9 +1552,143 @@ items:
           - name: HTTP/3
             displayName: deploy, publish, server, iis
             uid: host-and-deploy/iis/http3
-      - name: HTTP.sys
-        displayName: deploy, publish, server, httpsys
-        uid: fundamentals/servers/httpsys
+      - name: YARP
+        items:
+          - name: YARP Overview
+            uid: fundamentals/servers/yarp/overview
+          - name: Get started with YARP
+            uid: fundamentals/servers/yarp/getting-started
+          - name: Configuration
+            items:
+            - name: Configuration Files
+              displayName: yarp
+              uid: fundamentals/servers/yarp/config-files
+            - name: Configuration Providers
+              displayName: yarp
+              uid: fundamentals/servers/yarp/config-providers
+            - name: Configuration Filters
+              displayName: yarp
+              uid: fundamentals/servers/yarp/config-filters
+            - name: HTTP client configuration
+              displayName: yarp
+              uid: fundamentals/servers/yarp/http-client-config
+          - name: Proxy Features
+            items:
+              - name: Header Routing
+                displayName: yarp
+                uid: fundamentals/servers/yarp/header-routing
+              - name: Query Parameter Routing
+                displayName: yarp
+                uid: fundamentals/servers/yarp/queryparameter-routing
+              - name: Transforms
+                items:
+                  - name: Transforms Overview
+                    displayName: yarp
+                    uid: fundamentals/servers/yarp/transforms
+                  - name: Request Transforms
+                    displayName: yarp
+                    uid: fundamentals/servers/yarp/transforms-request
+                  - name: Response Transforms
+                    displayName: yarp
+                    uid: fundamentals/servers/yarp/transforms-response
+              - name: Load Balancing
+                displayName: yarp
+                uid: fundamentals/servers/yarp/load-balancing
+              - name: Session Affinity
+                displayName: yarp
+                uid: fundamentals/servers/yarp/session-affinity
+              - name: Destinations Health Checks
+                displayName: yarp
+                uid: fundamentals/servers/yarp/dests-health-checks
+              - name: Rate Limiting
+                displayName: yarp
+                uid: fundamentals/servers/yarp/rate-limiting
+              - name: Timeouts
+                displayName: yarp
+                uid: fundamentals/servers/yarp/timeouts
+              - name: Authentication and Authorization
+                displayName: yarp
+                uid: fundamentals/servers/yarp/authn-authz
+              - name: Output Caching
+                displayName: yarp
+                uid: fundamentals/servers/yarp/output-caching
+              - name: Distributed Tracing
+                displayName: yarp
+                uid: fundamentals/servers/yarp/distributed-tracing
+              - name: A/B Testing
+                displayName: yarp
+                uid: fundamentals/servers/yarp/ab-testing
+          - name: Protocols and Guidance
+            items:
+              - name: Header Guidelines
+                displayName: yarp
+                uid: fundamentals/servers/yarp/header-guidelines
+              - name: HTTPS & TLS
+                displayName: yarp
+                uid: fundamentals/servers/yarp/https-tls
+              - name: Proxying gRPC
+                displayName: yarp
+                uid: fundamentals/servers/yarp/grpc
+              - name: HTTP/3
+                displayName: yarp
+                uid: fundamentals/servers/yarp/http3
+              - name: Cross-Origin Requests (CORS)
+                displayName: yarp
+                uid: fundamentals/servers/yarp/cors
+              - name: Let's Encrypt
+                displayName: yarp
+                uid: fundamentals/servers/yarp/lets-encrypt
+              - name: WebSockets and SPDY
+                displayName: yarp
+                uid: fundamentals/servers/yarp/websockets
+          - name: Extensibility
+            items:
+            - name: Overview
+              displayName: yarp
+              uid: fundamentals/servers/yarp/extensibility
+            - name: Middleware
+              displayName: yarp
+              uid: fundamentals/servers/yarp/middleware
+            - name: Direct Forwarding
+              displayName: yarp
+              uid: fundamentals/servers/yarp/direct-forwarding
+            - name: Destination Resolvers
+              displayName: yarp
+              uid: fundamentals/servers/yarp/destination-resolvers
+            - name: Request and Response Transform Extensibility
+              displayName: yarp
+              uid: fundamentals/servers/yarp/transform-extensibility
+          - name: Deployment options
+            items:
+            - name: HTTP.sys Delegation
+              displayName: yarp
+              uid: fundamentals/servers/yarp/httpsys-delegation
+            - name: Service Fabric Integration
+              displayName: yarp
+              uid: fundamentals/servers/yarp/service-fabric-int
+            - name: YARP Kubernetes Ingress Controller
+              displayName: yarp
+              uid: fundamentals/servers/yarp/kubernetes-ingress
+          - name: Troubleshooting
+            items:
+            - name: Diagnosing proxy issues
+              displayName: yarp
+              uid: fundamentals/servers/yarp/diagnosing-yarp-issues
+  - name: Metrics
+    items:
+      - name: Overview
+        displayName: logging, monitoring
+        uid: metrics/overview
+      - name: Built-in metrics
+        uid: metrics/built-in
+      - name: HTTP metrics
+        uid: metrics/http
+      - name: Diagnostics metrics
+        uid: metrics/diagnostics
+      - name: Blazor (Razor components) metrics
+        uid: metrics/blazor
+      - name: Authentication and authorization metrics
+        uid: metrics/security
   - name: Test
     items:
       - name: .NET Hot Reload
@@ -1220,6 +1722,8 @@ items:
         uid: test/loadtests
       - name: Test middleware
         uid: test/middleware
+      - name: .localhost top-level domain
+        uid: test/localhost-tld
   - name: Debug
     items:
       - name: Debug with Visual Studio
@@ -1241,8 +1745,10 @@ items:
       - name: Azure and IIS errors reference
         uid: host-and-deploy/azure-iis-errors-reference
   - name: Code analysis
-    uid: diagnostics/code-analysis
     items:
+      - name: Overview
+        displayName: code analysis
+        uid: diagnostics/code-analysis
       - name: ASP0000
         uid: diagnostics/asp0000
       - name: ASP0001
@@ -1295,6 +1801,22 @@ items:
         uid: diagnostics/asp0025
       - name: ASP0026
         uid: diagnostics/asp0026
+      - name: ASP0027
+        uid: diagnostics/asp0027
+      - name: ASP0028
+        uid: diagnostics/asp0028
+      - name: ASP0033
+        uid: diagnostics/asp0033
+      - name: ASP0034
+        uid: diagnostics/asp0034
+      - name: ASP0035
+        uid: diagnostics/asp0035
+      - name: ASP0036
+        uid: diagnostics/asp0036
+      - name: ASP0037
+        uid: diagnostics/asp0037
+      - name: ASP0038
+        uid: diagnostics/asp0038
       - name: BL0001
         uid: diagnostics/bl0001
       - name: BL0002
@@ -1307,6 +1829,10 @@ items:
         uid: diagnostics/bl0005
       - name: BL0006
         uid: diagnostics/bl0006
+      - name: BL0007
+        uid: diagnostics/bl0007
+      - name: BL0008
+        uid: diagnostics/bl0008
       - name: MVC1000
         uid: diagnostics/mvc1000
       - name: MVC1001
@@ -1321,6 +1847,40 @@ items:
         uid: diagnostics/mvc1005
       - name: MVC1006
         uid: diagnostics/mvc1006
+  - name: RDG diagnostics
+    items:
+      - name: Overview
+        displayName: aot, rdg diagnostics
+        uid: fundamentals/aot/request-delegate-generator/rdg-ids
+      - name: RDG002
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg002
+      - name: RDG004
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg004
+      - name: RDG005
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg005
+      - name: RDG006
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg006
+      - name: RDG007
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg007
+      - name: RDG008
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg008
+      - name: RDG009
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg009
+      - name: RDG010
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg010
+      - name: RDG011
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg011
+      - name: RDG012
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg012
+      - name: RDG013
+        uid: fundamentals/aot/request-delegate-generator/diagnostics/rdg013
+  - name: ASPDEPR diagnostics
+    items:
+      - name: Overview
+        displayName: aspdepr diagnostics
+        uid: diagnostics/aspdepr-ids
+      - name: ASPDEPR002
+        uid: diagnostics/aspdepr002
   - name: Data access
     items:
       - name: Tutorials
@@ -1367,6 +1927,8 @@ items:
                 uid: data/ef-mvc/inheritance
               - name: Advanced topics
                 uid: data/ef-mvc/advanced
+      - name: Scaffold a data model with dotnet scaffold in RP
+        uid: data/dotnet-scaffold-rp
       - name: EF 6 with ASP.NET Core
         uid: data/entity-framework-6
       - name: Azure SQL Database with Azure App Service
@@ -1454,7 +2016,7 @@ items:
             uid: host-and-deploy/docker/building-net-docker-images
           - name: Visual Studio Tools
             displayName: deploy, publish, docker
-            uid: host-and-deploy/docker/visual-studio-tools-for-docker
+            href: /visualstudio/containers/add-container-support
           - name: Publish to a Docker image
             displayName: deploy, publish, docker
             href: /visualstudio/containers/vs-azure-tools-docker-hosting-web-apps-in-docker
@@ -1512,6 +2074,12 @@ items:
                 uid: security/authentication/identity-enable-qrcodes
               - name: Two-factor authentication with SMS
                 uid: security/authentication/2fa
+              - name: Passkeys (WebAuthn)
+                items:
+                  - name: Overview
+                    uid: security/authentication/passkeys/index
+                  - name: Blazor
+                    uid: security/authentication/passkeys/blazor
               - name: External authentication providers
                 items:
                   - name: Overview
@@ -1562,6 +2130,12 @@ items:
                     href: /azure/active-directory-b2c/enable-authentication-web-api
           - name: Configure cookie authentication
             uid: security/authentication/cookie
+          - name: API endpoint authentication behavior
+            uid: security/authentication/api-endpoint-auth
+          - name: Configure OIDC web authentication
+            uid: security/authentication/configure-oidc-web-authentication
+          - name: Configure JWT bearer authentication
+            uid: security/authentication/configure-jwt-bearer-authentication
           - name: Configure certificate authentication
             uid: security/authentication/certauth
           - name: Configure Windows authentication
@@ -1589,30 +2163,28 @@ items:
             uid: security/authorization/introduction
           - name: Create a web app with authorization
             uid: security/authorization/secure-data
-          - name: Razor Pages authorization conventions
-            uid: security/authorization/razor-pages-authorization
           - name: Simple authorization
             uid: security/authorization/simple
+          - name: Require authenticated users by default
+            href: security/authorization/policies.md#require-global-user-authentication
           - name: Custom authorization with IAuthorizationRequirementData
             uid: security/authorization/iard
           - name: Role-based authorization
             uid: security/authorization/roles
-          - name: Claims-based authorization
+          - name: Claim-based authorization
             uid: security/authorization/claims
           - name: Policy-based authorization
             uid: security/authorization/policies
           - name: Authorization policy providers
-            uid: security/authorization/iauthorizationpolicyprovider
+            uid: security/authorization/custom-authorization-policy-providers
           - name: Customize the behavior of AuthorizationMiddleware
             uid: security/authorization/authorizationmiddlewareresulthandler
           - name: Dependency injection in requirement handlers
             uid: security/authorization/dependencyinjection
           - name: Resource-based authorization
-            uid: security/authorization/resourcebased
-          - name: View-based authorization
-            uid: security/authorization/views
-          - name: Limit identity by scheme
-            uid: security/authorization/limitingidentitybyscheme
+            uid: security/authorization/resource-based
+          - name: Authorize with a specific scheme
+            uid: security/authorization/authorize-with-a-specific-scheme
       - name: Data protection
         displayName: encryption
         items:
@@ -1731,6 +2303,9 @@ items:
     items:
       - name: Overview
         uid: performance/overview
+      - name: Best practices
+        displayName: performance
+        uid: fundamentals/best-practices
       - name: Caching
         items:
           - name: Overview
@@ -1845,8 +2420,17 @@ items:
         uid: fundamentals/middleware/extensibility-third-party-container
   - name: Migration and updates
     items:
+      - name: Overview
+        displayName: migrate, migration
+        uid: migration/index
       - name: Version updates
         items:
+          - name: 10 to 11
+            displayName: migrate, migration
+            uid: migration/100-to-110
+          - name: 9 to 10
+            displayName: migrate, migration
+            uid: migration/90-to-100
           - name: 8 to 9
             displayName: migrate, migration
             uid: migration/80-to-90
@@ -1884,7 +2468,7 @@ items:
                 uid: migration/logging-nonaspnetcore
               - name: 2.0 to 2.1
                 displayName: migrate, migration
-                uid: migration/20_21
+                uid: migration/20-to-21
               - name: 1.x to 2.0
                 displayName: migrate, migration
                 items:
@@ -1896,52 +2480,58 @@ items:
         displayName: migrate, migration
         items:
           - name: Overview
-            uid: migration/proper-to-2x/index
+            uid: migration/fx-to-core/index
+          - name: Get started
+            uid: migration/fx-to-core/start
+          - name: Tooling
+            uid: migration/fx-to-core/tooling
           - name: Incremental migration
             displayName: migrate, migration
             items:
-            - name: Overview
-              uid: migration/inc/overview
-            - name: Get started
-              uid: migration/inc/start
             - name: System.Web adapters
-              uid: migration/inc/adapters
+              uid: migration/fx-to-core/systemweb-adapters
             - name: Remote app setup
-              uid: migration/inc/remote-app-setup
-            - name: Usage Guidance
-              uid: migration/inc/usage_guidance
-            - name: Wrapped session state
-              uid: migration/inc/wrapped
-            - name: Session state migration
-              uid: migration/inc/session
-            - name: Module migration
-              uid: migration/inc/http-modules
-            - name: Remote app session state
-              uid: migration/inc/remote-session
-            - name: Remote Authentication
-              uid: migration/inc/remote-authentication
-            - name: Unit testing
-              uid: migration/inc/unit-testing
+              uid: migration/fx-to-core/inc/remote-app-setup
             - name: A/B Testing endpoints
-              uid: migration/inc/ab-testing
+              uid: migration/fx-to-core/inc/ab-testing
             - name: Blazor support with YARP
-              uid: migration/inc/blazor
-          - name: MVC and Web API
-            uid: migration/mvc
-          - name: Web Forms
-            uid: migration/web_forms
-          - name: Web API
-            uid: migration/webapi
-          - name: Configuration
-            uid: migration/configuration
-          - name: Authentication and Identity
-            uid: migration/identity
-          - name: ClaimsPrincipal.Current
-            uid: migration/claimsprincipal-current
-          - name: Membership to Identity
-            uid: migration/proper-to-2x/membership-to-core-identity
-          - name: HTTP modules to middleware
-            uid: migration/http-modules
+              uid: migration/fx-to-core/inc/blazor
+          - name: Technology Areas
+            items:
+            - name: Overview
+              uid: migration/fx-to-core/areas
+            - name: HttpApplicationHost
+              uid: migration/fx-to-core/areas/hosting
+            - name: HttpContext
+              uid: migration/fx-to-core/areas/http-context
+            - name: HTTP Modules
+              uid: migration/fx-to-core/areas/http-modules
+            - name: HTTP Handlers
+              uid: migration/fx-to-core/areas/http-handlers
+            - name: Machine Key
+              uid: migration/fx-to-core/areas/machine-key
+            - name: Session
+              uid: migration/fx-to-core/areas/session
+            - name: Authentication
+              uid: migration/fx-to-core/areas/authentication
+            - name: Membership
+              uid: migration/fx-to-core/areas/membership
+            - name: OWIN
+              uid: migration/fx-to-core/areas/owin
+            - name: Web API
+              uid: migration/fx-to-core/areas/webapi
+            - name: ClaimsPrincipal.Current
+              uid: migration/fx-to-core/areas/claimsprincipal-current
+            - name: Miscellaneous
+              uid: migration/fx-to-core/areas/misc
+          - name: Example Migration
+            items:
+            - name: Overview
+              uid: migration/fx-to-core/examples/overview
+            - name: Configuration
+              uid: migration/fx-to-core/examples/configuration
+            - name: Identity
+              uid: migration/fx-to-core/examples/identity
   - name: API reference
     href: /dotnet/api/
   - name: Contribute

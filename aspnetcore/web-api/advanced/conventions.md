@@ -4,11 +4,17 @@ author: tdykstra
 description: Learn about web API conventions in ASP.NET Core.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 12/05/2019
+ms.date: 07/06/2026
 uid: web-api/advanced/conventions
 ---
 # Use web API conventions
+
+:::moniker range=">= aspnetcore-10.0"
+
+> [!WARNING]
+> The web API analyzers used with these conventions are deprecated as of .NET 10 and will be removed in a future release. Setting `IncludeOpenAPIAnalyzers` to `true` emits warning `ASPDEPR007`. For more information, see [IncludeOpenAPIAnalyzers property and MVC API analyzers are deprecated](/aspnet/core/breaking-changes/10/openapi-analyzers-deprecated?view=aspnetcore-10.0&preserve-view=true).
+
+:::moniker-end
 
 Common [API documentation](xref:tutorials/web-api-help-pages-using-swagger) can be extracted and applied to multiple actions, controllers, or all controllers within an assembly. Web API conventions are a substitute for decorating individual actions with [`[ProducesResponseType]`](xref:Microsoft.AspNetCore.Mvc.ProducesResponseTypeAttribute).
 
@@ -25,7 +31,7 @@ Actions that follow the patterns in the `ValuesController.cs` work with the defa
 
 At runtime, <xref:Microsoft.AspNetCore.Mvc.ApiExplorer> understands conventions. `ApiExplorer` is MVC's abstraction to communicate with [OpenAPI](https://www.openapis.org/) (also known as Swagger) document generators. Attributes from the applied convention are associated with an action and are included in the action's OpenAPI documentation. [API analyzers](xref:web-api/advanced/analyzers) also understand conventions. If your action is unconventional (for example, it returns a status code that isn't documented by the applied convention), a warning encourages you to document the status code.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/conventions/sample) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/web-api/advanced/conventions/sample) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Apply web API conventions
 
@@ -46,7 +52,7 @@ Conventions don't compose; each action may be associated with exactly one conven
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     ```
 
-    For more information on `[ProducesDefaultResponseType]`, see [Default Response](https://swagger.io/docs/specification/describing-responses/#default).
+    For more information on `[ProducesDefaultResponseType]`, see [Default Response](https://swagger.io/docs/specification/describing-responses/#default-response).
 
 1. `Microsoft.AspNetCore.Mvc.ApiConventionTypeAttribute` applied to a controller &mdash; Applies the specified convention type to all actions on the controller. A convention method is marked with hints that determine the actions to which the convention method applies. For more information on hints, see [Create web API conventions](#create-web-api-conventions)).
 

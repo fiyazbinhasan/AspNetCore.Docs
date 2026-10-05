@@ -1,11 +1,11 @@
 ---
 title: Use Graph API with ASP.NET Core Blazor WebAssembly
+ai-usage: ai-assisted
 author: guardrex
 description: Learn how to use the Microsoft Graph SDK/API with Blazor WebAssembly apps.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 09/09/2024
+ms.author: wpickett
+ms.date: 09/09/2026
 uid: blazor/security/webassembly/graph-api
 zone_pivot_groups: blazor-graph-api
 ---
@@ -26,7 +26,7 @@ The guidance in this article isn't meant to replace the [Microsoft Graph documen
 Additional approaches for working with Microsoft Graph and Blazor WebAssembly are provided by the following Microsoft Graph and Azure samples:
 
 * [Microsoft Graph sample Blazor WebAssembly app](https://github.com/microsoftgraph/msgraph-sample-blazor-clientside): The sample adopts a factory-based approach with the [Microsoft Graph SDK](/graph/sdks/sdks-overview) to obtain Office 365 data. The sample uses a default <xref:System.Net.Http.HttpClient> to make Graph client requests. If you need to use the default <xref:System.Net.Http.HttpClient> with the base address of the app (`BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)`) for other purposes, for example to load data from the web root of the app, consider refactoring the Graph client factory to use a [named `HttpClient`](xref:blazor/call-web-api#named-httpclient-with-ihttpclientfactory) dedicated to Graph requests.
-* [ASP.NET Core 8.0 Blazor WebAssembly | standalone app | user sign-in, protected web API access (Microsoft Graph) | Microsoft identity platform](https://github.com/Azure-Samples/ms-identity-docs-code-dotnet/tree/main/spa-blazor-wasm): The sample is a [Progressive Web Application (PWA)](xref:blazor/progressive-web-app) that uses an authorization message handler and <xref:System.Net.Http.HttpClient> to obtain Graph data. As with the preceding sample, this sample also uses a default <xref:System.Net.Http.HttpClient> to make Graph client requests. Instead of using the Microsoft Graph SDK, the sample retrieves user account data as JSON via a [Microsoft Graph API](/graph/use-the-api) request in a component. This is a similar technique to the **Named HttpClient with Graph API** approach in this article (use the button at the top of this article to see the guidance), except that this article's guidance uses a [named `HttpClient`](xref:blazor/call-web-api#named-httpclient-with-ihttpclientfactory) dedicated to Graph requests.
+* [ASP.NET Core in .NET 8 Blazor WebAssembly | standalone app | user sign-in, protected web API access (Microsoft Graph) | Microsoft identity platform](https://github.com/Azure-Samples/ms-identity-docs-code-dotnet/tree/main/spa-blazor-wasm): The sample is a [Progressive Web Application (PWA)](xref:blazor/progressive-web-app/index) that uses an authorization message handler and <xref:System.Net.Http.HttpClient> to obtain Graph data. As with the preceding sample, this sample also uses a default <xref:System.Net.Http.HttpClient> to make Graph client requests. Instead of using the Microsoft Graph SDK, the sample retrieves user account data as JSON via a [Microsoft Graph API](/graph/use-the-api) request in a component. This is a similar technique to the **Named HttpClient with Graph API** approach in this article (use the button at the top of this article to see the guidance), except that this article's guidance uses a [named `HttpClient`](xref:blazor/call-web-api#named-httpclient-with-ihttpclientfactory) dedicated to Graph requests.
 
 To provide feedback on either of the preceding two samples, open an issue on the sample's GitHub repository. If you're opening an issue for the Azure sample, provide a link to the sample in your opening comment because the Azure sample repository (`Azure-Samples`) contains many samples. Describe the problem in detail and include sample code as needed. Place a minimal app into GitHub that reproduces the problem or error. Be sure to remove Azure account configuration data from the sample before you commit it to the public repository.
 
@@ -34,6 +34,8 @@ To provide feedback or seek assistance with this article or ASP.NET Core, see <x
 
 > [!IMPORTANT]
 > The scenarios described in this article apply to using Microsoft Entra (ME-ID) as the identity provider, not AAD B2C. Using Microsoft Graph with a client-side Blazor WebAssembly app and the AAD B2C identity provider isn't supported at this time because the app would require a client secret, which can't be secured in the client-side Blazor app. For an AAD B2C standalone Blazor WebAssembly app use Graph API, create a backend server (web) API to access Graph API on behalf of users. The client-side app authenticates and authorizes users to [call the web API](xref:blazor/call-web-api) to securely access Microsoft Graph and return data to the client-side Blazor app from your server-based web API. The client secret is safely maintained in the server-based web API, not in the Blazor app on the client. **Never store a client secret in a client-side Blazor app.**
+
+[!INCLUDE[](~/includes/azure-active-directory-b2c-eol-support-notice.md)]
 
 :::moniker range="< aspnetcore-8.0"
 
@@ -45,7 +47,7 @@ The examples in this article take advantage of new .NET/C# features. When using 
 
 :::zone pivot="graph-sdk-5"
 
-*The following guidance applies to Microsoft Graph v5.*
+*The following guidance applies to Microsoft Graph v5 or later.*
 
 The Microsoft Graph SDK for use in Blazor apps is called the *Microsoft Graph .NET Client Library*.
 
@@ -65,6 +67,9 @@ The Graph SDK examples require the following package references in the standalon
 * [`Microsoft.Authentication.WebAssembly.Msal`](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal)
 * [`Microsoft.Extensions.Http`](https://www.nuget.org/packages/Microsoft.Extensions.Http)
 * [`Microsoft.Graph`](https://www.nuget.org/packages/Microsoft.Graph)
+
+> [!NOTE]
+> The [`Microsoft.Authentication.WebAssembly.Msal` package](https://www.nuget.org/packages/Microsoft.Authentication.WebAssembly.Msal) transitively adds the [`Microsoft.AspNetCore.Components.WebAssembly.Authentication` package](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.WebAssembly.Authentication) to the app.
 
 [!INCLUDE[](~/includes/package-reference.md)]
 
@@ -432,7 +437,10 @@ When testing with the Graph SDK locally, we recommend using a new InPrivate/inco
 
 :::zone pivot="graph-sdk-4"
 
-*The following guidance applies to Microsoft Graph v4. If you're upgrading an app from SDK v4 to v5, see the [Microsoft Graph .NET SDK v5 changelog and upgrade guide](https://github.com/microsoftgraph/msgraph-sdk-dotnet/blob/main/docs/upgrade-to-v5.md).*
+*The following guidance applies to Microsoft Graph v4. If you're upgrading an app from SDK v4 to v5 or later, see the following resources:*
+
+* *[Microsoft Graph .NET SDK v5 changelog and upgrade guide](https://github.com/microsoftgraph/msgraph-sdk-dotnet/blob/main/docs/upgrade-to-v5.md)*
+* *[Microsoft Graph .NET SDK releases (`microsoftgraph/msgraph-sdk-dotnet` GitHub repository)](https://github.com/microsoftgraph/msgraph-sdk-dotnet/releases) (see the 6.0.0 breaking changes remarks)*
 
 The Microsoft Graph SDK for use in Blazor apps is called the *Microsoft Graph .NET Client Library*.
 
@@ -938,6 +946,7 @@ In the preceding example, the `GraphAuthorizationMessageHandler` <xref:System.Ne
 
 * [Utility base component classes to manage a DI scope](xref:blazor/fundamentals/dependency-injection#utility-base-component-classes-to-manage-a-di-scope)
 * [Detect client-side transient disposables](xref:blazor/fundamentals/dependency-injection#detect-client-side-transient-disposables)
+* [`DelegatingHandler` instances](xref:fundamentals/http-requests#outgoing-request-middleware)
 
 A trailing slash (`/`) on the base address is required. In the preceding code, the third argument to `string.Join` is `string.Empty` to ensure the trailing slash is present: `https://graph.microsoft.com/v1.0/`.
 

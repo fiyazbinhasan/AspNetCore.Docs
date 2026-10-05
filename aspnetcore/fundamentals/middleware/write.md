@@ -1,11 +1,10 @@
 ---
 title: Write custom ASP.NET Core middleware
-author: rick-anderson
+author: tdykstra
 description: Learn how to write custom ASP.NET Core middleware.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 12/18/2021
+ms.author: tdykstra
+ms.date: 06/21/2025
 uid: fundamentals/middleware/write
 ---
 # Write custom ASP.NET Core middleware
@@ -71,7 +70,7 @@ Middleware components can resolve their dependencies from [dependency injection 
 ## Per-request middleware dependencies
 
 Middleware is constructed at app startup and therefore has application life
-time. [Scoped lifetime](/dotnet/core/extensions/dependency-injection#scoped) services used by middleware constructors aren't shared with other dependency-injected types during each request. To share a *scoped* service between middleware and other types, add these services to the `InvokeAsync` method's signature. The `InvokeAsync` method can accept additional parameters that are populated by DI:
+time. [Scoped lifetime](/dotnet/core/extensions/dependency-injection/service-lifetimes#scoped) services used by middleware constructors aren't shared with other dependency-injected types during each request. To share a *scoped* service between middleware and other types, add these services to the `InvokeAsync` method's signature. The `InvokeAsync` method can accept additional parameters that are populated by DI:
 
 :::code language="csharp" source="~/fundamentals/middleware/write/6sample/WebMiddleware/MyCustomMiddleware.cs":::
 
@@ -93,7 +92,7 @@ The `IMessageWriter` interface and implementation:
 * [DEEP DIVE: HOW IS THE ASP.NET CORE MIDDLEWARE PIPELINE BUILT](https://www.stevejgordon.co.uk/how-is-the-asp-net-core-middleware-pipeline-built)
 * <xref:fundamentals/middleware/index>
 * <xref:test/middleware>
-* <xref:migration/http-modules>
+* <xref:migration/fx-to-core/areas/http-modules>
 * <xref:fundamentals/startup>
 * <xref:fundamentals/request-features>
 * <xref:fundamentals/middleware/extensibility>
@@ -179,7 +178,7 @@ The following code calls the middleware from `Startup.Configure`:
 * [Lifetime and registration options](xref:fundamentals/dependency-injection#lifetime-and-registration-options) contains a complete sample of middleware with *scoped*, *transient*, and *singleton* lifetime services.
 * <xref:fundamentals/middleware/index>
 * <xref:test/middleware>
-* <xref:migration/http-modules>
+* <xref:migration/fx-to-core/areas/http-modules>
 * <xref:fundamentals/startup>
 * <xref:fundamentals/request-features>
 * <xref:fundamentals/middleware/extensibility>

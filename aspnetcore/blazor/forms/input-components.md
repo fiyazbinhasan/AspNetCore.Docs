@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor input components
 author: guardrex
 description: Learn about built-in Blazor input components.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/forms/input-components
 ---
 # ASP.NET Core Blazor input components
@@ -37,6 +36,7 @@ The components in the table are also supported outside of a form in Razor compon
 | <xref:Microsoft.AspNetCore.Components.Forms.InputSelect%601> | `<select>` |
 | <xref:Microsoft.AspNetCore.Components.Forms.InputText> | `<input>` |
 | <xref:Microsoft.AspNetCore.Components.Forms.InputTextArea> | `<textarea>` |
+| [`Label<TValue>`](#label-component) (.NET 11 or later) | `<label>` |
 
 For more information on the <xref:Microsoft.AspNetCore.Components.Forms.InputFile> component, see <xref:blazor/file-uploads>.
 
@@ -54,7 +54,7 @@ For more information on the <xref:Microsoft.AspNetCore.Components.Forms.InputFil
 | <xref:Microsoft.AspNetCore.Components.Forms.InputTextArea> | `<textarea>` |
 
 > [!NOTE]
-> <xref:Microsoft.AspNetCore.Components.Forms.InputRadio%601> and <xref:Microsoft.AspNetCore.Components.Forms.InputRadioGroup%601> components are available in ASP.NET Core 5.0 or later. For more information, select a 5.0 or later version of this article.
+> <xref:Microsoft.AspNetCore.Components.Forms.InputRadio%601> and <xref:Microsoft.AspNetCore.Components.Forms.InputRadioGroup%601> components are available in .NET 5 or later. For more information, select a .NET 5 or later version of this article.
 
 :::moniker-end
 
@@ -231,10 +231,6 @@ When the model property for the ship's classification (`Classification`) is set,
 }
 ```
 
-<!--
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/forms-and-validation/Starship3.razor":::
--->
-
 :::moniker-end
 
 The <xref:Microsoft.AspNetCore.Components.Forms.EditForm> in the preceding example creates an <xref:Microsoft.AspNetCore.Components.Forms.EditContext> based on the assigned `Starship` instance (`Model="..."`) and handles a valid form. The next example demonstrates how to assign an <xref:Microsoft.AspNetCore.Components.Forms.EditContext> to a form and validate when the form is submitted.
@@ -314,10 +310,6 @@ In the following example:
 }
 ```
 
-<!--
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/forms-and-validation/Starship4.razor":::
--->
-
 :::moniker-end
 
 > [!NOTE]
@@ -327,7 +319,7 @@ In the following example:
 
 ## Multiple option selection with the `InputSelect` component
 
-Binding supports [`multiple`](https://developer.mozilla.org/docs/Web/HTML/Attributes/multiple) option selection with the <xref:Microsoft.AspNetCore.Components.Forms.InputSelect%601> component. The [`@onchange`](xref:mvc/views/razor#onevent) event provides an array of the selected options via [event arguments (`ChangeEventArgs`)](xref:blazor/components/event-handling#event-arguments). The value must be bound to an array type, and binding to an array type makes the [`multiple`](https://developer.mozilla.org/docs/Web/HTML/Attributes/multiple) attribute optional on the <xref:Microsoft.AspNetCore.Components.Forms.InputSelect%601> tag.
+Binding supports [`multiple`](https://developer.mozilla.org/docs/Web/HTML/Attributes/multiple) option selection with the <xref:Microsoft.AspNetCore.Components.Forms.InputSelect%601> component. The [`@onchange`](xref:mvc/views/razor#onevent) event provides an array of the selected options via [event arguments (`ChangeEventArgs`)](xref:blazor/components/event-handling#event-arguments). The value must be bound to an array type, which results in the <xref:Microsoft.AspNetCore.Components.Forms.InputSelect%601> component automatically adding the [`multiple` attribute](https://developer.mozilla.org/docs/Web/HTML/Attributes/multiple) to the `<select>` element when the component is rendered.
 
 In the following example, the user must select at least two starship classifications but no more than three classifications.
 
@@ -409,10 +401,6 @@ In the following example, the user must select at least two starship classificat
 }
 ```
 
-<!--
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/forms-and-validation/Starship5.razor":::
--->
-
 :::moniker-end
 
 :::moniker range=">= aspnetcore-6.0"
@@ -458,27 +446,92 @@ The validation summary displays the friendly name when the field's value is inva
 
 > The Production Date field must be a date.
 
-<!-- UPDATE 10.0 The feature has been backlogged.
-     https://github.com/dotnet/aspnetcore/issues/49147
+:::moniker-end
 
-> [!NOTE]
-> Alternatively, the [`[Display]` attribute](xref:System.ComponentModel.DataAnnotations.DisplayAttribute) on the model class property is supported:
->
-> ```csharp
-> [Required, Display(Name = "Production Date")]
-> public DateTime ProductionDate { get; set; }
-> ```
->
-> [`[DisplayName]` attribute](xref:System.ComponentModel.DisplayNameAttribute) is also supported:
->
-> ```csharp
-> [Required, DisplayName("Production Date")]
-> public DateTime ProductionDate { get; set; }
-> ```
->
-> Between the two approaches, the `[Display]` attribute is recommended, which makes additional properties available. The `[Display]` attribute also enables assigning a resource type for localization.
+:::moniker range=">= aspnetcore-11.0"
 
+<!-- UPDATE 11.0 - API cross-link 
+
+                   <xref:Microsoft.AspNetCore.Components.Forms.DisplayName%601>
 -->
+The `DisplayName` component can be used to display property names from metadata attributes
+
+```csharp
+[Required, DisplayName("Production Date")]
+public DateTime ProductionDate { get; set; }
+```
+
+The [`[Display]` attribute](xref:System.ComponentModel.DataAnnotations.DisplayAttribute) on the model class property is supported:
+
+```csharp
+[Required, Display(Name = "Production Date")]
+public DateTime ProductionDate { get; set; }
+```
+
+Between the two approaches, the `[Display]` attribute is recommended, which makes additional properties available. The `[Display]` attribute also enables assigning a resource type for localization. When both attributes are present, `[Display]` takes precedence over `[DisplayName]`. If neither attribute is present, the component falls back to the property name.
+
+Use the `DisplayName` component in labels or table headers:
+
+```razor
+<label>
+    <DisplayName For="@(() => Model!.ProductionDate)" />
+    <InputDate @bind-Value="Model!.ProductionDate" />
+</label>
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+## `Label` component
+
+<!-- UPDATE 11.0 - API cross-link 
+
+                   <xref:Microsoft.AspNetCore.Components.Forms.Label%601>
+-->
+
+The `Label` component renders a `<label>` element that automatically extracts the display name from a model property using `[Display]` or `[DisplayName]` attributes. This simplifies form creation by eliminating the need to manually specify label text.
+
+### Nested pattern
+
+The nested pattern wraps the input component inside the label:
+
+```razor
+<Label For="() => Model!.ProductionDate">
+    <InputDate @bind-Value="Model!.ProductionDate" />
+</Label>
+```
+
+This renders:
+
+```html
+<label>Production Date<input type="date" ... /></label>
+```
+
+### Non-nested pattern
+
+For accessibility requirements or styling flexibility, use the non-nested pattern where the label's `for` attribute references the input's `id`:
+
+```razor
+<Label For="() => Model!.ProductionDate" />
+<InputDate @bind-Value="Model!.ProductionDate" />
+```
+
+This renders:
+
+```html
+<label for="Model_ProductionDate">Production Date</label>
+<input id="Model_ProductionDate" type="date" ... />
+```
+
+The `id` attribute is automatically sanitized to create a valid HTML id (dots are replaced with underscores to avoid CSS selector conflicts).
+
+Input components automatically generate an `id` attribute based on the bound expression. If an explicit `id` is provided, it takes precedence:
+
+```razor
+<Label For="() => Model!.ProductionDate" for="prod-date" />
+<InputDate @bind-Value="Model!.ProductionDate" id="prod-date" />
+```
 
 :::moniker-end
 
@@ -554,5 +607,36 @@ Assign a custom template to <xref:Microsoft.AspNetCore.Components.Forms.InputDat
 ```
 
 > The ProductionDate field has an incorrect date value.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-10.0"
+
+## `InputHidden` component to handle hidden input fields in forms
+
+The [`InputHidden` component](xref:Microsoft.AspNetCore.Components.Forms.InputHidden) provides a hidden input field for storing string values.
+
+In the following example, a hidden input field is created for the form's `Parameter` property. When the form is submitted, the value of the hidden field is displayed:
+
+```razor
+<EditForm Model="Parameter" OnValidSubmit="Submit" FormName="InputHidden Example">
+    <InputHidden id="hidden" @bind-Value="Parameter" />
+    <button type="submit">Submit</button>
+</EditForm>
+
+@if (submitted)
+{
+    <p>Hello @Parameter!</p>
+}
+
+@code {
+    private bool submitted;
+
+    [SupplyParameterFromForm] 
+    public string Parameter { get; set; } = "stranger";
+
+    private void Submit() => submitted = true;
+}
+```
 
 :::moniker-end

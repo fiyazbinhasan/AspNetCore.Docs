@@ -3,9 +3,8 @@ title: Share assets across web and native clients using a Razor class library (R
 author: guardrex
 description: Learn how to share Razor components, C# code, and static assets across web and native clients using a Razor class library (RCL).
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/hybrid/class-libraries
 ---
 # Share assets across web and native clients using a Razor class library (RCL)
@@ -48,31 +47,26 @@ For more information, see the following articles:
 
 :::moniker-end
 
-<!-- UPDATE 9.0 Ask Beth on a replacement for this
-
 ## Sample app
 
-For an example of the scenarios described in this article, see the .NET Podcasts sample app:
+For an example of the scenarios described in this article, see the [eShop Reference Application (AdventureWorks) (`dotnet/eShop` GitHub repository)](https://github.com/dotnet/eShop). The .NET MAUI Blazor Hybrid app is in the `src/HybridApp` folder.
 
-* [GitHub repository (`microsoft/dotnet-podcasts`)](https://github.com/microsoft/dotnet-podcasts)
-* [Running sample app (Azure Container Apps Service)](https://dotnetpodcasts.azurewebsites.net/)
+For a version of the sample app tailored for Azure hosting, see the [`Azure-Samples/eShopOnAzure` GitHub repository](https://github.com/Azure-Samples/eShopOnAzure).
 
-The .NET Podcasts app showcases the following technologies:
+The sample app showcases the following technologies:
 
 * [.NET](https://dotnet.microsoft.com/download/dotnet)
 * [ASP.NET Core](https://dotnet.microsoft.com/apps/aspnet)
 * [Blazor](https://dotnet.microsoft.com/apps/aspnet/web-apps/blazor)
 * [.NET MAUI](https://dotnet.microsoft.com/apps/maui)
-* [Azure Container Apps](https://azure.microsoft.com/services/container-apps/)
-* [Orleans](/dotnet/orleans/overview)
-
--->
+* [Aspire](/dotnet/aspire/get-started/aspire-overview)
+* [Docker](https://docs.docker.com/get-started/docker-overview/)
 
 ## Share web UI Razor components, code, and static assets
 
 Components from an RCL can be simultaneously shared by web and native client apps built using Blazor. The guidance in <xref:blazor/components/class-libraries> explains how to share Razor components using a Razor class library (RCL). The same guidance applies to reusing Razor components from an RCL in a Blazor Hybrid app.
 
-Component namespaces are derived from the RCL's package ID or assembly name and the component's folder path within the RCL. For more information, see <xref:blazor/components/index#class-name-and-namespace>. [`@using`](xref:mvc/views/razor#using) directives can be placed in `_Imports.razor` files for components and code, as the following example demonstrates for an RCL named `SharedLibrary` with a `Shared` folder of shared Razor components and a `Data` folder of shared data classes:
+Component namespaces are derived from the RCL's package ID or assembly name and the component's folder path within the RCL. For more information, see <xref:blazor/components/index#class-name-and-namespace>. [`@using`](xref:mvc/views/razor#using) directives can be placed in imports files (`_Imports.razor`) for components and code, as the following example demonstrates for an RCL named `SharedLibrary` with a `Shared` folder of shared Razor components and a `Data` folder of shared data classes:
 
 ```razor
 @using SharedLibrary
@@ -149,7 +143,7 @@ public interface IWeatherForecastService
 }
 ```
 
-The `_Imports.razor` file in the RCL includes the following added namespaces:
+The imports file (`_Imports.razor`) in the RCL includes the following added namespaces:
 
 ```razor
 @using SharedLibrary.Data
@@ -191,10 +185,10 @@ namespace {APP NAMESPACE}.Services;
 
 public class WeatherForecastService : IWeatherForecastService
 {
-    private static readonly string[] Summaries = new[]
-    {
+    private static readonly string[] Summaries = 
+    [
         "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot"
-    };
+    ];
 
     public async Task<WeatherForecast[]?> GetForecastAsync(DateTime startDate) =>
         await Task.FromResult(Enumerable.Range(1, 5)

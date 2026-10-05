@@ -1,17 +1,16 @@
 ---
 title: Redis backplane for ASP.NET Core SignalR scale-out
-author: bradygaster
+author: wadepickett
 description: Learn how to set up a Redis backplane to enable scale-out for an ASP.NET Core SignalR app.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
-ms.date: 10/31/2024
+ms.date: 07/06/2026
 uid: signalr/redis-backplane
 ---
 <!-- ms.sfi.ropc: t -->
 # Set up a Redis backplane for ASP.NET Core SignalR scale-out
 
-By [Andrew Stanton-Nurse](https://twitter.com/anurse), [Brady Gaster](https://twitter.com/bradygaster), and [Tom Dykstra](https://github.com/tdykstra).
+By [Ashley Stanton-Nurse](https://github.com/analogrelay), [Brady Gaster](https://twitter.com/bradygaster), and [Tom Dykstra](https://github.com/tdykstra).
 
 :::moniker range=">= aspnetcore-8.0"
 
@@ -30,7 +29,7 @@ This article explains SignalR-specific aspects of setting up a [Redis](https://r
 
   * <xref:signalr/scale>
   * [Redis documentation](https://redis.io/)
-  * [Azure Redis Cache documentation](/azure/redis-cache/)
+  * [Azure Redis Cache documentation](/azure/azure-cache-for-redis/)
 
 * In the SignalR app, install the following NuGet package:
 
@@ -132,7 +131,7 @@ For more information, see the following resources:
 * <xref:signalr/scale>
 * [Redis documentation](https://redis.io/documentation)
 * [StackExchange Redis documentation](https://stackexchange.github.io/StackExchange.Redis/)
-* [Azure Redis Cache documentation](/azure/redis-cache/)
+* [Azure Redis Cache documentation](/azure/azure-cache-for-redis/)
 
 :::moniker-end
 

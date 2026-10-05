@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor JavaScript interoperability (JS interop)
 author: guardrex
 description: Learn how to interact with JavaScript in Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/js-interop/index
 ---
 # ASP.NET Core Blazor JavaScript interoperability (JS interop)
@@ -18,6 +17,7 @@ Further JS interop guidance is provided in the following articles:
 
 * <xref:blazor/js-interop/call-javascript-from-dotnet>
 * <xref:blazor/js-interop/call-dotnet-from-javascript>
+* <xref:blazor/performance/js-interop>
 
 :::moniker range=">= aspnetcore-7.0"
 
@@ -36,7 +36,7 @@ Further JS interop guidance is provided in the following articles:
      blazor/includes/compression-with-untrusted-data.md because the
      text is used in a warning format in two articles. -->
 
-With compression, which is enabled by default, avoid creating secure (authenticated/authorized) interactive server-side components that render data from untrusted sources. Untrusted sources include route parameters, query strings, data from JS interop, and any other source of data that a third-party user can control (databases, external services). For more information, see <xref:blazor/fundamentals/signalr#websocket-compression-for-interactive-server-components> and <xref:blazor/security/server/interactive-server-side-rendering?view=aspnetcore-9.0#interactive-server-components-with-websocket-compression-enabled>.
+With compression, which is enabled by default, avoid creating secure (authenticated/authorized) interactive server-side components that render data from untrusted sources. Untrusted sources include route parameters, query strings, data from JS interop, and any other source of data that a third-party user can control (databases, external services). For more information, see <xref:blazor/fundamentals/signalr#websocket-compression-for-interactive-server-components> and <xref:blazor/security/interactive-server-side-rendering?view=aspnetcore-9.0#interactive-server-components-with-websocket-compression-enabled>.
 
 :::moniker-end
 
@@ -107,7 +107,7 @@ A JavaScript function can be invoked directly from an inline event handler. In t
 However, the use of inline event handlers is a *poor design choice* for calling JavaScript functions:
 
 * Mixing HTML markup and JavaScript code often leads to unmaintainable code.
-* Inline event handler execution may be blocked by a [Content Security Policy (CSP) (MDN documentation)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+* Inline event handler execution may be blocked by a [Content Security Policy (CSP) (MDN documentation)](https://developer.mozilla.org/docs/Web/HTTP/CSP).
 
 We recommend avoiding inline event handlers in favor of approaches that assign handlers in JavaScript with [`addEventListener`](https://developer.mozilla.org/docs/Web/API/EventTarget/addEventListener), as the following example demonstrates:
 
@@ -155,11 +155,19 @@ export function addHandlers() {
     {
         if (module is not null)
         {
-            await module.DisposeAsync();
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
 }
 ```
+
+In the preceding example, <xref:Microsoft.JSInterop.JSDisconnectedException> is trapped during module disposal in case Blazor's SignalR circuit is lost. If the preceding code is used in a Blazor WebAssembly app, there's no SignalR connection to lose, so you can remove the `try`-`catch` block and leave the line that disposes the module (`await module.DisposeAsync();`). For more information, see <xref:blazor/js-interop/index#javascript-interop-calls-without-a-circuit>.
 
 For more information, see the following resources:
 
@@ -193,7 +201,7 @@ Blazor uses <xref:System.Text.Json?displayProperty=fullName> for serialization w
 * Global default serialization isn't customizable to avoid breaking existing component libraries, impacts on performance and security, and reductions in reliability.
 * Serializing .NET member names results in lowercase JSON key names.
 * JSON is deserialized as <xref:System.Text.Json.JsonElement> C# instances, which permit mixed casing. Internal casting for assignment to C# model properties works as expected in spite of any case differences between JSON key names and C# property names.
-* Complex framework types, such as <xref:System.Collections.Generic.KeyValuePair>, might be [trimmed away by the IL Trimmer on publish](xref:blazor/host-and-deploy/configure-trimmer) and not present for JS interop. We recommend creating custom types for types that the IL Trimmer trims away.
+* Complex framework types might be [trimmed away by the IL Trimmer on publish](xref:blazor/host-and-deploy/configure-trimmer#failure-to-preserve-types-used-by-a-published-app) and not present for JS interop or JSON serialization/deserialization. We recommend creating custom types for types that the IL Trimmer trims away.
 * Blazor always relies on [reflection for JSON serialization](/dotnet/standard/serialization/system-text-json/reflection-vs-source-generation), including when using C# [source generation](/dotnet/csharp/roslyn-sdk/source-generators-overview). Setting `JsonSerializerIsReflectionEnabledByDefault` to `false` in the app's project file results in an error when serialization is attempted.
 
 <xref:System.Text.Json.Serialization.JsonConverter> API is available for custom serialization. Properties can be annotated with a [`[JsonConverter]` attribute](xref:System.Text.Json.Serialization.JsonConverterAttribute) to override default serialization for an existing data type.
@@ -259,11 +267,19 @@ In the following example, the `DOMCleanup` component:
     {
         if (module is not null)
         {
-            await module.DisposeAsync();
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
 }
 ```
+
+In the preceding example, <xref:Microsoft.JSInterop.JSDisconnectedException> is trapped during module disposal in case Blazor's SignalR circuit is lost. If the preceding code is used in a Blazor WebAssembly app, there's no SignalR connection to lose, so you can remove the `try`-`catch` block and leave the line that disposes the module (`await module.DisposeAsync();`). For more information, see <xref:blazor/js-interop/index#javascript-interop-calls-without-a-circuit>.
 
 In the following example, the `MutationObserver` callback is executed each time a DOM change occurs. Execute your cleanup code when the `if` statement confirms that the target element (`cleanupDiv`) was removed (`if (targetRemoved) { ... }`). It's important to disconnect and delete the `MutationObserver` to avoid a memory leak after your cleanup code executes.
 
@@ -299,11 +315,34 @@ export class DOMCleanup {
 window.DOMCleanup = DOMCleanup;
 ```
 
+The preceding approaches attach the `MutationObserver` to `target.parentNode`, which works until `parentNode` itself is removed from the DOM. This is a common scenario, for example, when navigating to a new page, which causes the entire page component to be removed from the DOM. In such cases, any child components observing changes within the page aren't cleaned up properly.
+
+Don't assume that observing `document.body`, instead of `target.parentNode`, is a better target. Observing `document.body` has performance implications because callback logic is executed for *all* DOM updates, whether or not they have anything to do with your element. Use either of the following approaches:
+
+* In cases where you can identify a suitable ancestor node to observe, use `MutationObserver` with it. Ideally, this ancestor is scoped to the changes that you want to observe, rather than `document.body`.
+* Instead of using `MutationObserver`, consider using a [custom element and `disconnectedCallback`](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements). The event always fires when your custom element is disconnected, no matter where it resides in the DOM relative to the DOM change.
+
 ## JavaScript interop calls without a circuit
 
 *This section only applies to server-side apps.*
 
-JavaScript (JS) interop calls can't be issued after a SignalR circuit is disconnected. Without a circuit during component disposal or at any other time that a circuit doesn't exist, the following method calls fail and log a message that the circuit is disconnected as a <xref:Microsoft.JSInterop.JSDisconnectedException>:
+JavaScript (JS) interop calls can't be issued after Blazor's SignalR circuit is disconnected. Without a circuit during component disposal or at any other time that a circuit doesn't exist, the following method calls fail and log a message that the circuit is disconnected as a <xref:Microsoft.JSInterop.JSDisconnectedException>:
+
+:::moniker range=">= aspnetcore-10.0"
+
+* JS interop method calls
+  * <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeVoidAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.IJSObjectReference.InvokeConstructorAsync%2A>
+  * <xref:Microsoft.JSInterop.IJSInProcessObjectReference.InvokeConstructor%2A>
+  * <xref:Microsoft.JSInterop.IJSObjectReference.GetValueAsync%2A>
+  * <xref:Microsoft.JSInterop.IJSObjectReference.SetValueAsync%2A>
+* `Dispose`/`DisposeAsync` calls on any <xref:Microsoft.JSInterop.IJSObjectReference>.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
 
 * JS interop method calls
   * <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A?displayProperty=nameWithType>
@@ -311,12 +350,14 @@ JavaScript (JS) interop calls can't be issued after a SignalR circuit is disconn
   * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeVoidAsync%2A?displayProperty=nameWithType>
 * `Dispose`/`DisposeAsync` calls on any <xref:Microsoft.JSInterop.IJSObjectReference>.
 
+:::moniker-end
+
 In order to avoid logging <xref:Microsoft.JSInterop.JSDisconnectedException> or to log custom information, catch the exception in a [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statement.
 
 For the following component disposal example:
 
-* The component implements <xref:System.IAsyncDisposable>.
-* `objInstance` is an <xref:Microsoft.JSInterop.IJSObjectReference>.
+* The server-side component implements <xref:System.IAsyncDisposable>.
+* `module` is an <xref:Microsoft.JSInterop.IJSObjectReference> for a JS module.
 * <xref:Microsoft.JSInterop.JSDisconnectedException> is caught and not logged.
 * Optionally, you can log custom information in the `catch` statement at whatever log level you prefer. The following example doesn't log custom information because it assumes the developer doesn't care about when or where circuits are disconnected during component disposal.
 
@@ -325,9 +366,9 @@ async ValueTask IAsyncDisposable.DisposeAsync()
 {
     try
     {
-        if (objInstance is not null)
+        if (module is not null)
         {
-            await objInstance.DisposeAsync();
+            await module.DisposeAsync();
         }
     }
     catch (JSDisconnectedException)
@@ -336,12 +377,12 @@ async ValueTask IAsyncDisposable.DisposeAsync()
 }
 ```
 
-If you must clean up your own JS objects or execute other JS code on the client after a circuit is lost, use the [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver) pattern in JS on the client. The [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver) pattern allows you to run a function when an element is removed from the DOM.
+If you must clean up your own JS objects or execute other JS code on the client after a circuit is lost in a server-side Blazor app, use the [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver) pattern in JS on the client. The [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver) pattern allows you to run a function when an element is removed from the DOM.
 
 For more information, see the following articles:
 
 * <xref:blazor/fundamentals/handle-errors#javascript-interop>: The *JavaScript interop* section discusses error handling in JS interop scenarios.
-* <xref:blazor/components/lifecycle#component-disposal-with-idisposable-and-iasyncdisposable>: The *Component disposal with `IDisposable` and `IAsyncDisposable`* section describes how to implement disposal patterns in Razor components.
+* <xref:blazor/components/component-disposal>: The article describes how to implement disposal patterns in Razor components.
 
 ## Cached JavaScript files
 
@@ -354,7 +395,7 @@ To disable client-side caching in browsers, developers usually adopt one of the 
 * Disable caching when the browser's developer tools console is open. Guidance can be found in the developer tools documentation of each browser maintainer:
   * [Chrome DevTools](https://developer.chrome.com/docs/devtools/)
   * [Microsoft Edge Developer Tools overview](/microsoft-edge/devtools-guide-chromium/)
-* Perform a manual browser refresh of any webpage of the Blazor app to reload JS files from the server. ASP.NET Core's HTTP Caching Middleware always honors a valid no-cache [`Cache-Control` header](https://developer.mozilla.org/docs/Web/HTTP/Headers/Cache-Control) sent by a client.
+* Perform a manual browser refresh of any webpage of the Blazor app to reload JS files from the server. ASP.NET Core's HTTP response caching middleware always honors a valid no-cache [`Cache-Control` header](https://developer.mozilla.org/docs/Web/HTTP/Headers/Cache-Control) sent by a client.
 
 For more information, see:
 

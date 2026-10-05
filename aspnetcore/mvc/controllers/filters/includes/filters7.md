@@ -20,7 +20,7 @@ This document applies to Razor Pages, API controllers, and controllers with view
 
 Filters run within the *ASP.NET Core action invocation pipeline*, sometimes referred to as the *filter pipeline*. The filter pipeline runs after ASP.NET Core selects the action to execute:
 
-:::image source="~/mvc/controllers/filters/_static/filter-pipeline-1.png" alt-text="The request is processed through Other Middleware, Routing Middleware, Action Selection, and the Action Invocation Pipeline. The request processing continues back through Action Selection, Routing Middleware, and various Other Middleware before becoming a response sent to the client.":::
+:::image source="~/mvc/controllers/filters/_static/filter-pipeline-1.png" alt-text="The request is processed through other middleware, routing middleware, Action Selection, and the Action Invocation Pipeline. The request processing continues back through Action Selection, routing middleware, and various other middleware before becoming a response sent to the client.":::
 
 ### Filter types
 
@@ -97,7 +97,7 @@ Interfaces for multiple filter stages can be implemented in a single class. For 
 * Asynchronous: <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncActionFilter> and <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncResultFilter>
 * <xref:Microsoft.AspNetCore.Mvc.Filters.IOrderedFilter>
 
-Implement **either** the synchronous or the async version of a filter interface, **not** both. The runtime checks first to see if the filter implements the async interface, and if so, it calls that. If not, it calls the synchronous interface's method(s). If both asynchronous and synchronous interfaces are implemented in one class, only the async method is called. When using abstract classes like <xref:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute>, override only the synchronous methods or the asynchronous methods for each filter type.
+Implement **either** the synchronous or the async version of a filter interface, **not** both. The runtime checks first to see if the filter implements the async interface, and if so, it calls that. If not, it calls the synchronous interface's methods. If both asynchronous and synchronous interfaces are implemented in one class, only the async method is called. When using abstract classes like <xref:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute>, override only the synchronous methods or the asynchronous methods for each filter type.
 
 ### Built-in filter attributes
 
@@ -535,7 +535,7 @@ When passing an *instance* of a filter into `Add`, instead of its `Type`, the fi
 
 ## Additional resources
 
-* [View or download sample](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/samples) ([how to download](xref:index#how-to-download-a-sample)).
+* [View or download sample](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample)).
 * <xref:razor-pages/filter>
 
 :::moniker-end
@@ -558,13 +558,13 @@ This document applies to Razor Pages, API controllers, and controllers with view
 * The component is embedded in a page or view.
 * The page or controller and view uses the filter.
 
-[View or download sample](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/samples) ([how to download](xref:index#how-to-download-a-sample)).
+[View or download sample](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/controllers/filters/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample)).
 
 ## How filters work
 
 Filters run within the *ASP.NET Core action invocation pipeline*, sometimes referred to as the *filter pipeline*. The filter pipeline runs after ASP.NET Core selects the action to execute.
 
-:::image source="~/mvc/controllers/filters/_static/filter-pipeline-1.png" alt-text="The request is processed through Other Middleware, Routing Middleware, Action Selection, and the Action Invocation Pipeline. The request processing continues back through Action Selection, Routing Middleware, and various Other Middleware before becoming a response sent to the client.":::
+:::image source="~/mvc/controllers/filters/_static/filter-pipeline-1.png" alt-text="The request is processed through other middleware, routing middleware, Action Selection, and the Action Invocation Pipeline. The request processing continues back through Action Selection, routing middleware, and various other middleware before becoming a response sent to the client.":::
 
 ### Filter types
 
@@ -617,7 +617,7 @@ Interfaces for multiple filter stages can be implemented in a single class. For 
 * Asynchronous: <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncActionFilter> and <xref:Microsoft.AspNetCore.Mvc.Filters.IAsyncResultFilter>
 * <xref:Microsoft.AspNetCore.Mvc.Filters.IOrderedFilter>
 
-Implement **either** the synchronous or the async version of a filter interface, **not** both. The runtime checks first to see if the filter implements the async interface, and if so, it calls that. If not, it calls the synchronous interface's method(s). If both asynchronous and synchronous interfaces are implemented in one class, only the async method is called. When using abstract classes like <xref:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute>, override only the synchronous methods or the asynchronous methods for each filter type.
+Implement **either** the synchronous or the async version of a filter interface, **not** both. The runtime checks first to see if the filter implements the async interface, and if so, it calls that. If not, it calls the synchronous interface's methods. If both asynchronous and synchronous interfaces are implemented in one class, only the async method is called. When using abstract classes like <xref:Microsoft.AspNetCore.Mvc.Filters.ActionFilterAttribute>, override only the synchronous methods or the asynchronous methods for each filter type.
 
 ### Built-in filter attributes
 

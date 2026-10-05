@@ -27,7 +27,7 @@ Globalizing and localizing an app involves the following tasks:
 * [Provide localized resources for the cultures the app supports](xref:fundamentals/localization/provide-resources)
 * [Implement a strategy to select the culture for each request](xref:fundamentals/localization/select-language-culture)
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/3.x/) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/3.x/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Additional resources
 
@@ -38,7 +38,6 @@ Globalizing and localizing an app involves the following tasks:
 * [Globalizing and localizing .NET applications](/dotnet/standard/globalization-localization/index)
 * [Localization.StarterWeb project](https://github.com/aspnet/Entropy/tree/master/samples/Localization.StarterWeb) used in the article.
 * [Resources in .resx Files](/dotnet/framework/resources/working-with-resx-files-programmatically)
-* [Microsoft Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308)
 * [Localization & Generics](http://hishambinateya.com/localization-and-generics)
 
 :::moniker-end
@@ -59,7 +58,7 @@ App localization involves the following:
 1. Provide localized resources for the languages and cultures you support
 1. Implement a strategy to select the language/culture for each request
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/3.x/Localization) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample/3.x/Localization) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Make the app content localizable
 
@@ -104,8 +103,8 @@ The default implementation of `IViewLocalizer` finds the resource file based on 
 
 A French resource file could contain the following:
 
-| Key | Value |
-| --- | ----- |
+| Key                        | Value                         |
+| -------------------------- | ----------------------------- |
 | `<i>Hello</i> <b>{0}!</b>` | `<i>Bonjour</i> <b>{0} !</b>` |
 
 The rendered view would contain the HTML markup from the resource file.
@@ -252,11 +251,9 @@ Localization is configured in the `Startup.ConfigureServices` method:
 
 ### Localization middleware
 
-The current culture on a request is set in the localization [Middleware](xref:fundamentals/middleware/index). The localization middleware is enabled in the `Startup.Configure` method. The localization middleware must be configured before any middleware that might check the request culture (for example, `app.UseMvcWithDefaultRoute()`). Localization Middleware must appear after Routing Middleware if using <xref:Microsoft.AspNetCore.Localization.Routing.RouteDataRequestCultureProvider>. For more information on middleware order, see <xref:fundamentals/middleware/index#middleware-order>.
+The current culture on a request is set in the localization [Middleware](xref:fundamentals/middleware/index). The localization middleware is enabled in the `Startup.Configure` method. The localization middleware must be configured before any middleware that might check the request culture (for example, `app.UseMvcWithDefaultRoute()`). Localization middleware must appear after routing middleware if using <xref:Microsoft.AspNetCore.Localization.Routing.RouteDataRequestCultureProvider>. For more information on middleware order, see <xref:fundamentals/middleware/index#middleware-order>.
 
 [!code-csharp[](~/fundamentals/localization/sample/3.x/Localization/Startup.cs?name=snippet2)]
-
-[!INCLUDE[about the series](~/includes/code-comments-loc.md)]
 
 `UseRequestLocalization` initializes a `RequestLocalizationOptions` object. On every request the list of `RequestCultureProvider` in the `RequestLocalizationOptions` is enumerated and the first provider that can successfully determine the request culture is used. The default providers come from the `RequestLocalizationOptions` class:
 
@@ -409,7 +406,6 @@ Terms:
 * [Localization.StarterWeb project](https://github.com/aspnet/Entropy/tree/master/samples/Localization.StarterWeb) used in the article.
 * [Globalizing and localizing .NET applications](/dotnet/standard/globalization-localization/index)
 * [Resources in .resx Files](/dotnet/framework/resources/working-with-resx-files-programmatically)
-* [Microsoft Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308)
 * [Localization & Generics](http://hishambinateya.com/localization-and-generics)
 
 :::moniker-end

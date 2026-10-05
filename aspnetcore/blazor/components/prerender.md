@@ -3,164 +3,209 @@ title: Prerender ASP.NET Core Razor components
 author: guardrex
 description: Learn about Razor component prerendering in ASP.NET Core Blazor apps.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/22/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/prerender
 ---
 # Prerender ASP.NET Core Razor components
 
-<!-- UPDATE 9.0 Activate after release and INCLUDE is updated
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 <!--
     NOTE: The console output block quotes in this topic use a double-space 
     at the ends of lines to generate a bare return in block quote output.
 -->
 
-This article explains Razor component prerendering scenarios for server-rendered components in Blazor Web Apps.
+This article explains Razor component prerendering scenarios for server-rendered components in Blazor Web Apps and Blazor Server apps.
 
-*Prerendering* is the process of initially rendering page content on the server without enabling event handlers for rendered controls. The server outputs the HTML UI of the page as soon as possible in response to the initial request, which makes the app feel more responsive to users. Prerendering can also improve [Search Engine Optimization (SEO)](https://developer.mozilla.org/docs/Glossary/SEO) by rendering content for the initial HTTP response that search engines use to calculate page rank.
+*Prerendering* is the process of statically rendering page content from the server to deliver HTML to the browser as quickly as possible. After the prerendered content is quickly displayed to the user, interactive content with active event handlers are rendered, replacing any content that was rendered previously. Prerendering can also improve [Search Engine Optimization (SEO)](https://developer.mozilla.org/docs/Glossary/SEO) by rendering content for the initial HTTP response that search engines use to calculate page rank.
+
+:::moniker range=">= aspnetcore-8.0"
+
+Prerendering is enabled by default for interactive components.
+
+Internal navigation with interactive routing doesn't use prerendering because the page is already interactive. For more information, see [Static versus interactive routing](xref:blazor/fundamentals/routing#static-versus-interactive-routing) and [Interactive routing and prerendering](xref:blazor/state-management/prerendered-state-persistence#interactive-routing-and-prerendering).
+
+[`OnAfterRender{Async}` component lifecycle events](xref:blazor/components/lifecycle#after-component-render-onafterrenderasync) aren't called when prerendering, only after the component renders interactively.
+
+## Disable prerendering
+
+<!-- UPDATE 11.0 Tracking ...
+
+                 "prerender: false" is ignored in child components
+                 https://github.com/dotnet/aspnetcore/issues/55635
+
+                 ... for .NET 11 work in the following area. -->
+
+Prerendering can complicate an app because the app's Razor components must render twice: once for prerendering and once for setting up interactivity. If the components are set up to run on WebAssembly, then you also must design your components so that they can run from both the server and the client.
+
+To disable prerendering for a *component instance*, pass the `prerender` flag with a value of `false` to the render mode:
+
+* `<... @rendermode="new InteractiveServerRenderMode(prerender: false)" />`
+* `<... @rendermode="new InteractiveWebAssemblyRenderMode(prerender: false)" />`
+* `<... @rendermode="new InteractiveAutoRenderMode(prerender: false)" />`
+
+To disable prerendering in a *component definition*:
+
+* `@rendermode @(new InteractiveServerRenderMode(prerender: false))`
+* `@rendermode @(new InteractiveWebAssemblyRenderMode(prerender: false))`
+* `@rendermode @(new InteractiveAutoRenderMode(prerender: false))`
+
+To disable prerendering for the entire app, indicate the render mode at the highest-level interactive component in the app's component hierarchy that isn't a root component.
+
+For apps based on the Blazor Web App project template, a render mode assigned to the entire app is specified where the `Routes` component is used in the `App` component (`Components/App.razor`). The following example sets the app's render mode to Interactive Server with prerendering disabled:
+
+```razor
+<Routes @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+```
+
+Also, disable prerendering for the [`HeadOutlet` component](xref:blazor/components/control-head-content#headoutlet-component) in the `App` component:
+
+```razor
+<HeadOutlet @rendermode="new InteractiveServerRenderMode(prerender: false)" />
+```
+
+Making a root component, such as the `App` component, interactive with the `@rendermode` directive at the top of the root component's definition file (`.razor`) isn't supported. Therefore, prerendering can't be disabled directly by the `App` component.
+
+Disabling prerendering using the preceding techniques only takes effect for top-level render modes. If a parent component specifies a render mode, the prerendering settings of its children are ignored.
+
+:::moniker-end
 
 ## Persist prerendered state
 
-Without persisting prerendered state, state used during prerendering is lost and must be recreated when the app is fully loaded. If any state is created asynchronously, the UI may flicker as the prerendered UI is replaced when the component is rerendered.
+Without persisting prerendered state, state used during prerendering is lost and must be recreated when the app is fully loaded. If any state is created asynchronously, the UI may flicker as the prerendered UI is replaced when the component is rerendered. For guidance on how to persist state during prerendering, see <xref:blazor/state-management/prerendered-state-persistence>.
 
-Consider the following `PrerenderedCounter1` counter component. The component sets an initial random counter value during prerendering in [`OnInitialized` lifecycle method](xref:blazor/components/lifecycle#component-initialization-oninitializedasync). After the SignalR connection to the client is established, the component rerenders, and the initial count value is replaced when `OnInitialized` executes a second time.
+:::moniker range=">= aspnetcore-8.0"
 
-`PrerenderedCounter1.razor`:
+## Client-side services fail to resolve during prerendering
 
-:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/PrerenderedCounter1.razor":::
+Assuming that prerendering isn't disabled for a component or for the app, a component in the `.Client` project is prerendered on the server. Because the server doesn't have access to registered client-side Blazor services, it isn't possible to inject these services into a component without receiving an error that the service can't be found during prerendering.
 
-Run the app and inspect logging from the component. The following is example output.
-
-> [!NOTE]
-> If the app adopts interactive (enhanced) routing and the page is reached via an internal navigation, prerendering doesn't occur. Therefore, you must perform a full page reload for the `PrerenderedCounter1` component to see the following output.
-
-> :::no-loc text="info: BlazorSample.Components.Pages.PrerenderedCounter1[0]":::  
-> :::no-loc text="      currentCount set to 41":::  
-> :::no-loc text="info: BlazorSample.Components.Pages.PrerenderedCounter1[0]":::  
-> :::no-loc text="      currentCount set to 92":::
-
-The first logged count occurs during prerendering. The count is set again after prerendering when the component is rerendered. There's also a flicker in the UI when the count updates from 41 to 92.
-
-To retain the initial value of the counter during prerendering, Blazor supports persisting state in a prerendered page using the <xref:Microsoft.AspNetCore.Components.PersistentComponentState> service (and for components embedded into pages or views of Razor Pages or MVC apps, the [Persist Component State Tag Helper](xref:mvc/views/tag-helpers/builtin-th/persist-component-state-tag-helper)).
-
-To preserve prerendered state, decide what state to persist using the <xref:Microsoft.AspNetCore.Components.PersistentComponentState> service. <xref:Microsoft.AspNetCore.Components.PersistentComponentState.RegisterOnPersisting%2A?displayProperty=nameWithType> registers a callback to persist the component state before the app is paused. The state is retrieved when the app resumes.
-
-The following example demonstrates the general pattern:
-
-* The `{TYPE}` placeholder represents the type of data to persist.
-* The `{TOKEN}` placeholder is a state identifier string. Consider using `nameof({VARIABLE})`, where the `{VARIABLE}` placeholder is the name of the variable that holds the state. Using [`nameof()`](/dotnet/csharp/language-reference/operators/nameof) for the state identifier avoids the use of a quoted string.
+For example, consider the following `Home` component in the `.Client` project in a Blazor Web App with [global Interactive WebAssembly or Interactive Auto rendering](xref:blazor/components/render-modes#apply-a-render-mode-to-the-entire-app). The component attempts to inject <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment> to obtain the environment's name.
 
 ```razor
-@implements IDisposable
-@inject PersistentComponentState ApplicationState
+@page "/"
+@inject IWebAssemblyHostEnvironment Environment
 
-...
+<PageTitle>Home</PageTitle>
+
+<h1>Home</h1>
+
+<p>
+    Environment: @Environment.Environment
+</p>
+```
+
+No compile time error occurs, but a runtime error occurs during prerendering:
+
+> :::no-loc text="Cannot provide a value for property 'Environment' on type 'BlazorSample.Client.Pages.Home'. There is no registered service of type 'Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment'.":::
+
+This error occurs because the component must compile and execute on the server during prerendering, but <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment> isn't a registered service on the server.
+
+Consider any of the following approaches to address this scenario:
+
+* [Register the service on the server in addition to the client](#register-the-service-on-the-server-in-addition-to-the-client)
+* [Inject a service that the app can use during prerendering](#inject-a-service-that-the-app-can-use-during-prerendering)
+* [Make the service optional](#make-the-service-optional)
+* [Create a service abstraction](#create-a-service-abstraction)
+* [Disable prerendering for the component](#disable-prerendering-for-the-component)
+
+### Register the service on the server in addition to the client
+
+If the service supports server execution, register the service on the server in addition to the client so that it's available during prerendering. For an example of this scenario, see the guidance for <xref:System.Net.Http.HttpClient> services in the [Blazor Web App external web APIs](xref:blazor/call-web-api#blazor-web-app-external-web-apis) section of the *Call web API* article.
+
+### Inject a service that the app can use during prerendering
+
+In some cases, the app can use a service on the server during prerendering and a different service on the client.
+
+For example, the following code obtains the app's environment whether the code is running on the server or on the client by injecting <xref:Microsoft.Extensions.Hosting.IHostEnvironment> from the [`Microsoft.Extensions.Hosting.Abstractions` NuGet package](https://www.nuget.org/packages/Microsoft.Extensions.Hosting.Abstractions):
+
+```csharp
+private string? environmentName;
+
+public Home(IHostEnvironment? serverEnvironment = null, 
+    IWebAssemblyHostEnvironment? wasmEnvironment = null)
+{
+    environmentName = serverEnvironment?.EnvironmentName;
+    environmentName ??= wasmEnvironment?.Environment;
+}
+```
+
+However, this approach adds an additional dependency to the client project that isn't needed.
+
+### Make the service optional
+
+Make the service optional if it isn't required during prerendering using either of the following approaches.
+
+The following example uses constructor injection of <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment>:
+
+```csharp
+private string? environmentName;
+
+public Home(IWebAssemblyHostEnvironment? env = null)
+{
+    environmentName = env?.Environment;
+}
+```
+
+Alternatively, inject <xref:System.IServiceProvider> to optionally obtain the service if it's available:
+
+```razor
+@page "/"
+@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject IServiceProvider Services
+
+<PageTitle>Home</PageTitle>
+
+<h1>Home</h1>
+
+<p>
+    <b>Environment:</b> @environmentName
+</p>
 
 @code {
-    private {TYPE} data;
-    private PersistingComponentStateSubscription persistingSubscription;
+    private string? environmentName;
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        persistingSubscription = 
-            ApplicationState.RegisterOnPersisting(PersistData);
-
-        if (!ApplicationState.TryTakeFromJson<{TYPE}>(
-            "{TOKEN}", out var restored))
+        if (Services.GetService<IWebAssemblyHostEnvironment>() is { } env)
         {
-            data = await ...;
+            environmentName = env.Environment;
         }
-        else
-        {
-            data = restored!;
-        }
-    }
-
-    private Task PersistData()
-    {
-        ApplicationState.PersistAsJson("{TOKEN}", data);
-
-        return Task.CompletedTask;
-    }
-
-    void IDisposable.Dispose()
-    {
-        persistingSubscription.Dispose();
     }
 }
 ```
 
-The following counter component example persists counter state during prerendering and retrieves the state to initialize the component.
+### Create a service abstraction
 
-`PrerenderedCounter2.razor`:
+If a different service implementation is needed on the server, create a service abstraction and create implementations for the service in the server and client projects. Register the services in each project. Inject the custom service abstraction into components where needed. The component then depends solely on the custom service abstraction.
 
-:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/PrerenderedCounter2.razor":::
+In the case of <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment>, we can reuse the existing interface instead of creating a new one:
 
-When the component executes, `currentCount` is only set once during prerendering. The value is restored when the component is rerendered. The following is example output.
+`ServerHostEnvironment.cs`:
 
-> [!NOTE]
-> If the app adopts [interactive routing](xref:blazor/fundamentals/routing#static-versus-interactive-routing) and the page is reached via an internal navigation, prerendering doesn't occur. Therefore, you must perform a full page reload for the `PrerenderedCounter2` component to see the following output.
+```csharp
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.AspNetCore.Components;
 
-> :::no-loc text="info: BlazorSample.Components.Pages.PrerenderedCounter2[0]":::  
-> :::no-loc text="      currentCount set to 96":::  
-> :::no-loc text="info: BlazorSample.Components.Pages.PrerenderedCounter2[0]":::  
-> :::no-loc text="      currentCount restored to 96":::
-
-By initializing components with the same state used during prerendering, any expensive initialization steps are only executed once. The rendered UI also matches the prerendered UI, so no flicker occurs in the browser.
-
-The persisted prerendered state is transferred to the client, where it's used to restore the component state. During client-side rendering (CSR, `InteractiveWebAssembly`), the data is exposed to the browser and must not contain sensitive, private information. During interactive server-side rendering (interactive SSR, `InteractiveServer`), [ASP.NET Core Data Protection](xref:security/data-protection/introduction) ensures that the data is transferred securely. The `InteractiveAuto` render mode combines WebAssembly and Server interactivity, so it's necessary to consider data exposure to the browser, as in the CSR case.
-
-## Components embedded into pages and views (Razor Pages/MVC)
-
-For components embedded into a page or view of a Razor Pages or MVC app, you must add the [Persist Component State Tag Helper](xref:mvc/views/tag-helpers/builtin-th/persist-component-state-tag-helper) with the `<persist-component-state />` HTML tag inside the closing `</body>` tag of the app's layout. **This is only required for Razor Pages and MVC apps.** For more information, see <xref:mvc/views/tag-helpers/builtin-th/persist-component-state-tag-helper>.
-
-`Pages/Shared/_Layout.cshtml`:
-
-```cshtml
-<body>
-    ...
-
-    <persist-component-state />
-</body>
+public class ServerHostEnvironment(IWebHostEnvironment env, NavigationManager nav) : 
+    IWebAssemblyHostEnvironment
+{
+    public string Environment => env.EnvironmentName;
+    public string BaseAddress => nav.BaseUri;
+}
 ```
 
-## Interactive routing and prerendering
+In the server project's `Program` file, register the service:
 
-Internal navigation for [interactive routing](xref:blazor/fundamentals/routing#static-versus-interactive-routing) doesn't involve requesting new page content from the server. Therefore, prerendering doesn't occur for internal page requests.
+```csharp
+builder.Services.TryAddScoped<IWebAssemblyHostEnvironment, ServerHostEnvironment>();
+```
 
-The <xref:Microsoft.AspNetCore.Components.PersistentComponentState> service only works on the initial page load and not across [enhanced page navigation events](xref:blazor/fundamentals/routing#enhanced-navigation-and-form-handling). If the app performs a full (non-enhanced) navigation to a page utilizing persistent component state, the persisted state is made available for the app to use when it becomes interactive. But if an interactive circuit has already been established and an enhanced navigation is performed to a page that renders persisted component state, that state isn't made available in the existing circuit. The <xref:Microsoft.AspNetCore.Components.PersistentComponentState> service isn't aware of enhanced navigation, and there's no mechanism to deliver state updates to components that are already running.
+At this point, the <xref:Microsoft.AspNetCore.Components.WebAssembly.Hosting.IWebAssemblyHostEnvironment> service can be [injected into an interactive WebAssembly or Auto component that is also prerendered from the server](xref:blazor/fundamentals/environments#read-the-environment-in-a-blazor-webassembly-app).
 
-## Prerendering guidance
+### Disable prerendering for the component
 
-Prerendering guidance is organized in the Blazor documentation by subject matter. The following links cover all of the prerendering guidance throughout the documentation set by subject:
+Disable prerendering for the component or for the entire app. For more information, see the [Disable prerendering](#disable-prerendering) section.
 
-* Fundamentals
-  * <xref:Microsoft.AspNetCore.Components.Routing.Router.OnNavigateAsync> is executed *twice* when prerendering: [Handle asynchronous navigation events with `OnNavigateAsync`](xref:blazor/fundamentals/routing#handle-asynchronous-navigation-events-with-onnavigateasync)
-  * [Startup: Control headers in C# code](xref:blazor/fundamentals/startup#control-headers-in-c-code)
-  * [Handle Errors: Prerendering](xref:blazor/fundamentals/handle-errors#prerendering)
-  * [SignalR: Prerendered state size and SignalR message size limit](xref:blazor/fundamentals/signalr#prerendered-state-size-and-signalr-message-size-limit)
-
-* [Render modes: Prerendering](xref:blazor/components/render-modes#prerendering)
-
-* Components
-  * [Control `<head>` content during prerendering](xref:blazor/components/control-head-content#control-head-content-during-prerendering)
-  * Razor component lifecycle subjects that pertain to prerendering
-    * [Component initialization (`OnInitialized{Async}`)](xref:blazor/components/lifecycle#component-initialization-oninitializedasync)
-    * [After component render (`OnAfterRender{Async}`)](xref:blazor/components/lifecycle#after-component-render-onafterrenderasync)
-    * [Stateful reconnection after prerendering](xref:blazor/components/lifecycle#stateful-reconnection-after-prerendering)
-    * [Prerendering with JavaScript interop](xref:blazor/components/lifecycle#prerendering-with-javascript-interop): This section also appears in the two JS interop articles on calling JavaScript from .NET and calling .NET from JavaScript.
-  * [QuickGrid component sample app](xref:blazor/components/quickgrid#sample-app): The [**QuickGrid for Blazor** sample app](https://aspnet.github.io/quickgridsamples/) is hosted on GitHub Pages. The site loads fast thanks to static prerendering using the community-maintained [`BlazorWasmPrerendering.Build` GitHub project](https://github.com/jsakamoto/BlazorWasmPreRendering.Build).
-  * [Prerendering when integrating components into Razor Pages and MVC apps](xref:blazor/components/integration)
-
-* Authentication and authorization
-  * [Server-side threat mitigation: Cross-site scripting (XSS)](xref:blazor/security/server/interactive-server-side-rendering#cross-site-scripting-xss)
-  * [Server-side unauthorized content display while prerendering with a custom `AuthenticationStateProvider`](xref:blazor/security/server/index#unauthorized-content-display-while-prerendering-with-a-custom-authenticationstateprovider)
-  * [Blazor WebAssembly rendered component authentication with prerendering](xref:blazor/security/webassembly/additional-scenarios#prerendering-with-authentication)
-
-* [State management: Handle prerendering](xref:blazor/state-management#handle-prerendering): Besides the *Handle prerendering* section, several of the article's other sections include remarks on prerendering.
+:::moniker-end

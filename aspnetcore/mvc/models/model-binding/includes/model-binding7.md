@@ -7,7 +7,7 @@ This article explains what model binding is, how it works, and how to customize 
 Controllers and Razor pages work with data that comes from HTTP requests. For example, route data may provide a record key, and posted form fields may provide values for the properties of the model. Writing code to retrieve each of these values and convert them from strings to .NET types would be tedious and error-prone. Model binding automates this process. The model binding system:
 
 * Retrieves data from various sources such as route data, form fields, and query strings.
-* Provides the data to controllers and Razor pages in method parameters and public properties.
+* Provides the data to controllers and Razor pages in method parameters and `public` properties.
 * Converts string data to .NET types.
 * Updates properties of complex types.
 
@@ -42,17 +42,17 @@ Model binding tries to find values for the following kinds of targets:
 
 * Parameters of the controller action method that a request is routed to.
 * Parameters of the Razor Pages handler method that a request is routed to. 
-* Public properties of a controller or `PageModel` class, if specified by attributes.
+* Public (`public`) properties of a controller or `PageModel` class, if specified by attributes.
 
 ### [BindProperty] attribute
 
-Can be applied to a public property of a controller or `PageModel` class to cause model binding to target that property:
+Can be applied to a `public` property of a controller or `PageModel` class to cause model binding to target that property:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Pages/Edit.cshtml.cs" id="snippet_Class" highlight="3":::
 
 ### [BindProperties] attribute
 
-Can be applied to a controller or `PageModel` class to tell model binding to target all public properties of the class:
+Can be applied to a controller or `PageModel` class to tell model binding to target all `public` properties of the class:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Pages/Create.cshtml.cs" id="snippet_Class" highlight="1":::
 
@@ -250,12 +250,14 @@ The following controller action uses the `DateRangeTP` class to bind a date rang
 
 A complex type must have a public default constructor and public writable properties to bind. When model binding occurs, the class is instantiated using the public default constructor.
 
-For each property of the complex type, [model binding looks through the sources for the name pattern](https://github.com/dotnet/aspnetcore/blob/v6.0.3/src/Mvc/Mvc.Core/src/ModelBinding/ParameterBinder.cs#L157-L172) *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix. The decision to use the prefix isn't made per property. For example, with a query containing `?Instructor.Id=100&Name=foo`, bound to method `OnGet(Instructor instructor)`, the resulting object of type `Instructor` contains:
+For each property of the complex type, [model binding looks through the sources for the name pattern](https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ModelBinding/ParameterBinder.cs#L115-L130) *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix. The decision to use the prefix isn't made per property. For example, with a query containing `?Instructor.Id=100&Name=foo`, bound to method `OnGet(Instructor instructor)`, the resulting object of type `Instructor` contains:
 
 * `Id` set to `100`.
 * `Name` set to `null`. Model binding expects `Instructor.Name` because `Instructor.Id` was used in the preceding query parameter.
 
-For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` public property, the prefix is the public property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
+[!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
+
+For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` `public` property, the prefix is the property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
 
 For example, suppose the complex type is the following `Instructor` class:
 
@@ -694,7 +696,7 @@ For nullable parameters, ensure that the parameter isn't `null` before accessing
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * <xref:mvc/models/validation>
 * <xref:mvc/advanced/custom-model-binding>
 
@@ -709,7 +711,7 @@ This article explains what model binding is, how it works, and how to customize 
 Controllers and Razor pages work with data that comes from HTTP requests. For example, route data may provide a record key, and posted form fields may provide values for the properties of the model. Writing code to retrieve each of these values and convert them from strings to .NET types would be tedious and error-prone. Model binding automates this process. The model binding system:
 
 * Retrieves data from various sources such as route data, form fields, and query strings.
-* Provides the data to controllers and Razor pages in method parameters and public properties.
+* Provides the data to controllers and Razor pages in method parameters and `public` properties.
 * Converts string data to .NET types.
 * Updates properties of complex types.
 
@@ -744,17 +746,17 @@ Model binding tries to find values for the following kinds of targets:
 
 * Parameters of the controller action method that a request is routed to.
 * Parameters of the Razor Pages handler method that a request is routed to. 
-* Public properties of a controller or `PageModel` class, if specified by attributes.
+* Public (`public`) properties of a controller or `PageModel` class, if specified by attributes.
 
 ### [BindProperty] attribute
 
-Can be applied to a public property of a controller or `PageModel` class to cause model binding to target that property:
+Can be applied to a `public` property of a controller or `PageModel` class to cause model binding to target that property:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Pages/Edit.cshtml.cs" id="snippet_Class" highlight="3":::
 
 ### [BindProperties] attribute
 
-Can be applied to a controller or `PageModel` class to tell model binding to target all public properties of the class:
+Can be applied to a controller or `PageModel` class to tell model binding to target all `public` properties of the class:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Pages/Create.cshtml.cs" id="snippet_Class" highlight="1":::
 
@@ -883,12 +885,14 @@ The simple types that the model binder can convert source strings into include t
 
 A complex type must have a public default constructor and public writable properties to bind. When model binding occurs, the class is instantiated using the public default constructor.
 
-For each property of the complex type, [model binding looks through the sources for the name pattern](https://github.com/dotnet/aspnetcore/blob/v6.0.3/src/Mvc/Mvc.Core/src/ModelBinding/ParameterBinder.cs#L157-L172) *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix. The decision to use the prefix isn't made per property. For example, with a query containing `?Instructor.Id=100&Name=foo`, bound to method `OnGet(Instructor instructor)`, the resulting object of type `Instructor` contains:
+For each property of the complex type, [model binding looks through the sources for the name pattern](https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ModelBinding/ParameterBinder.cs#L115-L130) *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix. The decision to use the prefix isn't made per property. For example, with a query containing `?Instructor.Id=100&Name=foo`, bound to method `OnGet(Instructor instructor)`, the resulting object of type `Instructor` contains:
 
 * `Id` set to `100`.
 * `Name` set to `null`. Model binding expects `Instructor.Name` because `Instructor.Id` was used in the preceding query parameter.
 
-For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` public property, the prefix is the public property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
+[!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
+
+For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` `public` property, the prefix is the property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
 
 For example, suppose the complex type is the following `Instructor` class:
 
@@ -1327,7 +1331,7 @@ For nullable parameters, ensure that the parameter isn't `null` before accessing
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * <xref:mvc/models/validation>
 * <xref:mvc/advanced/custom-model-binding>
 
@@ -1337,14 +1341,14 @@ For nullable parameters, ensure that the parameter isn't `null` before accessing
 
 This article explains what model binding is, how it works, and how to customize its behavior.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:index#how-to-download-a-sample)).
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample)).
 
 ## What is Model binding
 
 Controllers and Razor pages work with data that comes from HTTP requests. For example, route data may provide a record key, and posted form fields may provide values for the properties of the model. Writing code to retrieve each of these values and convert them from strings to .NET types would be tedious and error-prone. Model binding automates this process. The model binding system:
 
 * Retrieves data from various sources such as route data, form fields, and query strings.
-* Provides the data to controllers and Razor pages in method parameters and public properties.
+* Provides the data to controllers and Razor pages in method parameters and `public` properties.
 * Converts string data to .NET types.
 * Updates properties of complex types.
 
@@ -1379,17 +1383,17 @@ Model binding tries to find values for the following kinds of targets:
 
 * Parameters of the controller action method that a request is routed to.
 * Parameters of the Razor Pages handler method that a request is routed to. 
-* Public properties of a controller or `PageModel` class, if specified by attributes.
+* Public (`public`) properties of a controller or `PageModel` class, if specified by attributes.
 
 ### [BindProperty] attribute
 
-Can be applied to a public property of a controller or `PageModel` class to cause model binding to target that property:
+Can be applied to a `public` property of a controller or `PageModel` class to cause model binding to target that property:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/3.x/ModelBindingSample/Pages/Instructors/Edit.cshtml.cs" id="snippet_BindProperty" highlight="3-4":::
 
 ### [BindProperties] attribute
 
-Available in ASP.NET Core 2.1 and later.  Can be applied to a controller or `PageModel` class to tell model binding to target all public properties of the class:
+Available in ASP.NET Core 2.1 or later.  Can be applied to a controller or `PageModel` class to tell model binding to target all `public` properties of the class:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/3.x/ModelBindingSample/Pages/Instructors/Create.cshtml.cs" id="snippet_BindProperties" highlight="1-2":::
 
@@ -1532,7 +1536,7 @@ A complex type must have a public default constructor and public writable proper
 
 For each property of the complex type, model binding looks through the sources for the name pattern *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix.
 
-For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` public property, the prefix is the public property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
+For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` `public` property, the prefix is the property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
 
 For example, suppose the complex type is the following `Instructor` class:
 

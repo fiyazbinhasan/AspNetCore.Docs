@@ -4,8 +4,7 @@ author: tdykstra
 description: Learn how to host an ASP.NET Core app in a Windows Service.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 12/19/2022
+ms.date: 04/27/2026
 uid: host-and-deploy/windows-service
 ---
 # Host ASP.NET Core in a Windows Service
@@ -25,7 +24,7 @@ An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/fram
 
 The ASP.NET Core Worker Service template provides a starting point for writing long running service apps. To use the template as a basis for a Windows Service app:
 
-1. Create a Worker Service app from the .NET Core template.
+1. Create a Worker Service app from the .NET template.
 1. Install the NuGet package [Microsoft.Extensions.Hosting.WindowsServices](https://www.nuget.org/packages/Microsoft.Extensions.Hosting.WindowsServices).
 1. Follow the guidance in the [App configuration](#app-configuration) section to update the Worker Service app so that it can run as a Windows Service.
 
@@ -33,7 +32,7 @@ The ASP.NET Core Worker Service template provides a starting point for writing l
 
 ## App configuration
 
-Update Program.cs to call [AddWindowsService](https://source.dot.net/#Microsoft.Extensions.Hosting.WindowsServices/WindowsServiceLifetimeHostBuilderExtensions.cs,f8bfb38e255ef3b6,references). When the app is running as a Windows Service, `AddWindowsService`:
+Update Program.cs to call <!--keep-->[AddWindowsService](https://source.dot.net/#Microsoft.Extensions.Hosting.WindowsServices/WindowsServiceLifetimeHostBuilderExtensions.cs,f8bfb38e255ef3b6,references). When the app is running as a Windows Service, `AddWindowsService`:
 
 * Sets the host lifetime to `WindowsServiceLifetime`.
 * Sets the [content root](xref:fundamentals/index#content-root) to [AppContext.BaseDirectory](xref:System.AppContext.BaseDirectory). For more information, see the [Current directory and content root](#current-directory-and-content-root) section.
@@ -49,9 +48,9 @@ Consider the following `ServiceA` class:
 
 The following `Program.cs` calls [`AddHostedService`](/dotnet/api/microsoft.extensions.dependencyinjection.servicecollectionhostedserviceextensions.addhostedservice) to register `ServiceA`:
 
-:::code language="csharp" source="~/host-and-deploy/windows-service/samples/7.x/WebAppServiceSample/Program.cs" highlight="5":::
+:::code language="csharp" source="~/host-and-deploy/windows-service/samples/7.x/WebAppServiceSample/Program.cs" highlight="8":::
 
-The following sample apps accompany this topic:
+The following sample apps accompany this article:
 
 * Background Worker Service Sample: A non-web app sample based on the [Worker Service template](#worker-service-template) that uses [hosted services](xref:fundamentals/host/hosted-services) for background tasks.
 * Web App Service Sample: A Razor Pages web app sample that runs as a Windows Service with [hosted services](xref:fundamentals/host/hosted-services) for background tasks.
@@ -60,7 +59,7 @@ For MVC guidance, see the articles under <xref:mvc/overview> and <xref:migration
 
 ## Deployment type
 
-For information and advice on deployment scenarios, see [.NET Core application deployment](/dotnet/core/deploying/).
+For information and advice on deployment scenarios, see [.NET application deployment](/dotnet/core/deploying/).
 
 ### SDK
 
@@ -78,7 +77,7 @@ If the service only executes background tasks (for example, [hosted services](xr
 
 ### Framework-dependent deployment (FDD)
 
-Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET Core on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
+Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
 
 If using the [Web SDK](#sdk), a *web.config* file, which is normally produced when publishing an ASP.NET Core app, is unnecessary for a Windows Services app. To disable the creation of the *web.config* file, add the `<IsTransformWebConfigDisabled>` property set to `true`.
 
@@ -102,9 +101,9 @@ A Windows [Runtime Identifier (RID)](/dotnet/core/rid-catalog) is included in th
 To publish for multiple RIDs:
 
 * Provide the RIDs in a semicolon-delimited list.
-* Use the property name [\<RuntimeIdentifiers>](/dotnet/core/tools/csproj#runtimeidentifiers) (plural).
+* Use the property name [\<RuntimeIdentifiers>](/dotnet/core/project-sdk/msbuild-props#runtimeidentifiers) (plural).
 
-For more information, see [.NET Core RID Catalog](/dotnet/core/rid-catalog).
+For more information, see [.NET RID Catalog](/dotnet/core/rid-catalog).
 
 ## Service user account
 
@@ -122,13 +121,13 @@ On Windows OS earlier than the Windows 10 October 2018 Update (version 1809/buil
 powershell -Command "New-LocalUser -Name {SERVICE NAME}"
 ```
 
-Provide a [strong password](/windows/security/threat-protection/security-policy-settings/password-must-meet-complexity-requirements) when prompted.
+Provide a [strong password](/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/password-must-meet-complexity-requirements) when prompted.
 
 Unless the `-AccountExpires` parameter is supplied to the [New-LocalUser](/powershell/module/microsoft.powershell.localaccounts/new-localuser) cmdlet with an expiration <xref:System.DateTime>, the account doesn't expire.
 
-For more information, see [Microsoft.PowerShell.LocalAccounts](/powershell/module/microsoft.powershell.localaccounts/) and [Service User Accounts](/windows/desktop/services/service-user-accounts).
+For more information, see [Microsoft.PowerShell.LocalAccounts](/powershell/module/microsoft.powershell.localaccounts/) and [Service User Accounts](/windows/win32/services/service-user-accounts).
 
-An alternative approach to managing users when using Active Directory is to use Managed Service Accounts. For more information, see [Group Managed Service Accounts Overview](/windows-server/security/group-managed-service-accounts/group-managed-service-accounts-overview).
+An alternative approach to managing users when using Active Directory is to use Managed Service Accounts. For more information, see [Group Managed Service Accounts Overview](/windows-server/identity/ad-ds/manage/group-managed-service-accounts/group-managed-service-accounts/group-managed-service-accounts-overview).
 
 ## Log on as a service rights
 
@@ -276,11 +275,11 @@ Access the System and Application Event Logs:
 
 ### Run the app at a command prompt
 
-Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [Development environment](xref:fundamentals/environments).
+Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [`Development` environment](xref:fundamentals/environments).
 
 ### Clear package caches
 
-A functioning app may fail immediately after upgrading either the .NET Core SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
+A functioning app might fail immediately after upgrading either the .NET SDK on the development machine or changing package versions within the app. In some cases, incoherent packages might break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
 
 1. Delete the *bin* and *obj* folders.
 1. Clear the package caches by executing [dotnet nuget locals all --clear](/dotnet/core/tools/dotnet-nuget-locals) from a command shell.
@@ -296,7 +295,7 @@ A *crash dump* is a snapshot of the system's memory and can help determine the c
 
 #### App crashes or encounters an exception
 
-Obtain and analyze a dump from [Windows Error Reporting (WER)](/windows/desktop/wer/windows-error-reporting):
+Obtain and analyze a dump from [Windows Error Reporting (WER)](/windows/win32/wer/windows-error-reporting):
 
 1. Create a folder to hold crash dump files at `c:\dumps`.
 1. Run the [EnableDumps PowerShell script](https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/host-and-deploy/windows-service/samples/scripts/EnableDumps.ps1) with the application executable name:
@@ -327,7 +326,7 @@ A dump can be analyzed using several approaches. For more information, see [Anal
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * [Kestrel endpoint configuration](xref:fundamentals/servers/kestrel/endpoints) (includes HTTPS configuration and SNI support)
 * <xref:fundamentals/host/generic-host>
 * <xref:test/troubleshoot>
@@ -338,7 +337,7 @@ A dump can be analyzed using several approaches. For more information, see [Anal
 
 An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/framework/windows-services/introduction-to-windows-service-applications) without using IIS. When hosted as a Windows Service, the app automatically starts after server reboots.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Prerequisites
 
@@ -349,7 +348,7 @@ An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/fram
 
 The ASP.NET Core Worker Service template provides a starting point for writing long running service apps. To use the template as a basis for a Windows Service app:
 
-1. Create a Worker Service app from the .NET Core template.
+1. Create a Worker Service app from the .NET template.
 1. Follow the guidance in the [App configuration](#app-configuration) section to update the Worker Service app so that it can run as a Windows Service.
 
 [!INCLUDE[](~/includes/worker-template-instructions.md)]
@@ -384,7 +383,7 @@ For MVC guidance, see the articles under <xref:mvc/overview> and <xref:migration
 
 ## Deployment type
 
-For information and advice on deployment scenarios, see [.NET Core application deployment](/dotnet/core/deploying/).
+For information and advice on deployment scenarios, see [.NET application deployment](/dotnet/core/deploying/).
 
 ### SDK
 
@@ -402,7 +401,7 @@ If the service only executes background tasks (for example, [hosted services](xr
 
 ### Framework-dependent deployment (FDD)
 
-Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET Core on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
+Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
 
 If using the [Web SDK](#sdk), a *web.config* file, which is normally produced when publishing an ASP.NET Core app, is unnecessary for a Windows Services app. To disable the creation of the *web.config* file, add the `<IsTransformWebConfigDisabled>` property set to `true`.
 
@@ -428,7 +427,7 @@ To publish for multiple RIDs:
 * Provide the RIDs in a semicolon-delimited list.
 * Use the property name [\<RuntimeIdentifiers>](/dotnet/core/tools/csproj#runtimeidentifiers) (plural).
 
-For more information, see [.NET Core RID Catalog](/dotnet/core/rid-catalog).
+For more information, see [.NET RID Catalog](/dotnet/core/rid-catalog).
 
 ## Service user account
 
@@ -600,11 +599,11 @@ Access the System and Application Event Logs:
 
 ### Run the app at a command prompt
 
-Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [Development environment](xref:fundamentals/environments).
+Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [`Development` environment](xref:fundamentals/environments).
 
 ### Clear package caches
 
-A functioning app may fail immediately after upgrading either the .NET Core SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
+A functioning app may fail immediately after upgrading either the .NET SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
 
 1. Delete the *bin* and *obj* folders.
 1. Clear the package caches by executing [dotnet nuget locals all --clear](/dotnet/core/tools/dotnet-nuget-locals) from a command shell.
@@ -661,7 +660,7 @@ A dump can be analyzed using several approaches. For more information, see [Anal
 
 An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/framework/windows-services/introduction-to-windows-service-applications) without using IIS. When hosted as a Windows Service, the app automatically starts after server reboots.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Prerequisites
 
@@ -672,7 +671,7 @@ An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/fram
 
 The ASP.NET Core Worker Service template provides a starting point for writing long running service apps. To use the template as a basis for a Windows Service app:
 
-1. Create a Worker Service app from the .NET Core template.
+1. Create a Worker Service app from the .NET template.
 1. Follow the guidance in the [App configuration](#app-configuration) section to update the Worker Service app so that it can run as a Windows Service.
 
 [!INCLUDE[](~/includes/worker-template-instructions.md)]
@@ -708,7 +707,7 @@ For MVC guidance, see the articles under <xref:mvc/overview> and <xref:migration
 
 ## Deployment type
 
-For information and advice on deployment scenarios, see [.NET Core application deployment](/dotnet/core/deploying/).
+For information and advice on deployment scenarios, see [.NET application deployment](/dotnet/core/deploying/).
 
 ### SDK
 
@@ -726,7 +725,7 @@ If the service only executes background tasks (for example, [hosted services](xr
 
 ### Framework-dependent deployment (FDD)
 
-Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET Core on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
+Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
 
 If using the [Web SDK](#sdk), a *web.config* file, which is normally produced when publishing an ASP.NET Core app, is unnecessary for a Windows Services app. To disable the creation of the *web.config* file, add the `<IsTransformWebConfigDisabled>` property set to `true`.
 
@@ -752,7 +751,7 @@ To publish for multiple RIDs:
 * Provide the RIDs in a semicolon-delimited list.
 * Use the property name [\<RuntimeIdentifiers>](/dotnet/core/tools/csproj#runtimeidentifiers) (plural).
 
-For more information, see [.NET Core RID Catalog](/dotnet/core/rid-catalog).
+For more information, see [.NET RID Catalog](/dotnet/core/rid-catalog).
 
 ## Service user account
 
@@ -923,11 +922,11 @@ Access the System and Application Event Logs:
 
 ### Run the app at a command prompt
 
-Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [Development environment](xref:fundamentals/environments).
+Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [`Development` environment](xref:fundamentals/environments).
 
 ### Clear package caches
 
-A functioning app may fail immediately after upgrading either the .NET Core SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
+A functioning app may fail immediately after upgrading either the .NET SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
 
 1. Delete the *bin* and *obj* folders.
 1. Clear the package caches by executing [dotnet nuget locals all --clear](/dotnet/core/tools/dotnet-nuget-locals) from a command shell.
@@ -984,7 +983,7 @@ A dump can be analyzed using several approaches. For more information, see [Anal
 
 An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/framework/windows-services/introduction-to-windows-service-applications) without using IIS. When hosted as a Windows Service, the app automatically starts after server reboots.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/host-and-deploy/windows-service/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Prerequisites
 
@@ -995,7 +994,7 @@ An ASP.NET Core app can be hosted on Windows as a [Windows Service](/dotnet/fram
 
 The ASP.NET Core Worker Service template provides a starting point for writing long running service apps. To use the template as a basis for a Windows Service app:
 
-1. Create a Worker Service app from the .NET Core template.
+1. Create a Worker Service app from the .NET template.
 1. Follow the guidance in the [App configuration](#app-configuration) section to update the Worker Service app so that it can run as a Windows Service.
 
 [!INCLUDE[](~/includes/worker-template-instructions.md)]
@@ -1031,7 +1030,7 @@ For MVC guidance, see the articles under <xref:mvc/overview> and <xref:migration
 
 ## Deployment type
 
-For information and advice on deployment scenarios, see [.NET Core application deployment](/dotnet/core/deploying/).
+For information and advice on deployment scenarios, see [.NET application deployment](/dotnet/core/deploying/).
 
 ### SDK
 
@@ -1049,7 +1048,7 @@ If the service only executes background tasks (for example, [hosted services](xr
 
 ### Framework-dependent deployment (FDD)
 
-Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET Core on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
+Framework-dependent deployment (FDD) relies on the presence of a shared system-wide version of .NET on the target system. When the FDD scenario is adopted following the guidance in this article, the SDK produces an executable (*.exe*), called a *framework-dependent executable*.
 
 If using the [Web SDK](#sdk), a *web.config* file, which is normally produced when publishing an ASP.NET Core app, is unnecessary for a Windows Services app. To disable the creation of the *web.config* file, add the `<IsTransformWebConfigDisabled>` property set to `true`.
 
@@ -1075,7 +1074,7 @@ To publish for multiple RIDs:
 * Provide the RIDs in a semicolon-delimited list.
 * Use the property name [\<RuntimeIdentifiers>](/dotnet/core/tools/csproj#runtimeidentifiers) (plural).
 
-For more information, see [.NET Core RID Catalog](/dotnet/core/rid-catalog).
+For more information, see [.NET RID Catalog](/dotnet/core/rid-catalog).
 
 ## Service user account
 
@@ -1246,11 +1245,11 @@ Access the System and Application Event Logs:
 
 ### Run the app at a command prompt
 
-Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [Development environment](xref:fundamentals/environments).
+Many startup errors don't produce useful information in the event logs. You can find the cause of some errors by running the app at a command prompt on the hosting system. To log additional detail from the app, lower the [log level](xref:fundamentals/logging/index#log-level) or run the app in the [`Development` environment](xref:fundamentals/environments).
 
 ### Clear package caches
 
-A functioning app may fail immediately after upgrading either the .NET Core SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
+A functioning app may fail immediately after upgrading either the .NET SDK on the development machine or changing package versions within the app. In some cases, incoherent packages may break an app when performing major upgrades. Most of these issues can be fixed by following these instructions:
 
 1. Delete the *bin* and *obj* folders.
 1. Clear the package caches by executing [dotnet nuget locals all --clear](/dotnet/core/tools/dotnet-nuget-locals) from a command shell.

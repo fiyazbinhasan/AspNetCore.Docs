@@ -1,10 +1,9 @@
 ---
 title: Use ASP.NET Core with HTTP/2 on IIS
-author: rick-anderson
+author: tdykstra
 description: Learn how to use HTTP/2 features with IIS.
 monikerRange: '>= aspnetcore-5.0'
-ms.author: riande
-ms.custom: mvc
+ms.author: tdykstra
 ms.date: 01/13/2020
 uid: host-and-deploy/iis/protocols
 ---

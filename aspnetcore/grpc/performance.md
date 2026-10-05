@@ -4,7 +4,7 @@ author: jamesnk
 description: Learn the best practices for building high-performance gRPC services.
 monikerRange: '>= aspnetcore-3.0'
 ms.author: wpickett
-ms.date: 04/11/2023
+ms.date: 05/16/2025
 uid: grpc/performance
 ---
 # Performance best practices with gRPC
@@ -94,6 +94,27 @@ For more information about garbage collection, see [Workstation and server garba
 > [!NOTE]
 > ASP.NET Core apps use server GC by default. Enabling `<ServerGarbageCollection>` is only useful in non-server gRPC client apps, for example in a gRPC client console app.
 
+## Asynchronous calls in client apps
+
+Prefer using [asynchronous programming with async and await](/dotnet/csharp/asynchronous-programming/) when calling gRPC methods. Making gRPC calls with blocking, such as using `Task.Result` or `Task.Wait()`, prevents other tasks from using a thread. This can lead to thread pool starvation, poor performance, and the app to hang with a deadlock.
+
+All gRPC method types generate asynchronous APIs on gRPC clients. The exception is unary methods, which generate both async _and_ blocking methods.
+
+Consider the following gRPC service defined in a *.proto* file:
+
+```protobuf
+service Greeter {
+  rpc SayHello (HelloRequest) returns (HelloReply);
+}
+```
+
+Its generated `GreeterClient` type has two .NET methods for calling `SayHello`:
+
+* `GreeterClient.SayHelloAsync` - calls the `Greeter.SayHello` service asynchronously. Can be awaited.
+* `GreeterClient.SayHello` - calls the `Greeter.SayHello` service and blocks until complete.
+
+The blocking `GreeterClient.SayHello` method shouldn't be used in asynchronous code. It can cause performance and reliability issues.
+
 ## Load balancing
 
 Some load balancers don't work effectively with gRPC. L4 (transport) load balancers operate at a connection level, by distributing TCP connections across endpoints. This approach works well for loading balancing API calls made with HTTP/1.1. Concurrent calls made with HTTP/1.1 are sent on different connections, allowing calls to be load balanced across endpoints.
@@ -124,7 +145,7 @@ There are many L7 proxies available. Some options are:
 
 * [Envoy](https://www.envoyproxy.io/) - A popular open source proxy.
 * [Linkerd](https://linkerd.io/) - Service mesh for Kubernetes.
-* [YARP: Yet Another Reverse Proxy](https://microsoft.github.io/reverse-proxy/) - An open source proxy written in .NET.
+* [YARP: Yet Another Reverse Proxy](https://dotnet.github.io/yarp/) - An open source proxy written in .NET.
 
 :::moniker range=">= aspnetcore-5.0"
 
@@ -135,6 +156,9 @@ gRPC calls between a client and service are usually sent over TCP sockets. TCP i
 Consider using a transport like Unix domain sockets or named pipes for gRPC calls between processes on the same machine. For more information, see <xref:grpc/interprocess>.
 
 ## Keep alive pings
+
+> [!IMPORTANT]
+> Keep alive pings require the cooperation of the server. Do not enable keep alive pings in the client without verifying that the server supports them. A server which does not support keep alive pings will usually ignore the first few pings, and will then send a `GOAWAY` message, closing the active HTTP/2 connection.
 
 Keep alive pings can be used to keep HTTP/2 connections alive during periods of inactivity. Having an existing HTTP/2 connection ready when an app resumes activity allows for the initial gRPC calls to be made quickly, without a delay caused by the connection being reestablished.
 
@@ -217,7 +241,7 @@ Server streaming calls don't have a request stream. This means that the only way
 
 Always dispose streaming calls once they're no longer needed. The type returned when starting streaming calls implements `IDisposable`. Disposing a call once it is no longer needed ensures it is stopped and all resources are cleaned up.
 
-In the following example, the [using declaration](/dotnet/csharp/language-reference/proposals/csharp-8.0/using#using-declaration) on the `AccumulateCount()` call ensures it's always disposed if an unexpected error occurs.
+In the following example, the [using declaration](/dotnet/csharp/language-reference/keywords/using-directive) on the `AccumulateCount()` call ensures it's always disposed if an unexpected error occurs.
 
 [!code-csharp[](~/grpc/performance/dispose-streaming-call.cs?highlight=2)]
 
@@ -370,6 +394,6 @@ Advice for creating high-performance applications with large binary payloads:
 * **Consider** splitting large binary payloads [using gRPC streaming](xref:grpc/client#client-streaming-call). Binary data is chunked and streamed over multiple messages. For more information on how to stream files, see examples in the grpc-dotnet repository:
   *  [gRPC streaming file download](https://github.com/grpc/grpc-dotnet/tree/master/examples#downloader).
   *  [gRPC streaming file upload](https://github.com/grpc/grpc-dotnet/tree/master/examples#uploader).
-* **Consider** not using gRPC for large binary data. In ASP.NET Core, Web APIs can be used alongside gRPC services. An HTTP endpoint can access the request and response stream body directly:
-  * [Read the request body using minimal web API](xref:fundamentals/minimal-apis#read-the-request-body)
-  * [Return stream response using minimal web API](xref:fundamentals/minimal-apis#stream)
+* **Consider** not using gRPC for large binary data. In ASP.NET Core, web APIs can be used alongside gRPC services. An HTTP endpoint can access the request and response stream body directly:
+  * [Read the request body in a Minimal API](xref:fundamentals/minimal-apis#read-the-request-body)
+  * [Return stream response in a Minimal API](xref:fundamentals/minimal-apis#stream)

@@ -1,6 +1,6 @@
 :::moniker range="= aspnetcore-8.0"
 
-This tutorial teaches the basics of building a controller-based web API that uses a database. Another approach to creating APIs in ASP.NET Core is to create *minimal APIs*. For help with choosing between minimal APIs and controller-based APIs, see <xref:fundamentals/apis>. For a tutorial on creating a minimal API, see <xref:tutorials/min-web-api>.
+This tutorial teaches the basics of building a controller-based web API that uses a database. Another approach to creating APIs in ASP.NET Core is to create *Minimal APIs*. For help with choosing between Minimal APIs and controller-based APIs, see <xref:fundamentals/apis>. For a tutorial on creating a Minimal API, see <xref:tutorials/min-web-api>.
 
 ## Overview
 
@@ -40,7 +40,7 @@ The following diagram shows the design of the app.
 * In the **Configure your new project dialog**, name the project *TodoApi* and select **Next**.
 * In the **Additional information** dialog:
   * Confirm the **Framework** is **.NET 8.0 (Long Term Support)**.
-  * Confirm the checkbox for **Use controllers(uncheck to use minimal APIs)** is checked.
+  * Confirm the checkbox for **Use controllers(uncheck to use Minimal APIs)** is checked.
   * Confirm the checkbox for **Enable OpenAPI support** is checked.
   * Select **Create**.
 
@@ -294,9 +294,19 @@ The ASP.NET Core templates for:
 
 When the `[action]` token isn't in the route template, the [action](xref:mvc/controllers/routing#action) name (method name) isn't included in the endpoint. That is, the action's associated method name isn't used in the matching route.
 
-## Update the PostTodoItem create method
+Open the generated `Controllers/TodoItemsController.cs` file to review the scaffolded code. Scaffolding generates a complete, working controller with action methods that create, read, update, and delete `TodoItem` data:
 
-Update the return statement in the `PostTodoItem` to use the [nameof](/dotnet/csharp/language-reference/operators/nameof) operator:
+* `GetTodoItems`: Get all to-do items.
+* `GetTodoItem`: Get a to-do item by ID.
+* `PostTodoItem`: Create a to-do item.
+* `PutTodoItem`: Update an existing to-do item.
+* `DeleteTodoItem`: Delete a to-do item.
+
+The following sections examine these generated methods, starting with `PostTodoItem`.
+
+## Examine the `PostTodoItem` create method
+
+Examine the scaffolded `PostTodoItem` method. The generated code already works. The return statement uses the [nameof](/dotnet/csharp/language-reference/operators/nameof) operator so the action name isn't hard-coded as a string. The commented-out line shows the equivalent hard-coded form that `nameof` replaces:
 
 [!code-csharp[](~/tutorials/first-web-api/samples/8.0/TodoApi/Controllers/TodoItemsController.cs?name=snippet_Create)]
 
@@ -308,7 +318,7 @@ The <xref:Microsoft.AspNetCore.Mvc.ControllerBase.CreatedAtAction%2A> method:
 
 * Returns an [HTTP 201 status code](https://developer.mozilla.org/docs/Web/HTTP/Status/201) if successful. `HTTP 201` is the standard response for an `HTTP POST` method that creates a new resource on the server.
 * Adds a [Location](https://developer.mozilla.org/docs/Web/HTTP/Headers/Location) header to the response. The `Location` header specifies the [URI](https://developer.mozilla.org/docs/Glossary/URI) of the newly created to-do item. For more information, see [10.2.2 201 Created](https://www.rfc-editor.org/rfc/rfc9110.html#section-10.2.2).
-* References the `GetTodoItem` action to create the `Location` header's URI. The C# `nameof` keyword is used to avoid hard-coding the action name in the `CreatedAtAction` call.
+* References the `GetTodoItem` action to create the `Location` header's URI.
 
 <a name="post7"></a>
 
@@ -413,7 +423,6 @@ There are many other tools that can be used to test web APIs, for example:
 For more information, see:
 
 * [Minimal API tutorial: test with .http files and Endpoints Explorer](xref:tutorials/min-web-api)
-* [Install and test APIs with `http-repl`](xref:tutorials/first-web-api?view=aspnetcore-6.0&preserve-view=true#ihr6)
 
 <!-- Verify https://go.microsoft.com/fwlink/?linkid=2123754 goes to this H2. Verify the latest released version is on top so this anchor works -->
 <a name="over-post"></a>
@@ -469,7 +478,7 @@ For information on deploying to Azure, see [Quickstart: Deploy an ASP.NET web ap
 
 ## Additional resources
 
-[View or download sample code for this tutorial](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/first-web-api/samples). See [how to download](xref:index#how-to-download-a-sample).
+[View or download sample code for this tutorial](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/first-web-api/samples). See [how to download](xref:fundamentals/index#how-to-download-a-sample).
 
 For more information, see the following resources:
 

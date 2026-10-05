@@ -3,9 +3,8 @@ title: Troubleshoot ASP.NET Core Blazor forms
 author: guardrex
 description: Learn how to troubleshoot forms in Blazor.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/forms/troubleshoot
 ---
 # Troubleshoot ASP.NET Core Blazor forms

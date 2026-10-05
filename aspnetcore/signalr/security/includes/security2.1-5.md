@@ -13,7 +13,7 @@ CORS should be configured in the SignalR app to only allow the origin `www.examp
 For more information on configuring CORS, see [Enable Cross-Origin Requests (CORS)](xref:security/cors). SignalR **requires** the following CORS policies:
 
 * Allow the specific expected origins. Allowing any origin is possible but is **not** secure or recommended.
-* HTTP methods `GET` and `POST` must be allowed.
+* HTTP methods `GET`, `POST`, and `DELETE` must be allowed. The `DELETE` method is required for the Long Polling transport to clean up connections on the server.
 * Credentials must be allowed in order for cookie-based sticky sessions to work correctly. They must be enabled even when authentication isn't used.
 
 :::moniker-end
@@ -41,7 +41,7 @@ public void Configure(IApplicationBuilder app, IHostingEnvironment env)
     {
         builder.WithOrigins("https://example.com")
             .AllowAnyHeader()
-            .WithMethods("GET", "POST")
+            .WithMethods("GET", "POST", "DELETE")
             .AllowCredentials();
     });
 
@@ -84,7 +84,7 @@ The protections provided by CORS don't apply to WebSockets. Browsers do **not**:
 
 However, browsers do send the `Origin` header when issuing WebSocket requests. Applications should be configured to validate these headers to ensure that only WebSockets coming from the expected origins are allowed.
 
-In ASP.NET Core 2.1 and later, header validation can be achieved using a custom middleware placed **before `UseSignalR`, and authentication middleware** in `Configure`:
+In ASP.NET Core 2.1 or later, header validation can be achieved using a custom middleware placed **before `UseSignalR`, and authentication middleware** in `Configure`:
 
 [!code-csharp[Main](~/signalr/security/sample/SignalR_CORS_2.1/Startup.cs?name=snippet2)]
 

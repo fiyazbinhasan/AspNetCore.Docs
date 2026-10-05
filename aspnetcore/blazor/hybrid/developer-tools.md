@@ -3,9 +3,8 @@ title: Use browser developer tools with ASP.NET Core Blazor Hybrid
 author: guardrex
 description: Learn how to use browser developer tools with ASP.NET Core Blazor Hybrid apps.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: "mvc"
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/hybrid/developer-tools
 zone_pivot_groups: blazor-hybrid-operating-systems
 ---
@@ -137,3 +136,4 @@ To use Safari developer tools with a macOS app:
 * [Chrome DevTools](https://developer.chrome.com/docs/devtools/)
 * [Microsoft Edge Developer Tools overview](/microsoft-edge/devtools-guide-chromium/)
 * [Safari Developer Help](https://support.apple.com/guide/safari-developer/welcome/mac)
+* [Inspect a `BlazorWebView` on Mac Catalyst (Mac Catalyst prior to 13.1 and iOS prior to 16.4)](/dotnet/maui/user-interface/controls/webview?pivots=devices-maccatalyst#inspect-a-webview-on-mac-catalyst)

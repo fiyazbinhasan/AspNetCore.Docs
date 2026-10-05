@@ -1,20 +1,22 @@
 ---
 title: Build a .NET MAUI Blazor Hybrid app with a Blazor Web App
+ai-usage: ai-assisted
 author: guardrex
 description: Learn how to build a .NET MAUI Blazor Hybrid app with a Blazor Web App that uses a shared user interface via a Razor class library (RCL).
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 10/17/2024
+ms.author: wpickett
+ms.date: 08/31/2026
 uid: blazor/hybrid/tutorials/maui-blazor-web-app
 ---
 # Build a .NET MAUI Blazor Hybrid app with a Blazor Web App
+
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article shows you how to build a .NET MAUI Blazor Hybrid app with a Blazor Web App that uses a shared user interface via a Razor class library (RCL).
 
 ## Prerequisites and preliminary steps
 
-For prerequisites and preliminary steps, see <xref:blazor/hybrid/tutorials/maui>. We recommend using the .NET MAUI Blazor Hybrid tutorial to set up your local system for .NET MAUI development before using the guidance in this article.
+For prerequisites and preliminary steps, see the [Build your first app](/dotnet/maui/get-started/first-app) tutorial. We recommend using the .NET MAUI Blazor Hybrid tutorial to set up your local system for .NET MAUI development before using the guidance in this article.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -28,28 +30,38 @@ If you haven't already installed the .NET MAUI workload, install it now. The .NE
 dotnet workload install maui
 ```
 
-Create a solution from the project template with the following .NET CLI command:
+Create a solution from the project template with the following .NET CLI command, replacing the `{INTERACTIVITY}` placeholder with the Blazor render mode that you desire to use:
+
+* `Server`: Adopts the Interactive Server render mode and produces a single-project Blazor app.
+* `WebAssembly`: Adopts the Interactive WebAssembly render mode and produces two Blazor projects, a server project and a `.Client` project.
+* `Auto`: Adopts the Interactive Auto render mode and produces two Blazor projects, a server project and a `.Client` project.
+
+For more information on the preceding render modes and the projects produced, see <xref:blazor/components/render-modes#render-modes> and the [Use Blazor render modes](#use-blazor-render-modes) section later in this article.
 
 ```dotnetcli
-dotnet new maui-blazor-web -o MauiBlazorWeb -I Server
+dotnet new maui-blazor-web -o MauiBlazorWeb -I {INTERACTIVITY}
 ```
 
 In the preceding command:
 
 * The `-o|--output` option creates a new folder for the app named `MauiBlazorWeb`.
-* The `-I|--InteractivityPlatform` option sets the interactivity render mode to Interactive Server (`InteractiveServer`). All three interactive Blazor render modes (`Server`, `WebAssembly`, and `Auto`) are supported by the project template. For more information, see the [Use Blazor render modes](#use-blazor-render-modes) section.
+* The `-I|--InteractivityPlatform` option sets the interactivity render mode. The `{INTERACTIVITY}` placeholder is the interactive Blazor render mode. All three interactive Blazor render modes (`Server`, `WebAssembly`, and `Auto`) are supported by the project template. For more information, see <xref:blazor/components/render-modes#render-modes> and the [Use Blazor render modes](#use-blazor-render-modes) section.
 
-The app automatically adopts global interactivity, which is important because MAUI apps always run interactively and throw errors on Razor component pages that explicitly specify a render mode. For more information, see [BlazorWebView needs a way to enable overriding ResolveComponentForRenderMode (`dotnet/aspnetcore` #51235)](https://github.com/dotnet/aspnetcore/issues/51235).
+The preceding command produces a Blazor app that adopts global interactivity, which is important because MAUI apps always run interactively and throw errors on Razor component pages that explicitly specify a render mode. For more information, see [BlazorWebView needs a way to enable overriding ResolveComponentForRenderMode (`dotnet/aspnetcore` #51235)](https://github.com/dotnet/aspnetcore/issues/51235).
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-10.0"
+
+## .NET MAUI Blazor Hybrid and Web App sample app
+
+[Obtain the sample app](xref:blazor/fundamentals/index#sample-apps) named `MauiBlazorWeb` from the [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) (`8.0` or `9.0` folder).
+
+The sample app is a starter solution that contains a .NET MAUI Blazor Hybrid (native, cross-platform) app, a Blazor Web App, and a Razor class library (RCL) that contains the shared UI (Razor components) used by the native and web apps.
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-9.0"
-
-## .NET MAUI Blazor Hybrid and Web App sample app
-
-[Obtain the sample app](xref:blazor/fundamentals/index#sample-apps) named `MauiBlazorWeb` from the [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) (.NET 8 or later).
-
-The sample app is a starter solution that contains a .NET MAUI Blazor Hybrid (native, cross-platform) app, a Blazor Web App, and a Razor class library (RCL) that contains the shared UI (Razor components) used by the native and web apps.
 
 ## Migrating a .NET MAUI Blazor Hybrid solution
 
@@ -68,7 +80,7 @@ Add new project to the solution with the **Blazor Web App** project template. Se
 * **Interactivity location**: **Global**
 * **Sample pages**: Unselected (disabled)
 
-<!-- UPDATE 10.0 Check on PU issue mentioned below and revise accordingly. -->
+<!-- UPDATE 11.0 Check on PU issue mentioned below and revise accordingly. -->
 
 The **Interactivity location** setting to **Global** is important because MAUI apps always run interactively and throw errors on Razor component pages that explicitly specify a render mode. If you don't use a global render mode, you must implement the approach described in the [Use Blazor render modes](#use-blazor-render-modes) section after following the guidance in this section. For more information, see [BlazorWebView needs a way to enable overriding ResolveComponentForRenderMode (`dotnet/aspnetcore` #51235)](https://github.com/dotnet/aspnetcore/issues/51235).
 
@@ -88,7 +100,7 @@ Delete the following files from the RCL's `wwwroot` folder:
 * `background.png`
 * `exampleJsInterop.js`
 
-In the RCL, replace the root `_Imports.razor` file with the one in the RCL's `Components` folder, overwriting the existing file in the RCL and deleting the original in the `Components` folder. After moving the file, open it and rename the last two `@using` statements to match the RCL's namespace. In the following example, the RCL's namespace is `MauiBlazorWeb.Shared`:
+In the RCL, replace the root imports file (`_Imports.razor`) with the one in the RCL's `Components` folder, overwriting the existing file in the RCL and deleting the original in the `Components` folder. After moving the file, open it and rename the last two `@using` statements to match the RCL's namespace. In the following example, the RCL's namespace is `MauiBlazorWeb.Shared`:
 
 ```razor
 @using MauiBlazorWeb.Shared
@@ -136,7 +148,7 @@ Replace the preceding lines with the following markup. In the following example,
 <link rel="stylesheet" href="_content/MauiBlazorWeb.Shared/css/app.css" />
 ```
 
-In the Blazor Web App, open the `_Imports.razor` file and add the following two `@using` statements for the RCL. In the following example, the RCL's namespace is `MauiBlazorWeb.Shared`:
+In the Blazor Web App, open the imports file (`_Imports.razor`) and add the following two `@using` statements for the RCL. In the following example, the RCL's namespace is `MauiBlazorWeb.Shared`:
 
 ```razor
 @using MauiBlazorWeb.Shared
@@ -189,6 +201,9 @@ Render mode specification subsections:
 
 * [Global Server interactivity](#global-server-interactivity)
 * [Global Auto or WebAssembly interactivity](#global-auto-or-webassembly-interactivity)
+* [Per-page/component Server interactivity](#per-pagecomponent-server-interactivity)
+* [Per-page/component Auto interactivity](#per-pagecomponent-auto-interactivity)
+* [Per-page/component WebAssembly interactivity](#per-pagecomponent-webassembly-interactivity)
 
 :::moniker-end
 
@@ -301,7 +316,7 @@ In `MauiProgram.CreateMauiApp` of `MauiProgram.cs`, call `ConfigureBlazorHybridR
 InteractiveRenderSettings.ConfigureBlazorHybridRenderModes();
 ```
 
-In the `_Imports.razor` file of the `.Shared` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
+In the imports file (`_Imports.razor`) of the `.Shared` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
 
 ```diff
 - @using static Microsoft.AspNetCore.Components.Web.RenderMode
@@ -343,7 +358,7 @@ In `MauiProgram.CreateMauiApp` of `MauiProgram.cs`, call `ConfigureBlazorHybridR
 InteractiveRenderSettings.ConfigureBlazorHybridRenderModes();
 ```
 
-In the `_Imports.razor` file of the `.Shared.Client` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
+In the imports file (`_Imports.razor`) of the `.Shared.Client` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
 
 ```diff
 - @using static Microsoft.AspNetCore.Components.Web.RenderMode
@@ -372,7 +387,25 @@ Project references:
 * `MauiBlazorWeb.Web` has a project reference to `MauiBlazorWeb.Web.Client`.
 * `MauiBlazorWeb.Web.Client` and `MauiBlazorWeb.Shared` have a project reference to `MauiBlazorWeb.Shared.Client`.
 
-Add the following <xref:Microsoft.AspNetCore.Components.Routing.Router.AdditionalAssemblies%2A> parameter to the `Router` component instance for the `MauiBlazorWeb.Shared.Client` project assembly (via its `_Imports` file) in the `MauiBlazorWeb.Shared` project's `Routes.razor` file:
+Add the following <xref:Microsoft.AspNetCore.Components.Routing.Router.AdditionalAssemblies%2A> parameter to the `Router` component instance for the `MauiBlazorWeb.Shared.Client` project assembly (via its imports file, `_Imports.razor`) in the `MauiBlazorWeb.Shared` project's `Routes.razor` file:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-10.0"
+
+```razor
+<Router AppAssembly="@typeof(Routes).Assembly" NotFoundPage="typeof(Pages.NotFound)" 
+        AdditionalAssemblies="new [] { typeof(MauiBlazorWeb.Shared.Client._Imports).Assembly }">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Components.Layout.MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+</Router>
+```
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-10.0"
 
 ```razor
 <Router AppAssembly="@typeof(Routes).Assembly" 
@@ -384,7 +417,11 @@ Add the following <xref:Microsoft.AspNetCore.Components.Routing.Router.Additiona
 </Router>
 ```
 
-Add the `MauiBlazorWeb.Shared.Client` project assembly (via its `_Imports` file) with the following <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointConventionBuilderExtensions.AddAdditionalAssemblies%2A> call in the `MauiBlazorWeb.Web` project's `Program.cs` file:
+:::moniker-end
+
+:::moniker range=">= aspnetcore-9.0"
+
+Add the `MauiBlazorWeb.Shared.Client` project assembly (via its imports file, `_Imports.razor`) with the following <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointConventionBuilderExtensions.AddAdditionalAssemblies%2A> call in the `MauiBlazorWeb.Web` project's `Program.cs` file:
 
 ```csharp
 app.MapRazorComponents<App>()    
@@ -440,7 +477,7 @@ In `MauiProgram.CreateMauiApp` of `MauiProgram.cs`, call `ConfigureBlazorHybridR
 InteractiveRenderSettings.ConfigureBlazorHybridRenderModes();
 ```
 
-In the `_Imports.razor` file of the `.Shared.Client` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
+In the imports file (`_Imports.razor`) of the `.Shared.Client` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
 
 ```diff
 - @using static Microsoft.AspNetCore.Components.Web.RenderMode
@@ -481,7 +518,7 @@ In `MauiProgram.CreateMauiApp` of `MauiProgram.cs`, call `ConfigureBlazorHybridR
 InteractiveRenderSettings.ConfigureBlazorHybridRenderModes();
 ```
 
-In the `_Imports.razor` file of the `.Shared` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
+In the imports file (`_Imports.razor`) of the `.Shared` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
 
 ```diff
 - @using static Microsoft.AspNetCore.Components.Web.RenderMode
@@ -523,7 +560,7 @@ In `MauiProgram.CreateMauiApp` of `MauiProgram.cs`, call `ConfigureBlazorHybridR
 InteractiveRenderSettings.ConfigureBlazorHybridRenderModes();
 ```
 
-In the `_Imports.razor` file of the `.Shared` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
+In the imports file (`_Imports.razor`) of the `.Shared` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
 
 ```diff
 - @using static Microsoft.AspNetCore.Components.Web.RenderMode
@@ -552,7 +589,7 @@ Project references:
 * `MauiBlazorWeb.Web` has a project reference to `MauiBlazorWeb.Web.Client`.
 * `MauiBlazorWeb.Web.Client` and `MauiBlazorWeb.Shared` have a project reference to `MauiBlazorWeb.Shared.Client`.
 
-Add the following <xref:Microsoft.AspNetCore.Components.Routing.Router.AdditionalAssemblies%2A> parameter to the `Router` component instance for the `MauiBlazorWeb.Shared.Client` project assembly (via its `_Imports` file) in the `MauiBlazorWeb.Shared` project's `Routes.razor` file:
+Add the following <xref:Microsoft.AspNetCore.Components.Routing.Router.AdditionalAssemblies%2A> parameter to the `Router` component instance for the `MauiBlazorWeb.Shared.Client` project assembly (via its imports file, `_Imports.razor`) in the `MauiBlazorWeb.Shared` project's `Routes.razor` file:
 
 ```razor
 <Router AppAssembly="@typeof(Routes).Assembly" 
@@ -564,7 +601,7 @@ Add the following <xref:Microsoft.AspNetCore.Components.Routing.Router.Additiona
 </Router>
 ```
 
-Add the `MauiBlazorWeb.Shared.Client` project assembly (via its `_Imports` file) with the following <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointConventionBuilderExtensions.AddAdditionalAssemblies%2A> call in the `MauiBlazorWeb.Web` project's `Program.cs` file:
+Add the `MauiBlazorWeb.Shared.Client` project assembly (via its imports file, `_Imports.razor`) with the following <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointConventionBuilderExtensions.AddAdditionalAssemblies%2A> call in the `MauiBlazorWeb.Web` project's `Program.cs` file:
 
 ```csharp
 app.MapRazorComponents<App>()    
@@ -620,7 +657,7 @@ In `MauiProgram.CreateMauiApp` of `MauiProgram.cs`, call `ConfigureBlazorHybridR
 InteractiveRenderSettings.ConfigureBlazorHybridRenderModes();
 ```
 
-In the `_Imports.razor` file of the `.Shared.Client` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
+In the imports file (`_Imports.razor`) of the `.Shared.Client` RCL, replace the `@using` statement for <xref:Microsoft.AspNetCore.Components.Web.RenderMode?displayProperty=fullName> with an `@using` statement for `InteractiveRenderSettings` to make the properties of the `InteractiveRenderSettings` class available to components:
 
 ```diff
 - @using static Microsoft.AspNetCore.Components.Web.RenderMode

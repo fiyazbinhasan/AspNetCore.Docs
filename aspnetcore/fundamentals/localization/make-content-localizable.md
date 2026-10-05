@@ -1,10 +1,10 @@
 ---
 title: Make an ASP.NET Core app's content localizable
-author: rick-anderson
+author: wadepickett
 description: Learn how to make an ASP.NET Core app's content localizable to prepare the app for localizing content into different languages and cultures.
-ms.author: riande
+ms.author: wpickett
 monikerRange: '>= aspnetcore-5.0'
-ms.date: 02/23/2023
+ms.date: 09/22/2026
 uid: fundamentals/localization/make-content-localizable
 ---
 # Make an ASP.NET Core app's content localizable
@@ -23,7 +23,7 @@ One task for localizing an app is to wrap localizable content with code that fac
 
 The following code example shows how to wrap the string "About Title" for localization.
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/Controllers/AboutController.cs)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/Controllers/AboutController.cs)]
 
 In the preceding code, the `IStringLocalizer<T>` implementation comes from [Dependency Injection](~/fundamentals/dependency-injection.md). If the localized value of "About Title" isn't found, then the indexer key is returned, that is, the string "About Title".
 
@@ -35,7 +35,7 @@ Alternatively, you can use the traditional approach and provide a key to retriev
 
 Use the <xref:Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer%601> implementation for resources that contain HTML. <xref:Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer> HTML-encodes arguments that are formatted in the resource string, but doesn't HTML-encode the resource string itself. In the following highlighted code, only the value of the `name` parameter is HTML-encoded.
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/Controllers/BookController.cs?highlight=3,5,20&start=1&end=24)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/Controllers/BookController.cs?highlight=3,5,20&start=1&end=24)]
 
 ***NOTE:*** Generally, only localize text, not HTML.
 
@@ -43,7 +43,7 @@ Use the <xref:Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer%601> implemen
 
 At the lowest level, <xref:Microsoft.Extensions.Localization.IStringLocalizerFactory> can be retrieved from of [Dependency Injection](~/fundamentals/dependency-injection.md):
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/Controllers/TestController.cs?highlight=6-12&name=snippet_1)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/Controllers/TestController.cs?highlight=6-12&name=snippet_1)]
 
 The preceding code demonstrates each of the two factory create methods.
 
@@ -51,17 +51,17 @@ The preceding code demonstrates each of the two factory create methods.
 
 You can partition your localized strings by controller or area, or have just one container. In the sample app, a marker class named `SharedResource` is used for shared resources. The marker class is never called:
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/SharedResource.cs)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/SharedResource.cs)]
 
 In the following sample, the `InfoController` and the `SharedResource` localizers are used:
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/Controllers/InfoController.cs?name=snippet_1)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/Controllers/InfoController.cs?name=snippet_1)]
 
 ## View localization
 
 The <xref:Microsoft.AspNetCore.Mvc.Localization.IViewLocalizer> service provides localized strings for a [view](xref:mvc/views/overview). The `ViewLocalizer` class implements this interface and finds the resource location from the view file path. The following code shows how to use the default implementation of `IViewLocalizer`:
 
-[!code-cshtml[](~/fundamentals/localization/sample/6.x/Localization/Views/Home/About.cshtml)]
+[!code-cshtml[](~/fundamentals/localization/sample/8.x/Localization/Views/Home/About.cshtml)]
 
 The default implementation of `IViewLocalizer` finds the resource file based on the view's file name. There's no option to use a global shared resource file. `ViewLocalizer` implements the localizer using `IHtmlLocalizer`, so Razor doesn't HTML-encode the localized string. You can parameterize resource strings, and `IViewLocalizer` HTML-encodes the parameters but not the resource string. Consider the following Razor markup:
 
@@ -71,8 +71,8 @@ The default implementation of `IViewLocalizer` finds the resource file based on 
 
 A French resource file could contain the following values:
 
-| Key | Value |
-| --- | ----- |
+| Key                        | Value                         |
+| -------------------------- | ----------------------------- |
 | `<i>Hello</i> <b>{0}!</b>` | `<i>Bonjour</i> <b>{0} !</b>` |
 
 The rendered view would contain the HTML markup from the resource file.
@@ -81,7 +81,7 @@ Generally, ***only localize text***, not HTML.
 
 To use a shared resource file in a view, inject `IHtmlLocalizer<T>`:
 
-[!code-cshtml[](~/fundamentals/localization/sample/6.x/Localization/Views/Test/About.cshtml?highlight=5,12)]
+[!code-cshtml[](~/fundamentals/localization/sample/8.x/Localization/Views/Test/About.cshtml?highlight=5,12)]
 
 ## DataAnnotations localization
 
@@ -90,7 +90,7 @@ DataAnnotations error messages are localized with `IStringLocalizer<T>`. Using t
 * *Resources/ViewModels.Account.RegisterViewModel.fr.resx*
 * *Resources/ViewModels/Account/RegisterViewModel.fr.resx*
 
-[!code-csharp[](~/fundamentals/localization/sample/6.x/Localization/ViewModels/Account/RegisterViewModel.cs)]
+[!code-csharp[](~/fundamentals/localization/sample/8.x/Localization/ViewModels/Account/RegisterViewModel.cs)]
 
 Non-validation attributes are localized.
 
@@ -109,6 +109,29 @@ The following code shows how to use one resource string for validation attribute
 ```
 
 In the preceding code, `SharedResource` is the class corresponding to the *.resx* file where the validation messages are stored. With this approach, DataAnnotations only uses `SharedResource`, rather than the resource for each class.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+## DataAnnotations localization in Minimal APIs and Blazor
+
+Validation error messages and the display names of validated members are localized by <xref:Microsoft.Extensions.Validation?displayProperty=fullName>, which is the validation pipeline used by Minimal APIs and Blazor forms.
+
+Localization activates automatically when an <xref:Microsoft.Extensions.Localization.IStringLocalizerFactory> is registered. Call <xref:Microsoft.Extensions.DependencyInjection.LocalizationServiceCollectionExtensions.AddLocalization%2A> together with <xref:Microsoft.Extensions.DependencyInjection.ValidationServiceCollectionExtensions.AddValidation%2A>:
+
+```csharp
+builder.Services.AddLocalization();
+builder.Services.AddValidation();
+```
+
+For the message lookup key conventions, shared resource files, custom message formatting, and the full set of options, see <xref:fundamentals/validation#localize-validation-messages>.
+
+The integration doesn't apply to MVC and Razor Pages apps. For those frameworks, see <xref:mvc/models/validation>.
+
+:::moniker-end
+
+:::moniker range="> aspnetcore-5.0"
 
 ## Configure localization services
 
@@ -142,7 +165,6 @@ Localizing an app also involves the following tasks:
 * [Globalizing and localizing .NET applications](/dotnet/standard/globalization-localization/index)
 * [Localization.StarterWeb project](https://github.com/aspnet/Entropy/tree/master/samples/Localization.StarterWeb) used in the article.
 * [Resources in .resx Files](/dotnet/framework/resources/working-with-resx-files-programmatically)
-* [Microsoft Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308)
 * [Localization & Generics](http://hishambinateya.com/localization-and-generics)
 
 :::moniker-end

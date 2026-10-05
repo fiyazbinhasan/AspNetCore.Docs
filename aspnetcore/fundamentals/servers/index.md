@@ -1,11 +1,11 @@
 ---
 title: Web server implementations in ASP.NET Core
+ai-usage: ai-assisted
 author: tdykstra
 description: Discover the web servers Kestrel and HTTP.sys for ASP.NET Core. Learn how to choose a server and when to use a reverse proxy server.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 11/07/2019
+ms.date: 08/04/2026
 uid: fundamentals/servers/index
 ---
 # Web server implementations in ASP.NET Core
@@ -22,7 +22,7 @@ An ASP.NET Core app runs with an in-process HTTP server implementation. The serv
 
 ASP.NET Core ships with the following:
 
-* [Kestrel server](xref:fundamentals/servers/kestrel) is the default, cross-platform HTTP server implementation. Kestrel provides the best performance and memory utilization, but it doesn't have some of the advanced features in HTTP.sys. For more information, see [Kestrel vs. HTTP.sys](xref:fundamentals/servers/index?tabs=windows#korh) in the Windows tab.
+* [Kestrel server](xref:fundamentals/servers/kestrel) is the default, cross-platform HTTP server implementation. Kestrel provides the best performance and memory utilization, but it doesn't have some of the advanced features in HTTP.sys. For more information, see [Kestrel vs. HTTP.sys](xref:fundamentals/servers/index?tabs=windows#kestrel-vs-httpsys) in the Windows tab.
 * IIS HTTP Server is an [in-process server](#hosting-models) for IIS.
 * [HTTP.sys server](xref:fundamentals/servers/httpsys) is a Windows-only HTTP server based on the [HTTP.sys kernel driver and HTTP Server API](/windows/desktop/Http/http-api-start-page).
 
@@ -33,8 +33,6 @@ When using [IIS](/iis/get-started/introduction-to-iis/introduction-to-iis-archit
 
 The [ASP.NET Core Module](xref:host-and-deploy/aspnet-core-module) is a native IIS module that handles native IIS requests between IIS and the in-process IIS HTTP Server or Kestrel. For more information, see <xref:host-and-deploy/aspnet-core-module>.
 
-<a name="korh"></a>
-
 ## Kestrel vs. HTTP.sys
 
 Kestrel has the following advantages over HTTP.sys:
@@ -43,7 +41,7 @@ Kestrel has the following advantages over HTTP.sys:
   * Cross platform
   * Agility, it's developed and patched independent of the OS.
   * Programmatic port and TLS configuration
-  * Extensibility that allows for protocols like [PPv2](https://github.com/aspnet/AspLabs/blob/main/src/ProxyProtocol/ProxyProtocol.Sample/ProxyProtocol.cs) and alternate transports.
+  * Extensibility that allows for protocols like [PPv2](https://www.haproxy.org/download/3.1/doc/proxy-protocol.txt) and alternate transports.
 
 Http.Sys operates as a shared kernel mode component with the following features that kestrel does not have:
 
@@ -67,13 +65,16 @@ Several hosting models are available:
 
 For more information, see the following:
 
-* [Kestrel vs. HTTP.sys](#korh)
+* [Kestrel vs. HTTP.sys](#kestrel-vs-httpsys)
 * <xref:host-and-deploy/iis/index>
 * <xref:host-and-deploy/aspnet-core-module>
 
 # [macOS](#tab/macos)
 
 ASP.NET Core ships with [Kestrel server](xref:fundamentals/servers/kestrel), which is the default, cross-platform HTTP server.
+
+> [!NOTE]
+> macOS is supported for ASP.NET Core development, testing, continuous integration (CI), and local services without external access, but not for production server workloads. There is no server edition of macOS, and [Apple discontinued macOS Server](https://support.apple.com/101601). For production hosting, use Windows or Linux server distributions.
 
 # [Linux](#tab/linux)
 
@@ -85,7 +86,7 @@ ASP.NET Core ships with [Kestrel server](xref:fundamentals/servers/kestrel), whi
 
 ## Kestrel
 
- [Kestrel server](xref:fundamentals/servers/kestrel) is the default, cross-platform HTTP server implementation. Kestrel provides the best performance and memory utilization, but it doesn't have some of the advanced features in HTTP.sys. For more information, see [Kestrel vs. HTTP.sys](#korh) in this document.
+ [Kestrel server](xref:fundamentals/servers/kestrel) is the default, cross-platform HTTP server implementation. Kestrel provides the best performance and memory utilization, but it doesn't have some of the advanced features in HTTP.sys. For more information, see [Kestrel vs. HTTP.sys](#kestrel-vs-httpsys) in this document.
 
 Use Kestrel:
 
@@ -120,7 +121,7 @@ The following diagram illustrates the relationship between IIS, the ASP.NET Core
 
 Requests arrive from the web to the kernel-mode HTTP.sys driver. The driver routes the requests to IIS on the website's configured port, usually 80 (HTTP) or 443 (HTTPS). The module forwards the requests to Kestrel on a random port for the app, which isn't port 80 or 443.
 
-The module specifies the port via an environment variable at startup, and the [IIS Integration Middleware](xref:host-and-deploy/iis/index#enable-the-iisintegration-components) configures the server to listen on `http://localhost:{port}`. Additional checks are performed, and requests that don't originate from the module are rejected. The module doesn't support HTTPS forwarding, so requests are forwarded over HTTP even if received by IIS over HTTPS.
+The module specifies the port via an environment variable at startup, and the [IIS integration middleware](xref:host-and-deploy/iis/index#enable-the-iisintegration-components) configures the server to listen on `http://localhost:{port}`. Additional checks are performed, and requests that don't originate from the module are rejected. The module doesn't support HTTPS forwarding, so requests are forwarded over HTTP even if received by IIS over HTTPS.
 
 After Kestrel picks up the request from the module, the request is pushed into the ASP.NET Core middleware pipeline. The middleware pipeline handles the request and passes it on as an `HttpContext` instance to the app's logic. Middleware added by IIS Integration updates the scheme, remote IP, and pathbase to account for forwarding the request to Kestrel. The app's response is passed back to IIS, which pushes it back out to the HTTP client that initiated the request.
 
@@ -132,6 +133,9 @@ For IIS and ASP.NET Core Module configuration guidance, see the following topics
 # [macOS](#tab/macos)
 
 ASP.NET Core ships with [Kestrel server](xref:fundamentals/servers/kestrel), which is the default, cross-platform HTTP server.
+
+> [!NOTE]
+> macOS is supported for ASP.NET Core development, testing, continuous integration (CI), and local services without external access, but not for production server workloads. There is no server edition of macOS, and [Apple discontinued macOS Server](https://support.apple.com/101601). For production hosting, use Windows or Linux server distributions.
 
 # [Linux](#tab/linux)
 
@@ -173,11 +177,10 @@ The server is launched when the Integrated Development Environment (IDE) or edit
 
 * [Visual Studio](https://visualstudio.microsoft.com): Launch profiles can be used to start the app and server with either [IIS Express](/iis/extensions/introduction-to-iis-express/iis-express-overview)/[ASP.NET Core Module](xref:host-and-deploy/aspnet-core-module) or the console.
 * [Visual Studio Code](https://code.visualstudio.com/): The app and server are started by [Omnisharp](https://github.com/OmniSharp/omnisharp-vscode), which activates the CoreCLR debugger.
-* [Visual Studio for Mac](https://visualstudio.microsoft.com/vs/mac/): The app and server are started by the [Mono Soft-Mode Debugger](https://www.mono-project.com/docs/advanced/runtime/docs/soft-debugger/).
 
 When launching the app from a command prompt in the project's folder, [dotnet run](/dotnet/core/tools/dotnet-run) launches the app and server (Kestrel and HTTP.sys only). The configuration is specified by the `-c|--configuration` option, which is set to either `Debug` (default) or `Release`.
 
-A `launchSettings.json` file provides configuration when launching an app with `dotnet run` or with a debugger built into tooling, such as Visual Studio. If launch profiles are present in a `launchSettings.json` file, use the `--launch-profile {PROFILE NAME}` option with the `dotnet run` command or select the profile in Visual Studio. For more information, see [dotnet run](/dotnet/core/tools/dotnet-run) and [.NET Core distribution packaging](/dotnet/core/build/distribution-packaging).
+A `launchSettings.json` file provides configuration when launching an app with `dotnet run` or with a debugger built into tooling, such as Visual Studio. If launch profiles are present in a `launchSettings.json` file, use the `--launch-profile {PROFILE NAME}` option with the `dotnet run` command or select the profile in Visual Studio. For more information, see [dotnet run](/dotnet/core/tools/dotnet-run) and [.NET distribution packaging](/dotnet/core/build/distribution-packaging).
 
 ## HTTP/2 support
 
@@ -265,6 +268,8 @@ A `launchSettings.json` file provides configuration when launching an app with `
 :::moniker-end
 
 An HTTP/2 connection must use [Application-Layer Protocol Negotiation (ALPN)](https://tools.ietf.org/html/rfc7301#section-3) and TLS 1.2 or later. For more information, see the topics that pertain to your server deployment scenarios.
+
+[!INCLUDE[](~/includes/reliableWAP_H2.md)]
 
 ## Additional resources
 

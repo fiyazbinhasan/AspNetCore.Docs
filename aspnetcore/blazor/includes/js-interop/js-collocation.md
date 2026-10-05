@@ -15,7 +15,7 @@ When the app is published, the framework automatically moves the script to the w
 
 No change is required to the script's relative URL, as Blazor takes care of placing the JS file in published static assets for you.
 
-This section and the following examples are primarily focused on explaining JS file collocation. The first example demonstrates a collocated JS file with an ordinary JS function. The second example demonstrates the use of a module to load a function, which is the recommended approach for most production apps. Calling JS from .NET is fully covered in <xref:blazor/js-interop/call-javascript-from-dotnet>, where there are further explanations of the Blazor JS API with additional examples. Component disposal, which is present in the second example, is covered in <xref:blazor/components/lifecycle#component-disposal-with-idisposable-and-iasyncdisposable>.
+This section and the following examples are primarily focused on explaining JS file collocation. The first example demonstrates a collocated JS file with an ordinary JS function. The second example demonstrates the use of a module to load a function, which is the recommended approach for most production apps. Calling JS from .NET is fully covered in <xref:blazor/js-interop/call-javascript-from-dotnet>, where there are further explanations of the Blazor JS API with additional examples. Component disposal, which is present in the second example, is covered in <xref:blazor/components/component-disposal>.
 
 The following `JsCollocation1` component loads a script via a [`HeadContent` component](xref:blazor/components/control-head-content) and calls a JS function with <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A?displayProperty=nameWithType>. The `{PATH}` placeholder is the path to the component.
 
@@ -50,7 +50,7 @@ Add the following script after the Blazor script ([location of the Blazor start 
 @code {
     private string? result;
 
-    public async void ShowPrompt()
+    public async Task ShowPrompt()
     {
         result = await JS.InvokeAsync<string>(
             "showPrompt1", "What's your name?");
@@ -116,7 +116,7 @@ The following `JsCollocation2` component's `OnAfterRenderAsync` method loads a J
         }
     }
 
-    public async void ShowPrompt()
+    public async Task ShowPrompt()
     {
         if (module is not null)
         {
@@ -130,11 +130,19 @@ The following `JsCollocation2` component's `OnAfterRenderAsync` method loads a J
     {
         if (module is not null)
         {
-            await module.DisposeAsync();
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
         }
     }
 }
 ```
+
+In the preceding example, <xref:Microsoft.JSInterop.JSDisconnectedException> is trapped during module disposal in case Blazor's SignalR circuit is lost. If the preceding code is used in a Blazor WebAssembly app, there's no SignalR connection to lose, so you can remove the `try`-`catch` block and leave the line that disposes the module (`await module.DisposeAsync();`). For more information, see <xref:blazor/js-interop/index#javascript-interop-calls-without-a-circuit>.
 
 `{PATH}/JsCollocation2.razor.js`:
 
@@ -143,6 +151,9 @@ export function showPrompt2(message) {
   return prompt(message, 'Type your name here');
 }
 ```
+
+> [!IMPORTANT]
+> Don't place a `<script>` tag for `JsCollocation2.razor.js` after the [Blazor script](xref:blazor/project-structure#location-of-the-blazor-script) because the module is loaded and cached automatically when the [dynamic `import()`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/import) is invoked.
 
 Use of scripts and modules for collocated JS in a Razor class library (RCL) is only supported for Blazor's JS interop mechanism based on the <xref:Microsoft.JSInterop.IJSRuntime> interface. If you're implementing [JavaScript `[JSImport]`/`[JSExport]` interop](xref:blazor/js-interop/import-export-interop), see <xref:blazor/js-interop/import-export-interop#razor-class-library-rcl-collocated-js-is-unsupported>.
 

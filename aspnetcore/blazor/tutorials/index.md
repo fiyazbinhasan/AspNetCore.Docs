@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor tutorials
 author: guardrex
 description: Learn how to build Blazor apps with the tutorials listed in this article.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tutorials/index
 ---
 # ASP.NET Core Blazor tutorials

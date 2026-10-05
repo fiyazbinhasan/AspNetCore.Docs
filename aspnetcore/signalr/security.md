@@ -1,16 +1,16 @@
 ---
 title: Security considerations in ASP.NET Core SignalR
-author: bradygaster
+ai-usage: ai-assisted
+author: wadepickett
 description: Learn about security in ASP.NET Core SignalR.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
-ms.date: 02/20/2024
+ms.date: 09/15/2026
 uid: signalr/security
 ---
 # Security considerations in ASP.NET Core SignalR
 
-By [Andrew Stanton-Nurse](https://twitter.com/anurse)
+By [Ashley Stanton-Nurse](https://github.com/analogrelay)
 
 :::moniker range=">= aspnetcore-8.0"
 This article provides information on securing SignalR.
@@ -27,7 +27,7 @@ CORS should be configured in the SignalR app to only allow the origin `www.examp
 For more information on configuring CORS, see [Enable Cross-Origin Requests (CORS)](xref:security/cors). SignalR **requires** the following CORS policies:
 
 * Allow the specific expected origins. Allowing any origin is possible but is **not** secure or recommended.
-* HTTP methods `GET` and `POST` must be allowed.
+* HTTP methods `GET`, `POST`, and `DELETE` must be allowed. The `DELETE` method is required for the Long Polling transport to clean up connections on the server.
 * Credentials must be allowed in order for cookie-based sticky sessions to work correctly. They must be enabled even when authentication isn't used.
 
 However, in 5.0 we have provided an option in the TypeScript client to not use credentials.
@@ -38,6 +38,44 @@ For example, the following highlighted CORS policy allows a SignalR browser clie
 [!code-csharp[Main](~/signalr/security/sample/SignalR_CORS6-8/Program.cs?name=snippet_AddCors&highlight=7-16)]
 
 In the previous example, the CORS policy is customized to allow specific origins, methods, and credentials. For more information on customizing CORS policies and middleware in ASP.NET Core, see [CORS middleware: CORS with named policy and middleware](xref:security/cors#cors-with-named-policy-and-middleware).
+
+### Apply a CORS policy to SignalR hub endpoints
+
+Instead of applying a CORS policy globally with the `UseCors` middleware, you can apply CORS specifically to SignalR hub endpoints. This approach allows different CORS policies for different parts of the app.
+
+There are two ways to apply a CORS policy to SignalR hubs: chaining `RequireCors` on the endpoint mapping, or adding the `[EnableCors]` attribute to the Hub class. Both approaches require a named CORS policy to be registered in the service configuration. The following example defines a policy named `"SignalRPolicy"`:
+
+```csharp
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("SignalRPolicy", policy =>
+    {
+        policy.WithOrigins("https://example.com")
+            .AllowAnyHeader()
+            .WithMethods("GET", "POST", "DELETE")
+            .AllowCredentials();
+    });
+});
+```
+
+**Apply the CORS policy on the hub endpoint mapping** by chaining <xref:Microsoft.AspNetCore.Builder.CorsEndpointConventionBuilderExtensions.RequireCors%2A> on the `MapHub` call:
+
+```csharp
+app.MapHub<ChatHub>("/chatHub")
+    .RequireCors("SignalRPolicy");
+```
+
+**Apply the CORS policy on the Hub class** by adding the [`[EnableCors]`](xref:Microsoft.AspNetCore.Cors.EnableCorsAttribute) attribute:
+
+```csharp
+[EnableCors("SignalRPolicy")]
+public class ChatHub : Hub
+{
+    // ...
+}
+```
+
+For more information on enabling CORS with endpoint routing, see [Enable CORS with endpoint routing](xref:security/cors#enable-cors-with-endpoint-routing).
 
 ## WebSocket Origin Restriction
 

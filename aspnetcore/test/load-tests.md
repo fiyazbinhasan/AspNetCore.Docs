@@ -2,8 +2,7 @@
 title: ASP.NET Core load/stress testing
 author: Jeremy-Meng
 description: Learn about several tools and approaches for load testing and stress testing ASP.NET Core apps.
-ms.author: riande
-ms.custom: mvc
+ms.author: tdykstra
 ms.date: 4/05/2019
 uid: test/loadtests
 ---
@@ -34,7 +33,7 @@ The following list contains third-party web performance tools with various featu
 * [West Wind WebSurge](https://websurge.west-wind.com/)
 * [Netling](https://github.com/hallatore/Netling)
 * [Vegeta](https://github.com/tsenart/vegeta)
-* [NBomber](https://github.com/PragmaticFlow/NBomber)
+* [NBomber C#/F#](https://nbomber.com/)
 
 ## Load and stress test with release builds
 

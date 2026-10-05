@@ -1,11 +1,12 @@
 ---
 title: Host ASP.NET Core on Linux with Nginx
-author: rick-anderson
+ai-usage: ai-assisted
+author: tdykstra
 description: Learn how to set up Nginx as a reverse proxy on Ubuntu, RHEL and SUSE to forward HTTP traffic to an ASP.NET Core web app running on Kestrel.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc, engagement-fy23, linux-related-content
-ms.date: 5/8/2023
+ms.author: tdykstra
+ms.custom: linux-related-content, sfi-ropc-nochange
+ms.date: 11/10/2025
 uid: host-and-deploy/linux-nginx
 ---
 # Host ASP.NET Core on Linux with Nginx
@@ -17,7 +18,7 @@ By [Sourabh Shirhatti](https://twitter.com/sshirhatti)
 :::moniker range=">= aspnetcore-6.0"
 This guide explains setting up a production-ready ASP.NET Core environment for Ubuntu, Red Hat Enterprise (RHEL), and SUSE Linux Enterprise Server.
 
-For information on other Linux distributions supported by ASP.NET Core, see [Prerequisites for .NET Core on Linux](/dotnet/core/linux-prerequisites).
+For information on other Linux distributions supported by ASP.NET Core, see [Prerequisites for .NET on Linux](/dotnet/core/linux-prerequisites).
 
 This guide:
 
@@ -54,13 +55,13 @@ At any point in the future after upgrading the shared framework, restart the ASP
 
 Configure the app for a [framework-dependent deployment](/dotnet/core/deploying/#framework-dependent-deployments-fdd).
 
-If the app is run locally in the [Development environment](xref:fundamentals/environments#configure-services-and-middleware-by-environment) and isn't configured by the server to make secure HTTPS connections, adopt either of the following approaches:
+If the app is run locally in the [`Development` environment](xref:fundamentals/environments#configure-services-and-middleware-by-environment) and isn't configured by the server to make secure HTTPS connections, adopt either of the following approaches:
 
 * Configure the app to handle secure local connections. For more information, see the [HTTPS configuration](#https-configuration) section.
 
 * Configure the app to run at the insecure endpoint:
 
-  * Deactivate HTTPS Redirection Middleware in the Development environment (`Program.cs`):
+  * Deactivate HTTPS redirection middleware in the `Development` environment (`Program.cs`):
 
     ```csharp
     if (!app.Environment.IsDevelopment())
@@ -75,13 +76,13 @@ If the app is run locally in the [Development environment](xref:fundamentals/env
 
 For more information on configuration by environment, see <xref:fundamentals/environments>.
 
-Run [dotnet publish](/dotnet/core/tools/dotnet-publish) from the development environment to package an app into a directory (for example, `bin/Release/{TARGET FRAMEWORK MONIKER}/publish`, where the `{TARGET FRAMEWORK MONIKER}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks)) that can run on the server:
+Run [dotnet publish](/dotnet/core/tools/dotnet-publish) from the `Development` environment to package an app into a directory (for example, `bin/Release/{TARGET FRAMEWORK MONIKER}/publish`, where the `{TARGET FRAMEWORK MONIKER}` placeholder is the [Target Framework Moniker (TFM)](/dotnet/standard/frameworks)) that can run on the server:
 
 ```dotnetcli
 dotnet publish --configuration Release
 ```
 
-The app can also be published as a [self-contained deployment](/dotnet/core/deploying/#self-contained-deployments-scd) if you prefer not to maintain the .NET Core runtime on the server.
+The app can also be published as a [self-contained deployment](/dotnet/core/deploying/#self-contained-deployments-scd) if you prefer not to maintain the .NET runtime on the server.
 
 Copy the ASP.NET Core app to the server using a tool that integrates into the organization's workflow (for example, `SCP`, `SFTP`). It's common to locate web apps under the `var` directory (for example, `var/www/helloapp`).
 
@@ -103,9 +104,9 @@ Kestrel is great for serving dynamic content from ASP.NET Core. However, the web
 
 For the purposes of this guide, a single instance of Nginx is used. It runs on the same server, alongside the HTTP server. Based on requirements, a different setup may be chosen.
 
-Because requests are forwarded by reverse proxy, use the [Forwarded Headers Middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package, which is automatically included in ASP.NET Core apps via the [shared framework's `Microsoft.AspNetCore.App` metapackage](xref:fundamentals/metapackage-app). The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
+Because requests are forwarded by reverse proxy, use the [forwarded headers middleware](xref:host-and-deploy/proxy-load-balancer) from the [`Microsoft.AspNetCore.HttpOverrides`](https://www.nuget.org/packages/Microsoft.AspNetCore.HttpOverrides) package, which is automatically included in ASP.NET Core apps via the [shared framework's `Microsoft.AspNetCore.App` metapackage](xref:fundamentals/metapackage-app). The middleware updates the `Request.Scheme`, using the `X-Forwarded-Proto` header, so that redirect URIs and other security policies work correctly.
 
-[!INCLUDE[](~/includes/ForwardedHeaders.md)]
+Forwarded headers middleware should run before other middleware. This ordering ensures that the middleware relying on forwarded headers information can consume the header values for processing. To run forwarded headers middleware after diagnostics and error handling middleware, see [forwarded headers middleware order](xref:host-and-deploy/proxy-load-balancer#forwarded-headers-middleware-order).
 
 Invoke the <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForwardedHeaders%2A> method before calling other middleware. Configure the middleware to forward the `X-Forwarded-For` and `X-Forwarded-Proto` headers:
 
@@ -113,7 +114,7 @@ Invoke the <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersExtensions.UseForw
 
 If no <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions> are specified to the middleware, the default headers to forward are `None`.
 
-Proxies running on loopback addresses (`127.0.0.0/8`, `[::1]`), including the standard localhost address (`127.0.0.1`), are trusted by default. If other trusted proxies or networks within the organization handle requests between the internet and the web server, add them to the list of <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownProxies%2A> or <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks%2A> with <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>. The following example adds a trusted proxy server at IP address `10.0.0.100` to the Forwarded Headers Middleware `KnownProxies`:
+Proxies running on loopback addresses (`127.0.0.0/8`, `[::1]`), including the standard localhost address (`127.0.0.1`), are trusted by default. If other trusted proxies or networks within the organization handle requests between the internet and the web server, add them to the list of <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownProxies%2A> or <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions.KnownNetworks%2A> with <xref:Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>. The following example adds a trusted proxy server at IP address `10.0.0.100` to the forwarded headers middleware `KnownProxies`:
 
 :::code language="csharp" source="~/host-and-deploy/linux-nginx/sample7/Program.cs" id="snippet_all":::
 
@@ -123,7 +124,7 @@ For more information, see <xref:host-and-deploy/proxy-load-balancer>.
 
 # [Ubuntu](#tab/linux-ubuntu)
 
-Use `apt-get` to install Nginx. The installer creates a [`systemd`](https://systemd.io/) init script that runs Nginx as daemon on system startup. Follow the installation instructions for Ubuntu at [Nginx: Official Debian/Ubuntu packages](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/#official-debian-ubuntu-packages).
+Use `apt-get` to install Nginx. The installer creates a [`systemd`](https://systemd.io/) init script that runs Nginx as daemon on system startup. Follow the installation instructions for Ubuntu at [Nginx: Linux packages - Ubuntu](https://nginx.org/en/linux_packages.html#Ubuntu).
 
 # [Red Hat Enterprise Linux](#tab/linux-rhel)
 
@@ -169,30 +170,28 @@ To configure Nginx as a reverse proxy to forward HTTP requests to an ASP.NET Cor
 ---
 
 ```text
-http {
-  map $http_connection $connection_upgrade {
-    "~*Upgrade" $http_connection;
-    default keep-alive;
-  }
+map $http_connection $connection_upgrade {
+  "~*Upgrade" $http_connection;
+  default keep-alive;
+}
 
-  server {
-    listen        80;
-    server_name   example.com *.example.com;
-    location / {
-        proxy_pass         http://127.0.0.1:5000/;
-        proxy_http_version 1.1;
-        proxy_set_header   Upgrade $http_upgrade;
-        proxy_set_header   Connection $connection_upgrade;
-        proxy_set_header   Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header   X-Forwarded-Proto $scheme;
-    }
+server {
+  listen        80;
+  server_name   example.com *.example.com;
+  location / {
+      proxy_pass         http://127.0.0.1:5000/;
+      proxy_http_version 1.1;
+      proxy_set_header   Upgrade $http_upgrade;
+      proxy_set_header   Connection $connection_upgrade;
+      proxy_set_header   Host $host;
+      proxy_cache_bypass $http_upgrade;
+      proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header   X-Forwarded-Proto $scheme;
   }
 }
 ```
 
-If the app is a SignalR or Blazor Server app, see <xref:signalr/scale#linux-with-nginx> and <xref:blazor/host-and-deploy/server#linux-with-nginx> respectively for more information.
+If the app is a SignalR or Blazor Server app, see <xref:signalr/scale#linux-with-nginx> and <xref:blazor/host-and-deploy/server/index#linux-with-nginx> respectively for more information.
 
 When no `server_name` matches, Nginx uses the default server. If no default server is defined, the first server in the configuration file is the default server. As a best practice, add a specific default server that returns a status code of 444 in your configuration file. A default server configuration example is:
 
@@ -230,7 +229,7 @@ If the app runs on the server but fails to respond over the internet, check the 
 
 ---
 
-When done testing the app, shut down the app with <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) at the command prompt.
+When done testing the app, shut down the app with <kbd>Ctrl</kbd>+<kbd>C</kbd> in the command shell.
 
 ### Increase keepalive_requests
 
@@ -378,7 +377,7 @@ Close off all external ports that aren't in use. Uncomplicated firewall (ufw) pr
 # [Ubuntu](#tab/linux-ubuntu)
 
 > [!WARNING]
-> A firewall prevents access to the whole system if not configured correctly. Failure to specify the correct SSH port effectively locks you out of the system if you are using SSH to connect to it. The default port is 22. For more information, see the [introduction to ufw](https://help.ubuntu.com/community/UFW) and the [manual](https://manpages.ubuntu.com/manpages/lunar/en/man8/ufw.8.html).
+> A firewall prevents access to the whole system if not configured correctly. Failure to specify the correct SSH port effectively locks you out of the system if you are using SSH to connect to it. The default port is 22. For more information, see the [introduction to ufw](https://help.ubuntu.com/community/UFW) and the [manual](https://manpages.ubuntu.com/manpages/resolute/man8/ufw.8.html).
 
 Install `ufw` and configure it to allow traffic on any ports needed.
 
@@ -466,12 +465,12 @@ Configure the app to use a certificate in development for the `dotnet run` comma
 
 * Harden the security by employing some of the practices depicted in the following */etc/nginx/nginx.conf* file.
 
-* The following example doesn't configure the server to redirect insecure requests. We recommend using HTTPS Redirection Middleware. For more information, see <xref:security/enforcing-ssl>.
+* The following example doesn't configure the server to redirect insecure requests. We recommend using HTTPS redirection middleware. For more information, see <xref:security/enforcing-ssl>.
 
   > [!NOTE]
-  > For development environments where the server configuration handles secure redirection instead of HTTPS Redirection Middleware, we recommend using temporary redirects (302) rather than permanent redirects (301). Link caching can cause unstable behavior in development environments.
+  > For development environments where the server configuration handles secure redirection instead of HTTPS redirection middleware, we recommend using temporary redirects (302) rather than permanent redirects (301). Link caching can cause unstable behavior in development environments.
 
-* Adding a `Strict-Transport-Security` (HSTS) header ensures all subsequent requests made by the client are over HTTPS. For guidance on setting the `Strict-Transport-Security` header, see <xref:security/enforcing-ssl#http-strict-transport-security-protocol-hsts>.
+* Adding a `Strict-Transport-Security` (HSTS) header ensures all subsequent requests made by the client are over HTTPS. For guidance on setting the `Strict-Transport-Security` header, see <xref:security/enforcing-ssl#http-strict-transport-security-hsts-protocol>.
 
 * If HTTPS will be disabled in the future, use one of the following approaches:
 
@@ -499,7 +498,7 @@ Modify `/etc/nginx/nginx.conf`. Open it in a text editor, and replace the `http{
 [!code-nginx[](~/host-and-deploy/linux-nginx/nginx.conf)]
 
 > [!NOTE]
-> Blazor WebAssembly apps require a larger `burst` parameter value to accommodate the larger number of requests made by an app. For more information, see <xref:blazor/host-and-deploy/webassembly#nginx>.
+> Blazor WebAssembly apps require a larger `burst` parameter value to accommodate the larger number of requests made by an app. For more information, see <xref:blazor/host-and-deploy/webassembly/nginx>.
 
 > [!NOTE]
 > The preceding example disables Online Certificate Status Protocol (OCSP) Stapling. If enabled, confirm that the certificate supports the feature. For more information and guidance on enabling OCSP, see the following properties in the [Module ngx_http_ssl_module (Nginx documentation)](http://nginx.org/en/docs/http/ngx_http_ssl_module.html) article:
@@ -547,8 +546,8 @@ After upgrading the shared framework on the server, restart the ASP.NET Core app
 
 ## Additional resources
 
-* [Prerequisites for .NET Core on Linux](/dotnet/core/linux-prerequisites)
-* [Nginx: Binary Releases: Official Debian/Ubuntu packages](https://www.nginx.com/resources/wiki/start/topics/tutorials/install/#official-debian-ubuntu-packages)
+* [Prerequisites for .NET on Linux](/dotnet/core/linux-prerequisites)
+* [Nginx: Linux packages - Ubuntu](https://nginx.org/en/linux_packages.html#Ubuntu)
 * <xref:test/troubleshoot>
 * <xref:host-and-deploy/proxy-load-balancer>
 * [NGINX: Using the Forwarded header](https://www.nginx.com/resources/wiki/start/topics/examples/forwarded/)

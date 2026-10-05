@@ -20,11 +20,11 @@ To make a synchronous call from .NET to JavaScript in a client-side component, c
 }
 ```
 
-When working with <xref:Microsoft.JSInterop.IJSObjectReference> in ASP.NET Core 5.0 or later client-side components, you can use <xref:Microsoft.JSInterop.IJSInProcessObjectReference> synchronously instead. <xref:Microsoft.JSInterop.IJSInProcessObjectReference> implements <xref:System.IAsyncDisposable>/<xref:System.IDisposable> and should be disposed for garbage collection to prevent a memory leak, as the following example demonstrates:
+When working with <xref:Microsoft.JSInterop.IJSObjectReference> in .NET 5 or later client-side components, you can use <xref:Microsoft.JSInterop.IJSInProcessObjectReference> synchronously instead. <xref:Microsoft.JSInterop.IJSInProcessObjectReference> implements <xref:System.IAsyncDisposable>/<xref:System.IDisposable> and should be disposed for garbage collection to prevent a memory leak, as the following example demonstrates:
 
 ```razor
 @inject IJSRuntime JS
-@implements IAsyncDisposable
+@implements IDisposable
 
 ...
 
@@ -36,19 +36,23 @@ When working with <xref:Microsoft.JSInterop.IJSObjectReference> in ASP.NET Core 
     {
         if (firstRender)
         {
-            module = await JS.InvokeAsync<IJSInProcessObjectReference>("import", 
-            "./scripts.js");
+            var jsInProcess = (IJSInProcessRuntime)JS;
+            module = await jsInProcess.Invoke<IJSInProcessObjectReference>("import", 
+                "./scripts.js");
+            var value = module.Invoke<string>("javascriptFunctionIdentifier");
         }
     }
 
     ...
 
-    async ValueTask IAsyncDisposable.DisposeAsync()
+    void IDisposable.Dispose()
     {
         if (module is not null)
         {
-            await module.DisposeAsync();
+            await module.Dispose();
         }
     }
 }
 ```
+
+In the preceding example, a <xref:Microsoft.JSInterop.JSDisconnectedException> isn't trapped during module disposal because there's no Blazor-SignalR circuit in a Blazor WebAssembly app to lose. For more information, see <xref:blazor/js-interop/index#javascript-interop-calls-without-a-circuit>.

@@ -195,7 +195,7 @@ Update-Database
 
 `Update-Database` runs the `Up` method of the `New_DataAnnotations` class.
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 Use the following commands to add a migration for the new DataAnnotations:
 
@@ -225,6 +225,9 @@ CREATE TABLE [dbo].[Movie] (
     CONSTRAINT [PK_Movie] PRIMARY KEY CLUSTERED ([ID] ASC)
 );
 ```
+
+> [!NOTE]
+> The preceding `Up` method and schema show SQL Server output. If you're using SQLite instead of SQL Server, the generated migration and schema differ. SQLite has a minimal type system that maps `string` properties to `TEXT` and doesn't apply the `[StringLength]` maximum length to the schema. Columns such as `Title`, `Genre`, and `Rating` are created as `TEXT` with no length. The maximum length is still enforced by ASP.NET Core model validation, not by the database schema. For more information, see [SQLite EF Core Database Provider Limitations](/ef/core/providers/sqlite/limitations).
 
 ### Publish to Azure
 

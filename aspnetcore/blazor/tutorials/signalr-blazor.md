@@ -3,9 +3,8 @@ title: Use ASP.NET Core SignalR with Blazor
 author: guardrex
 description: Create a chat app that uses ASP.NET Core SignalR with Blazor.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 06/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tutorials/signalr-blazor
 ---
 # Use ASP.NET Core SignalR with Blazor
@@ -78,7 +77,7 @@ Follow the guidance for your choice of tooling:
 # [Visual Studio](#tab/visual-studio)
 
 > [!NOTE]
-> Visual Studio 2022 or later and .NET Core SDK 8.0.0 or later are required.
+> Visual Studio 2022 or later and .NET 8 or later SDK are required.
 
 In Visual Studio:
 
@@ -94,6 +93,7 @@ In Visual Studio:
   * **Interactivity location**: **Per page/component**
   * **Include sample pages**: Selected
   * **Do not use top-level statements**: Not selected
+  * **Use the .dev.localhost TLD in the application URL**: Not selected
   * Select **Create**.
 
 # [Visual Studio Code](#tab/visual-studio-code)
@@ -116,13 +116,14 @@ In VS Code:
 
   After the preceding changes are made, the **Command Palette** shows the following:
 
-  * **Framework**: Set to the latest public non-preview release of .NET.
+  * **Framework**: Confirm that the [latest framework](https://dotnet.microsoft.com/download/dotnet) is selected. If Visual Studio's **Framework** dropdown list doesn't include the latest available .NET framework, [update Visual Studio](/visualstudio/install/update-visual-studio) and restart the tutorial.
   * **Authentication type**: **None**
-  * **Configure for HTTPS**: **true**
+  * **Configure for HTTPS**: Selected
   * **Interactive render mode**: **WebAssembly**
   * **Interactivity location**: **Per page/component**
-  * **Include sample pages**: **true**
-  * **Do not use top-level statements**: **false**
+  * **Include sample pages**: Selected
+  * **Do not use top-level statements**: Not selected
+  * **Use the .dev.localhost TLD in the application URL**: Not selected
 
 * Select **Create project** from the **Command Palette**.
 
@@ -154,7 +155,7 @@ In the **Manage NuGet Packages** dialog, confirm that the **Package source** is 
 
 With **Browse** selected, type `Microsoft.AspNetCore.SignalR.Client` in the search box.
 
-In the search results, select the latest release of the [`Microsoft.AspNetCore.SignalR.Client`](https://www.nuget.org/packages/Microsoft.AspNetCore.SignalR.Client) package. Select **Install**.
+In the search results, select the latest release of the [`Microsoft.AspNetCore.SignalR.Client` package](https://www.nuget.org/packages/Microsoft.AspNetCore.SignalR.Client). Select **Install**.
 
 If the **Preview Changes** dialog appears, select **OK**.
 
@@ -199,7 +200,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using BlazorSignalRApp.Hubs;
 ```
 
-Add SignalR and Response Compression Middleware services:
+Add SignalR and response compression middleware services:
 
 ```csharp
 builder.Services.AddSignalR();
@@ -207,17 +208,17 @@ builder.Services.AddSignalR();
 builder.Services.AddResponseCompression(opts =>
 {
    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-       ["application/octet-stream"]);
+       [ "application/octet-stream" ]);
 });
 ```
 
-Use Response Compression Middleware at the top of the processing pipeline's configuration. Place the following line of code immediately after the line that builds the app (`var app = builder.Build();`):
+Use response compression middleware at the top of the processing pipeline's configuration. Place the following line of code immediately after the line that builds the app (`var app = builder.Build();`):
    
 ```csharp
 app.UseResponseCompression();
 ```
 
-Add an endpoint for the hub immediately before the line that runs the app (`app.Run();`):
+Add an endpoint for the hub:
 
 ```csharp
 app.MapHub<ChatHub>("/chathub");
@@ -240,7 +241,7 @@ Add an entry to the `NavMenu` component to reach the chat page. In `Components/L
 ```
 
 > [!NOTE]
-> Disable Response Compression Middleware in the `Development` environment when using [Hot Reload](xref:test/hot-reload). For more information, see <xref:blazor/fundamentals/signalr#disable-response-compression-for-hot-reload>.
+> Disable response compression middleware in the `Development` environment when using [Hot Reload](xref:test/hot-reload). For more information, see <xref:blazor/fundamentals/signalr#disable-response-compression-for-hot-reload>.
 
 ## Run the app
 
@@ -248,11 +249,11 @@ Follow the guidance for your tooling:
 
 # [Visual Studio](#tab/visual-studio)
 
-With the server `BlazorSignalRApp` project selected in **Solution Explorer**, press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows)/<kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+With the server `BlazorSignalRApp` project selected in **Solution Explorer**, press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 # [Visual Studio Code](#tab/visual-studio-code)
 
-Press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows)/<kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+Press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 # [.NET CLI](#tab/net-cli/)
 
@@ -285,7 +286,7 @@ Follow the guidance for your choice of tooling to create a hosted Blazor WebAsse
 # [Visual Studio](#tab/visual-studio)
 
 > [!NOTE]
-> Visual Studio 2022 or later and .NET Core SDK 6.0.0 or later are required.
+> Visual Studio 2022 or later and .NET or later 6 SDK are required.
 
 Create a new project.
 
@@ -346,7 +347,7 @@ In the **Manage NuGet Packages** dialog, confirm that the **Package source** is 
 
 With **Browse** selected, type `Microsoft.AspNetCore.SignalR.Client` in the search box.
 
-In the search results, select the [`Microsoft.AspNetCore.SignalR.Client`](https://www.nuget.org/packages/Microsoft.AspNetCore.SignalR.Client) package. Set the version to match the shared framework of the app. Select **Install**.
+In the search results, select the [`Microsoft.AspNetCore.SignalR.Client` package](https://www.nuget.org/packages/Microsoft.AspNetCore.SignalR.Client). Set the version to match the shared framework of the app. Select **Install**.
 
 If the **Preview Changes** dialog appears, select **OK**.
 
@@ -420,7 +421,7 @@ Add the namespace for the `ChatHub` class to the top of the file:
 using BlazorWebAssemblySignalRApp.Server.Hubs;
 ```
 
-Add SignalR and Response Compression Middleware services:
+Add SignalR and response compression middleware services:
 
 ```csharp
 builder.Services.AddSignalR();
@@ -431,7 +432,7 @@ builder.Services.AddResponseCompression(opts =>
 });
 ```
 
-Use Response Compression Middleware at the top of the processing pipeline's configuration immediately after the line that builds the app:
+Use response compression middleware at the top of the processing pipeline's configuration immediately after the line that builds the app:
    
 ```csharp
 app.UseResponseCompression();
@@ -455,7 +456,7 @@ Add the namespace for the `ChatHub` class to the top of the file:
 using BlazorWebAssemblySignalRApp.Server.Hubs;
 ```
 
-Add SignalR and Response Compression Middleware services:
+Add SignalR and response compression middleware services:
 
 ```csharp
 services.AddSignalR();
@@ -466,7 +467,7 @@ services.AddResponseCompression(opts =>
 });
 ```
 
-Use Response Compression Middleware at the top of the processing pipeline's configuration:
+Use response compression middleware at the top of the processing pipeline's configuration:
    
 ```csharp
 app.UseResponseCompression();
@@ -517,7 +518,7 @@ Replace the markup with the following code:
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
 
 > [!NOTE]
-> Disable Response Compression Middleware in the `Development` environment when using [Hot Reload](xref:test/hot-reload). For more information, see <xref:blazor/fundamentals/signalr#disable-response-compression-for-hot-reload>.
+> Disable response compression middleware in the `Development` environment when using [Hot Reload](xref:test/hot-reload). For more information, see <xref:blazor/fundamentals/signalr#disable-response-compression-for-hot-reload>.
 
 :::moniker-end
 
@@ -529,7 +530,7 @@ Follow the guidance for your tooling:
 
 # [Visual Studio](#tab/visual-studio)
 
-In **Solution Explorer**, select the `BlazorWebAssemblySignalRApp.Server` project. Press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows)/<kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+In **Solution Explorer**, select the `BlazorWebAssemblySignalRApp.Server` project. Press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 > [!IMPORTANT]
 > When executing a hosted Blazor WebAssembly app, run the app from the [solution's](xref:blazor/tooling#visual-studio-solution-file-sln) **:::no-loc text="Server":::** project.
@@ -545,7 +546,7 @@ In **Solution Explorer**, select the `BlazorWebAssemblySignalRApp.Server` projec
 
 For information on configuring VS Code assets in the `.vscode` folder, see the **Linux** operating system guidance in <xref:blazor/tooling>.
 
-Press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows)/<kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+Press <kbd>F5</kbd> to run the app with debugging or <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 > [!IMPORTANT]
 > When executing a hosted Blazor WebAssembly app, run the app from the [solution's](xref:blazor/tooling#visual-studio-solution-file-sln) **:::no-loc text="Server":::** project.
@@ -613,6 +614,6 @@ For detailed guidance on the SignalR and Blazor frameworks, see the following re
 * [Bearer token authentication with Identity Server, WebSockets, and Server-Sent Events](xref:signalr/authn-and-authz#bearer-token-authentication)
 * [Secure a SignalR hub in Blazor WebAssembly apps](xref:blazor/security/webassembly/index#secure-a-signalr-hub)
 * [SignalR cross-origin negotiation for authentication](xref:blazor/fundamentals/signalr#client-side-signalr-cross-origin-negotiation-for-authentication)
-* [SignalR configuration](xref:blazor/host-and-deploy/server#signalr-configuration)
+* [SignalR configuration](xref:blazor/host-and-deploy/server/index#signalr-configuration)
 * <xref:blazor/debug>
 * [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))

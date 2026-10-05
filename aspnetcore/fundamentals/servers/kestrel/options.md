@@ -4,8 +4,7 @@ author: tdykstra
 description: Learn about configuring options for Kestrel, the cross-platform web server for ASP.NET Core.
 monikerRange: '>= aspnetcore-5.0'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 01/26/2023
+ms.date: 08/25/2025
 uid: fundamentals/servers/kestrel/options
 ---
 # Configure options for the ASP.NET Core Kestrel web server
@@ -58,7 +57,7 @@ The following example configures `MaxRequestBodySize` for a specific request usi
 
 :::code language="csharp" source="samples/6.x/KestrelSample/Snippets/Program.cs" id="snippet_IHttpMaxRequestBodySizeFeatureMiddleware":::
 
-If the app attempts to configure the limit on a request after it starts to read the request, an exception is thrown. Ue the <xref:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature.IsReadOnly%2A?displayProperty=nameWithType> property to check if it's safe to set the `MaxRequestBodySize` property.
+If the app attempts to configure the limit on a request after it starts to read the request, an exception is thrown. Use the <xref:Microsoft.AspNetCore.Http.Features.IHttpMaxRequestBodySizeFeature.IsReadOnly%2A?displayProperty=nameWithType> property to check if it's safe to set the `MaxRequestBodySize` property.
 
 When an app runs [out-of-process](xref:host-and-deploy/iis/index#out-of-process-hosting-model) behind the [ASP.NET Core Module](xref:host-and-deploy/aspnet-core-module), IIS sets the limit and Kestrel's request body size limit is disabled.
 
@@ -169,7 +168,15 @@ For information about other Kestrel options and limits, see:
     
 ## Behavior with debugger attached
 
-Certain timeouts and rate limits aren't enforced when a debugger is attached to a Kestrel process. For more information, see [Behavior with debugger attached](xref:fundamentals/servers/kestrel#behavior-with-debugger-attached).
+The following timeout and rate limit options aren't enforced when a debugger is attached to a Kestrel process:
+
+* <xref:Microsoft.AspNetCore.Server.Kestrel.KestrelServerLimits.KeepAliveTimeout?displayProperty=nameWithType>
+* <xref:Microsoft.AspNetCore.Server.Kestrel.KestrelServerLimits.RequestHeadersTimeout?displayProperty=nameWithType>
+* <xref:Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerLimits.MinRequestBodyDataRate?displayProperty=nameWithType>
+* <xref:Microsoft.AspNetCore.Server.Kestrel.Core.KestrelServerLimits.MinResponseDataRate?displayProperty=nameWithType>
+* <xref:Microsoft.AspNetCore.Server.Kestrel.Core.Features.IConnectionTimeoutFeature>
+* <xref:Microsoft.AspNetCore.Server.Kestrel.Core.Features.IHttpMinRequestBodyDataRateFeature>
+* <xref:Microsoft.AspNetCore.Server.Kestrel.Core.Features.IHttpMinResponseDataRateFeature>
 
 :::moniker-end
 

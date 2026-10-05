@@ -1,6 +1,6 @@
 ---
 title: Migrate authentication and Identity to ASP.NET Core 2.0
-author: rick-anderson
+author: wadepickett
 description: This article outlines the most common steps for migrating ASP.NET Core 1.x authentication and Identity to ASP.NET Core 2.0.
 ms.author: wpickett
 ms.date: 06/21/2019
@@ -20,7 +20,7 @@ In 2.0, the <xref:Microsoft.AspNetCore.Identity> namespace became the new home f
 
 <a name="auth-middleware"></a>
 
-## Authentication Middleware and services
+## Authentication middleware and services
 
 In 1.x projects, authentication is configured via middleware. A middleware method is invoked for each authentication scheme you want to support.
 
@@ -114,7 +114,7 @@ Select one of the two options below, and make the necessary changes in `Startup.
                 });
         ```
 
-### JWT Bearer Authentication
+### JWT bearer Authentication
 
 Make the following changes in `Startup.cs`:
 * Replace the `UseJwtBearerAuthentication` method call in the `Configure` method with `UseAuthentication`:

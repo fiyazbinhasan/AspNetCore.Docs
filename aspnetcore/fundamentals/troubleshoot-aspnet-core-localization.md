@@ -2,8 +2,8 @@
 title: Troubleshoot ASP.NET Core localization
 author: hishamco
 description: Learn how to diagnose problems with localization in ASP.NET Core apps.
-ms.author: riande
-ms.date: 01/24/2019
+ms.author: tdykstra
+ms.date: 05/03/2024
 uid: fundamentals/troubleshoot-aspnet-core-localization
 ---
 # Troubleshoot ASP.NET Core localization
@@ -120,5 +120,5 @@ For more information, see [Blazor Localization does not work with InteractiveSer
 
 ## GitHub issues with helpful problem solving tips
 
-* [Please add more info about shared files (`dotnet/AspNetCore.Docs` #28674](https://github.com/dotnet/AspNetCore.Docs/issues/28674)
+* [Please add more info about shared files (`dotnet/AspNetCore.Docs` #28674)](https://github.com/dotnet/AspNetCore.Docs/issues/28674)
 * [Blazor Localization does not work with InteractiveServer (`dotnet/aspnetcore` #53707)](https://github.com/dotnet/aspnetcore/issues/53707) ([Location override using "Sensors" pane](#location-override-using-sensors-pane-in-developer-tools))

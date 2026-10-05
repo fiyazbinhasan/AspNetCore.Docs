@@ -3,9 +3,9 @@ title: Call JavaScript functions from .NET methods in ASP.NET Core Blazor
 author: guardrex
 description: Learn how to invoke JavaScript functions from .NET methods in Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 4/10/2024
+ms.author: wpickett
+ms.custom: sfi-ropc-nochange
+ms.date: 07/14/2026
 uid: blazor/js-interop/call-javascript-from-dotnet
 ---
 # Call JavaScript functions from .NET methods in ASP.NET Core Blazor
@@ -26,12 +26,28 @@ For information on how to call .NET methods from JS, see <xref:blazor/js-interop
 
 For the preceding .NET methods that invoke JS functions:
 
+:::moniker range=">= aspnetcore-11.0"
+
 * The function identifier (`String`) is relative to the global scope (`window`). To call `window.someScope.someFunction`, the identifier is `someScope.someFunction`. There's no need to register the function before it's called.
 * Pass any number of JSON-serializable arguments in `Object[]` to a JS function.
 * The cancellation token (`CancellationToken`) propagates a notification that operations should be canceled.
 * `TimeSpan` represents a time limit for a JS operation.
 * The `TValue` return type must also be JSON serializable. `TValue` should match the .NET type that best maps to the JSON type returned.
 * A [JS `Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise) is returned for `InvokeAsync` methods. `InvokeAsync` unwraps the [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise) and returns the value awaited by the [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+* [C# union types](/dotnet/csharp/language-reference/builtin-types/union) are supported.
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-11.0"
+
+* The function identifier (`String`) is relative to the global scope (`window`). To call `window.someScope.someFunction`, the identifier is `someScope.someFunction`. There's no need to register the function before it's called.
+* Pass any number of JSON-serializable arguments in `Object[]` to a JS function.
+* The cancellation token (`CancellationToken`) propagates a notification that operations should be canceled.
+* `TimeSpan` represents a time limit for a JS operation.
+* The `TValue` return type must also be JSON serializable. `TValue` should match the .NET type that best maps to the JSON type returned.
+* A [JS `Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise) is returned for `InvokeAsync` methods. `InvokeAsync` unwraps the [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise) and returns the value awaited by the [`Promise`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise).
+
+:::moniker-end
 
 For Blazor apps with prerendering enabled, which is the default for server-side apps, calling into JS isn't possible during prerendering. For more information, see the [Prerendering](#prerendering) section.
 
@@ -108,7 +124,7 @@ The following component:
 
 *This section applies to server-side components.*
 
-Some browser JavaScript (JS) APIs can only be executed in the context of a user gesture, such as using the [`Fullscreen API` (MDN documentation)](https://developer.mozilla.org/docs/Web/API/Fullscreen_API). These APIs can't be called through the JS interop mechanism in server-side components because UI event handling is performed asynchronously and generally no longer in the context of the user gesture. The app must handle the UI event completely in JavaScript, so use `onclick` instead of Blazor's `@onclick` directive attribute.
+Some browser JavaScript (JS) APIs can only be executed in the context of a user gesture, such as using the [`Fullscreen API`](https://developer.mozilla.org/docs/Web/API/Fullscreen_API). These APIs can't be called through the JS interop mechanism in server-side components because UI event handling is performed asynchronously and generally no longer in the context of the user gesture. The app must handle the UI event completely in JavaScript, so use `onclick` instead of Blazor's `@onclick` directive attribute.
 
 ## Invoke JavaScript functions without reading a returned value (`InvokeVoidAsync`)
 
@@ -132,7 +148,10 @@ Provide a `displayTickerAlert1` JS function. The function is called with <xref:M
 
 ### Component (`.razor`) example (`InvokeVoidAsync`)
 
-`TickerChanged` calls the `handleTickerChanged1` method in the following component.
+The following component:
+
+* Invokes the `displayTickerAlert1` JS function with <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeVoidAsync%2A> with two JSON-serializable parameters, a string in `stockSymbol` and a decimal in `price`, when selecting a button (**`Set Stock`**).
+* The JS function receives the two arguments in strictly-typed parameters and displays a modal alert box with a specified message.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -222,7 +241,7 @@ Provide a `displayTickerAlert1` JS function. The function is called with <xref:M
 
 :::moniker-end
 
-`TickerChanged` calls the `handleTickerChanged1` method in the following component.
+`TickerChanged` calls the `displayTickerAlert1` method in the following component.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -296,7 +315,10 @@ Provide a `displayTickerAlert2` JS function. The following example returns a str
 
 ### Component (`.razor`) example (`InvokeAsync`)
 
-`TickerChanged` calls the `handleTickerChanged2` method and displays the returned string in the following component.
+The following component:
+
+* Invokes the `displayTickerAlert2` JS function with <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeAsync%2A> with two JSON-serializable parameters, a string in `stockSymbol` and a decimal in `price`, when selecting a button (**`Set Stock`**).
+* The JS function receives the two arguments in strictly-typed parameters and displays a modal alert box with a specified message.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -386,7 +408,7 @@ Provide a `displayTickerAlert2` JS function. The following example returns a str
 
 :::moniker-end
 
-`TickerChanged` calls the `handleTickerChanged2` method and displays the returned string in the following component.
+`TickerChanged` calls the `displayTickerAlert2` method and displays the returned string in the following component.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -453,6 +475,104 @@ IJSRuntime JS { get; set; }
 
 [!INCLUDE[](~/blazor/includes/js-interop/synchronous-js-interop-call-js.md)]
 
+:::moniker range=">= aspnetcore-10.0"
+
+## Create an instance of a JS object using a constructor function
+
+Create an instance of a JS object using a constructor function and get the <xref:Microsoft.JSInterop.IJSObjectReference>/<xref:Microsoft.JSInterop.IJSInProcessObjectReference> .NET handle for referencing the instance with the following API:
+
+* <xref:Microsoft.JSInterop.JSRuntime.InvokeConstructorAsync%2A> (asynchronous)
+* <xref:Microsoft.JSInterop.IJSInProcessObjectReference.InvokeConstructor%2A> (synchronous)
+
+Examples in this section demonstrate the API calls with the following `TestClass` with a constructor function (`constructor(text)`):
+
+```javascript
+window.TestClass = class {
+  constructor(text) {
+    this.text = text;
+  }
+
+  getTextLength() {
+    return this.text.length;
+  }
+}
+```
+
+### Asynchronous `InvokeConstructorAsync`
+
+Use <xref:Microsoft.JSInterop.JSRuntime.InvokeConstructorAsync%2A> on <xref:Microsoft.JSInterop.IJSRuntime> and <xref:Microsoft.JSInterop.IJSObjectReference> to invoke the specified JS constructor function asynchronously. The function is invoked with the `new` operator. In the following example, `TestClass` contains a constructor function, and `classRef` is an <xref:Microsoft.JSInterop.IJSObjectReference>.
+
+```csharp
+var classRef = await JSRuntime.InvokeConstructorAsync("TestClass", "Blazor!");
+var text = await classRef.GetValueAsync<string>("text");
+var textLength = await classRef.InvokeAsync<int>("getTextLength");
+```
+
+An overload is available that takes a <xref:System.Threading.CancellationToken> argument or <xref:System.TimeSpan> timeout argument.
+
+### Synchronous `InvokeConstructor`
+
+Use <xref:Microsoft.JSInterop.IJSInProcessObjectReference.InvokeConstructor%2A> on <xref:Microsoft.JSInterop.IJSInProcessRuntime> and <xref:Microsoft.JSInterop.IJSInProcessObjectReference> to invoke the specified JS constructor function synchronously. The function is invoked with the `new` operator. In the following example, `TestClass` contains a constructor function, and `classRef` is an <xref:Microsoft.JSInterop.IJSInProcessObjectReference>:
+
+```csharp
+var inProcRuntime = ((IJSInProcessRuntime)JSRuntime);
+var classRef = inProcRuntime.InvokeConstructor("TestClass", "Blazor!");
+var text = classRef.GetValue<string>("text");
+var textLength = classRef.Invoke<int>("getTextLength");
+```
+
+An overload is available that takes a <xref:System.Threading.CancellationToken> argument or <xref:System.TimeSpan> timeout argument.
+
+## Read or modify the value of a JS object property
+
+Read or modify the value of a JS object property, both data and accessor properties, with the following API:
+
+* <xref:Microsoft.JSInterop.JSRuntime.GetValueAsync%2A>/<xref:Microsoft.JSInterop.JSRuntime.SetValueAsync%2A> (asynchronous)
+* `GetValue`/`SetValue` (synchronous)
+
+Examples in this section demonstrate the API calls with the following JS object (`testObject`):
+
+```javascript
+window.testObject = {
+  num: 10
+}
+```
+
+### Asynchronous `GetValueAsync` and `SetValueAsync`
+
+Use <xref:Microsoft.JSInterop.JSRuntime.GetValueAsync%2A> to read the value of the specified JS property asynchronously. A <xref:Microsoft.JSInterop.JSException> is thrown if the property doesn't exist or is a `set`-only property. In the following example, the value of `testObject.num` (10) is stored in `valueFromDataPropertyAsync`:
+
+```csharp
+var valueFromDataPropertyAsync = 
+    await JSRuntime.GetValueAsync<int>("testObject.num");
+```
+
+Use <xref:Microsoft.JSInterop.JSRuntime.SetValueAsync%2A> to update the value of the specified JS property asynchronously. If the property isn't defined on the target object, the property is created. A <xref:Microsoft.JSInterop.JSException> is thrown if the property exists but isn't writable or when a new property can't be added to the object. In the following example, `testObject.num` is set to 20, and `num2` is created with a value of 30 on `testObject`:
+
+```csharp
+await JSRuntime.SetValueAsync("testObject.num", 20);
+await JSRuntime.SetValueAsync("testObject.num2", 30);
+```
+
+### Synchronous `GetValue` and `SetValue`
+
+Use `GetValue` to read the value of the specified JS property synchronously. A <xref:Microsoft.JSInterop.JSException> is thrown if the property doesn't exist or is a `set`-only property. In the following example, the value of `testObject.num` (10) is stored in `valueFromDataProperty`:
+
+```csharp
+var inProcRuntime = ((IJSInProcessRuntime)JSRuntime);
+var valueFromDataProperty = inProcRuntime.GetValue<int>("testObject.num");
+```
+
+Use `SetValue` to update the value of the specified JS property synchronously. The property can't be a `get`-only property. If the property isn't defined on the target object, the property is created. A <xref:Microsoft.JSInterop.JSException> is thrown if the property exists but isn't writable or when a new property can't be added to the object. In the following example, `testObject.num` is set to 20, and `num2` is created with a value of 30 on `testObject`:
+
+```csharp
+var inProcRuntime = ((IJSInProcessRuntime)JSRuntime);
+inProcRuntime.SetValue("testObject.num", 20);
+inProcRuntime.SetValue("testObject.num2", 30);
+```
+
+:::moniker-end
+
 ## JavaScript location
 
 Load JavaScript (JS) code using any of approaches described by the [article on JavaScript location](xref:blazor/js-interop/javascript-location):
@@ -517,7 +637,70 @@ In the preceding example, the `{CONDITION}` placeholder represents a conditional
 
 For browser compatibility, see [Can I use: JavaScript modules: dynamic import](https://caniuse.com/es6-module-dynamic-import).
 
-For example, the following JS module exports a JS function for showing a [browser window prompt](https://developer.mozilla.org/docs/Web/API/Window/prompt). Place the following JS code in an external JS file.
+In server-side scenarios, JS interop calls can't be issued after Blazor's SignalR circuit is disconnected. Without a circuit during component disposal or at any other time that a circuit doesn't exist, the following method calls fail and log a message that the circuit is disconnected as a <xref:Microsoft.JSInterop.JSDisconnectedException>:
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-10.0"
+
+* JS interop method calls
+  * <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeVoidAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntime.InvokeConstructorAsync%2A>
+  * <xref:Microsoft.JSInterop.IJSInProcessObjectReference.InvokeConstructor%2A>
+  * <xref:Microsoft.JSInterop.JSRuntime.GetValueAsync%2A>
+  * <xref:Microsoft.JSInterop.JSRuntime.SetValueAsync%2A>
+* <xref:Microsoft.JSInterop.JSRuntime.Dispose%2A>/`DisposeAsync` calls on any <xref:Microsoft.JSInterop.IJSObjectReference>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-5.0 < aspnetcore-10.0"
+
+* JS interop method calls
+  * <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeAsync%2A?displayProperty=nameWithType>
+  * <xref:Microsoft.JSInterop.JSRuntimeExtensions.InvokeVoidAsync%2A?displayProperty=nameWithType>
+* <xref:Microsoft.JSInterop.JSRuntime.Dispose%2A>/`DisposeAsync` calls on any <xref:Microsoft.JSInterop.IJSObjectReference>.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-5.0"
+
+In order to avoid logging <xref:Microsoft.JSInterop.JSDisconnectedException> or to log custom information in server-side Blazor, catch the exception in a [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statement.
+
+For the following component disposal example:
+
+* The server-side component implements <xref:System.IAsyncDisposable>.
+* `module` is an <xref:Microsoft.JSInterop.IJSObjectReference> for a JS module.
+* <xref:Microsoft.JSInterop.JSDisconnectedException> is caught and not logged.
+* Optionally, you can log custom information in the `catch` statement at whatever log level you prefer. The following example doesn't log custom information. The code assumes that the developer doesn't care about when or where circuits are disconnected during component disposal.
+
+```csharp
+async ValueTask IAsyncDisposable.DisposeAsync()
+{
+    try
+    {
+        if (module is not null)
+        {
+            await module.DisposeAsync();
+        }
+    }
+    catch (JSDisconnectedException)
+    {
+    }
+}
+```
+
+If you must clean up your own JS objects or execute other JS code on the client after a circuit is lost in a server-side Blazor app, use the [`MutationObserver`](https://developer.mozilla.org/docs/Web/API/MutationObserver) pattern in JS on the client. The `MutationObserver` pattern allows you to execute JS code when an element is removed from the DOM.
+
+For more information, see the following articles:
+
+* <xref:blazor/js-interop/index#dom-cleanup-tasks-during-component-disposal>: Includes a code example of the `MutationObserver` pattern.
+* <xref:blazor/fundamentals/handle-errors#javascript-interop>: The *JavaScript interop* section discusses error handling in JS interop scenarios.
+* <xref:blazor/components/component-disposal>: The article describes how to implement disposal patterns in Razor components.
+
+The following JS module exports a JS function for showing a [browser window prompt](https://developer.mozilla.org/docs/Web/API/Window/prompt). Place the following JS code in an external JS file.
 
 `wwwroot/scripts.js`:
 
@@ -581,11 +764,12 @@ In the preceding example:
 * Specify the module's external JS file using its stable static web asset path: `./{SCRIPT PATH AND FILE NAME (.js)}`, where:
   * The path segment for the current directory (`./`) is required in order to create the correct static asset path to the JS file.
   * The `{SCRIPT PATH AND FILE NAME (.js)}` placeholder is the path and file name under `wwwroot`.
-* Disposes the <xref:Microsoft.JSInterop.IJSObjectReference> for [garbage collection](xref:blazor/components/lifecycle#asynchronous-iasyncdisposable) in <xref:System.IAsyncDisposable.DisposeAsync%2A?displayProperty=nameWithType>.
+* Disposes the <xref:Microsoft.JSInterop.IJSObjectReference> for [garbage collection](xref:blazor/components/component-disposal#asynchronous-iasyncdisposable) in <xref:System.IAsyncDisposable.DisposeAsync%2A?displayProperty=nameWithType>.
+* Don't place a `<script>` tag for the script after the [Blazor script](xref:blazor/project-structure#location-of-the-blazor-script) because the module is loaded and cached automatically when the [dynamic `import()`](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/import) is invoked.
 
 Dynamically importing a module requires a network request, so it can only be achieved asynchronously by calling <xref:Microsoft.JSInterop.IJSRuntime.InvokeAsync%2A>.
 
-`IJSInProcessObjectReference` represents a reference to a JS object whose functions can be invoked synchronously in client-side components. For more information, see the [Synchronous JS interop in client-side components](#synchronous-js-interop-in-client-side-components) section.
+<xref:Microsoft.JSInterop.IJSInProcessObjectReference> represents a reference to a JS object whose functions can be invoked synchronously in client-side components. For more information, see the [Synchronous JS interop in client-side components](#synchronous-js-interop-in-client-side-components) section.
 
 > [!NOTE]
 > When the external JS file is supplied by a [Razor class library](xref:blazor/components/class-libraries), specify the module's JS file using its stable static web asset path: `./_content/{PACKAGE ID}/{SCRIPT PATH AND FILE NAME (.js)}`:
@@ -1060,18 +1244,30 @@ The `{TIMEOUT}` placeholder is a <xref:System.TimeSpan> (for example, `TimeSpan.
 
 Set a per-invocation timeout in component code. The specified timeout overrides the global timeout set by <xref:Microsoft.AspNetCore.Components.Server.CircuitOptions.JSInteropDefaultCallTimeout>:
 
+:::moniker range=">= aspnetcore-8.0"
+
+```csharp
+var result = await JS.InvokeAsync<string>("{ID}", {TIMEOUT}, [ "Arg1" ]);
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-8.0"
+
 ```csharp
 var result = await JS.InvokeAsync<string>("{ID}", {TIMEOUT}, new[] { "Arg1" });
 ```
+
+:::moniker-end
 
 In the preceding example:
 
 * The `{TIMEOUT}` placeholder is a <xref:System.TimeSpan> (for example, `TimeSpan.FromSeconds(80)`).
 * The `{ID}` placeholder is the identifier for the function to invoke. For example, the value `someScope.someFunction` invokes the function `window.someScope.someFunction`.
 
-Although a common cause of JS interop failures are network failures with server-side components, per-invocation timeouts can be set for JS interop calls for client-side components. Although no SignalR circuit exists for a client-side component, JS interop calls might fail for other reasons that apply.
+Although a common cause of JS interop failures are network failures with server-side components, per-invocation timeouts can be set for JS interop calls for client-side components. Although no Blazor-SignalR circuit exists for a client-side component, JS interop calls might fail for other reasons that apply.
 
-For more information on resource exhaustion, see <xref:blazor/security/server/interactive-server-side-rendering>.
+For more information on resource exhaustion, see <xref:blazor/security/interactive-server-side-rendering>.
 
 ## Avoid circular object references
 
@@ -1699,4 +1895,4 @@ For more information, see <xref:blazor/js-interop/index#javascript-interop-calls
 * [`InteropComponent.razor` example (`dotnet/AspNetCore` GitHub repository `main` branch)](https://github.com/dotnet/AspNetCore/blob/main/src/Components/test/testassets/BasicTestApp/InteropComponent.razor): The `main` branch represents the product unit's current development for the next release of ASP.NET Core. To select the branch for a different release (for example, `release/{VERSION}`, where the `{VERSION}` placeholder is the release version), use the **Switch branches or tags** dropdown list to select the branch. For a branch that no longer exists, use the **Tags** tab to find the API (for example, `v7.0.0`).
 * [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))
 * <xref:blazor/fundamentals/handle-errors#javascript-interop> (*JavaScript interop* section)
-* [Threat mitigation: JavaScript functions invoked from .NET](xref:blazor/security/server/interactive-server-side-rendering#javascript-functions-invoked-from-net)
+* [Threat mitigation: JavaScript functions invoked from .NET](xref:blazor/security/interactive-server-side-rendering#javascript-functions-invoked-from-net)

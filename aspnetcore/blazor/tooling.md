@@ -3,9 +3,8 @@ title: Tooling for ASP.NET Core Blazor
 author: guardrex
 description: Learn about the tools available to build Blazor apps and how to use them.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 06/13/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tooling
 zone_pivot_groups: tooling
 ---
@@ -31,7 +30,7 @@ To create a Blazor app with Visual Studio, use the following guidance:
 
 * Create a new project using one of the available Blazor templates:
 
-  * **Blazor Web App**: Creates a Blazor web app that supports interactive server-side rendering (interactive SSR) and client-side rendering (CSR). The Blazor Web App template is recommended for getting started with Blazor to learn about server-side and client-side Blazor features.
+  * **Blazor Web App**: Creates an app that supports interactive server-side rendering (interactive SSR) and client-side rendering (CSR). The Blazor Web App template is recommended for getting started with Blazor to learn about server-side and client-side Blazor features.
   * **Blazor WebAssembly Standalone App**: Creates a standalone client web app that can be deployed as a static site.
 
 Select **Next**.
@@ -61,13 +60,6 @@ Select **Next**.
 * Provide a **Project name** and confirm that the **Location** is correct.
 
 * For more information on the options in the **Additional information** dialog, see the [Blazor project templates and template options](#blazor-project-templates-and-template-options) section.
-
-:::moniker range=">= aspnetcore-8.0"
-
-  > [!NOTE]
-  > The hosted Blazor WebAssembly project template isn't available in ASP.NET Core 8.0 or later. To create a hosted Blazor WebAssembly app, a **Framework** option earlier than .NET 8.0 must be selected with the **ASP.NET Core Hosted** checkbox.
-
-:::moniker-end
 
 :::moniker range="< aspnetcore-8.0"
 
@@ -329,7 +321,7 @@ Create a new project:
   ```
 
   > [!NOTE]
-  > The hosted Blazor WebAssembly project template isn't available in ASP.NET Core 8.0 or later. To create a hosted Blazor WebAssembly app using a .NET 8.0 or later SDK, pass the `-f|--framework` option with a 7.0 target framework (`net7.0`):
+  > The Hosted Blazor WebAssembly project template isn't available in .NET 8 or later. To create a hosted Blazor WebAssembly app using a .NET 8 or later SDK, pass the `-f|--framework` option with a .NET 7 target framework (`net7.0`):
   >
   > ```dotnet cli
   > dotnet new blazorwasm -o BlazorApp -ho -f net7.0
@@ -356,7 +348,7 @@ Create a new project:
   ```
 
   > [!NOTE]
-  > The hosted Blazor WebAssembly project template isn't available in ASP.NET Core 8.0 or later. To create a hosted Blazor WebAssembly app using a .NET 8.0 or later SDK, pass the `-f|--framework` option with the target framework moniker (for example, `net6.0`):
+  > The hosted Blazor WebAssembly project template isn't available in .NET 8 or later. To create a hosted Blazor WebAssembly app using a .NET 8 or later SDK, pass the `-f|--framework` option with the target framework moniker (for example, `net6.0`):
   >
   > ```dotnet cli
   > dotnet new blazorwasm -o BlazorApp -ho -f net6.0
@@ -415,7 +407,7 @@ Visual Studio:
 
 :::zone pivot="vsc"
 
-In VS Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+In VS Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 At the **Select debugger** prompt in the **Command Palette** at the top of the VS Code UI, select **C#**. At the next prompt, select the HTTPS profile (`[https]`).
 
@@ -433,7 +425,7 @@ dotnet watch
 
 The default browser is launched at `https://localhost:{PORT}`, which displays the app's UI. The `{PORT}` placeholder is the random port assigned at app creation. If you need to change the port due to a local port conflict, change the port in the project's `Properties/launchSettings.json` file.
 
-When an app created from the Blazor Web App project template is run with the .NET CLI, the app runs at an HTTP (insecure) endpoint because the first profile found in the app's launch settings file (`Properties/launchSettings.json`) is the HTTP (insecure) profile, which is named `http`. The HTTP profile was placed in the first position to ease the transition of adopting SSL/HTTPS security for non-Windows users.
+[!INCLUDE[](~/includes/default-launch-profile-for-dotnet-cli.md)]
 
 One approach for running the app with SSL/HTTPS is to pass the [`-lp`|`--launch-profile` option](/dotnet/core/tools/dotnet-run#options) with the `https` profile name to the `dotnet watch` command:
 
@@ -477,7 +469,7 @@ Stop the app using the following approach:
 Stop the app using the following approach:
 
 1. Close the browser window.
-2. In the command shell, press <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS).
+2. In the command shell, press <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
 :::zone-end
 
@@ -501,12 +493,36 @@ For more information, see the following resources:
 
 ## Blazor project templates and template options
 
-The Blazor framework provides project templates for creating new apps. The templates are used to create new Blazor projects and solutions regardless of the tooling that you select for Blazor development (Visual Studio, Visual Studio Code, or the [.NET command-line interface (CLI)](/dotnet/core/tools/)):
-
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-11.0"
 
 * Blazor Web App project template: `blazor`
 * Standalone Blazor WebAssembly app project template: `blazorwasm`
+* [Service defaults library for Blazor WebAssembly apps](#service-defaults-library-for-blazor-webassembly-apps): `blazor-wasm-servicedefaults`
+
+> [!NOTE]
+> The "Hosted" Blazor WebAssembly project template option isn't available in .NET 8 or later. To create a hosted Blazor WebAssembly app, a **Framework** option earlier than .NET 8 must be selected with the **ASP.NET Core Hosted** checkbox. However, we recommend a Blazor Web App for all new Blazor development in .NET 8 or later. For more information, see the following resources:
+>
+> * <xref:blazor/index#build-a-full-stack-web-app-with-blazor>
+> * <xref:aspnetcore-8#new-blazor-web-app-template>
+> * <xref:blazor/project-structure#blazor-web-app>
+> * <xref:migration/70-to-80#convert-a-hosted-blazor-webassembly-app-into-a-blazor-web-app>
+
+:::moniker-end
+
+The Blazor framework provides project templates for creating new apps. The templates are used to create new Blazor projects and solutions regardless of the tooling that you select for Blazor development (Visual Studio, Visual Studio Code, or the [.NET command-line interface (CLI)](/dotnet/core/tools/)):
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-11.0"
+
+* Blazor Web App project template: `blazor`
+* Standalone Blazor WebAssembly app project template: `blazorwasm`
+
+> [!NOTE]
+> The "Hosted" Blazor WebAssembly project template option isn't available in .NET 8 or later. To create a hosted Blazor WebAssembly app, a **Framework** option earlier than .NET 8 must be selected with the **ASP.NET Core Hosted** checkbox. However, we recommend a Blazor Web App for all new Blazor development in .NET 8 or later. For more information, see the following resources:
+>
+> * <xref:blazor/index#build-a-full-stack-web-app-with-blazor>
+> * <xref:aspnetcore-8#new-blazor-web-app-template>
+> * <xref:blazor/project-structure#blazor-web-app>
+> * <xref:migration/70-to-80#convert-a-hosted-blazor-webassembly-app-into-a-blazor-web-app>
 
 :::moniker-end
 
@@ -543,7 +559,7 @@ Detailed guidance on render modes is provided by the <xref:blazor/components/ren
 * To enable both interactive rendering modes and the ability to automatically switch between them at runtime, use the **Auto (Server and WebAssembly)** (automatic) render mode option.
 * If interactivity is set to `None`, the generated app has no interactivity. The app is only configured for static server-side rendering.
 
-The Interactive Auto render mode initially uses interactive SSR while the .NET app bundle and runtime are download to the browser. After the .NET WebAssembly runtime is activated, the render mode switches to Interactive WebAssembly rendering.
+The Interactive Auto render mode initially uses interactive SSR while the .NET app bundle and runtime are downloaded to the browser. After the .NET WebAssembly runtime is activated, the render mode switches to Interactive WebAssembly rendering.
 
 The Blazor Web App template enables both static and interactive SSR using a single project. If you also enable CSR, the project includes an additional client project (`.Client`) for your WebAssembly-based components. The built output from the client project is downloaded to the browser and executed on the client. Any components using the WebAssembly or automatic render modes must be built from the client project.
 
@@ -566,7 +582,7 @@ To include sample pages and a layout based on Bootstrap styling, use the **Inclu
 ### Additional guidance on template options
 
 * <xref:blazor/components/render-modes>
-* The *.NET default templates for dotnet new* article in the .NET Core documentation:
+* The *.NET default templates for dotnet new* article in the .NET documentation:
   * [`blazor`](/dotnet/core/tools/dotnet-new-sdk-templates#blazor)
   * [`blazorwasm`](/dotnet/core/tools/dotnet-new-sdk-templates#blazorwasm)
 * Passing the help option (`-h` or `--help`) to the [`dotnet new`](/dotnet/core/tools/dotnet-new) CLI command in a command shell:
@@ -579,7 +595,7 @@ To include sample pages and a layout based on Bootstrap styling, use the **Inclu
 
 For more information on template options, see the following resources:
 
-* The *.NET default templates for dotnet new* article in the .NET Core documentation:
+* The *.NET default templates for dotnet new* article in the .NET documentation:
   * [`blazorserver`](/dotnet/core/tools/dotnet-new-sdk-templates#blazorserver) (includes `blazorserver-empty` options)
   * [`blazorwasm`](/dotnet/core/tools/dotnet-new-sdk-templates#blazorwasm) (includes `blazorwasm-empty` options)
 * Passing the help option (`-h` or `--help`) to the [`dotnet new`](/dotnet/core/tools/dotnet-new) CLI command in a command shell:
@@ -594,12 +610,38 @@ For more information on template options, see the following resources:
 
 For more information on template options, see the following resources:
 
-* The *.NET default templates for dotnet new* article in the .NET Core documentation:
+* The *.NET default templates for dotnet new* article in the .NET documentation:
   * [`blazorserver`](/dotnet/core/tools/dotnet-new-sdk-templates#blazorserver)
   * [`blazorwasm`](/dotnet/core/tools/dotnet-new-sdk-templates#blazorwasm)
 * Passing the help option (`-h` or `--help`) to the [`dotnet new`](/dotnet/core/tools/dotnet-new) CLI command in a command shell:
   * `dotnet new blazorserver -h`
   * `dotnet new blazorwasm -h`
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+## Service defaults library for Blazor WebAssembly apps
+
+The `blazor-wasm-servicedefaults` project template creates a service defaults library for Blazor WebAssembly apps with [Aspire](/dotnet/aspire/get-started/aspire-overview) integration.
+
+The template features:
+
+* [OpenTelemetry (OTEL)](https://opentelemetry.io/) ([OpenTelemetry .NET](https://github.com/open-telemetry/opentelemetry-dotnet)) support: Logging, metrics, and tracing with standard OTEL Protocol (OTLP) exporter.
+* Service discovery integration via the [`Microsoft.Extensions.ServiceDiscovery` NuGet package](https://www.nuget.org/packages/Microsoft.Extensions.ServiceDiscovery).
+* HTTP resilience using the standard resilience handler via the [`Microsoft.Extensions.Http.Resilience` NuGet package](https://www.nuget.org/packages/Microsoft.Extensions.Http.Resilience).
+
+Example template usage with an output name of `BlazorSample.ServiceDefaults`:
+
+```dotnetcli
+dotnet new blazor-wasm-servicedefaults -o BlazorSample.ServiceDefaults
+```
+
+Reference the library from the Blazor WebAssembly client and make the following call in the app's `Program` file:
+
+```csharp
+builder.AddBlazorClientServiceDefaults();
+```
 
 :::moniker-end
 

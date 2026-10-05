@@ -3,7 +3,7 @@ title: Publish an ASP.NET Core web API to Azure API Management with Visual Studi
 author: codemillmatt
 description: Learn how to publish an ASP.NET Core web API to Azure API Management using Visual Studio.
 ms.author: wpickett
-ms.custom: "devx-track-csharp, mvc"
+ms.custom: devx-track-csharp
 ms.date: 10/05/2022
 uid: tutorials/publish-to-azure-api-management-using-vs
 ---
@@ -17,7 +17,7 @@ In this tutorial you'll learn how to create an ASP.NET Core web API project usin
 
 To complete the tutorial you'll need an Azure account.
 
-* Open a [free Azure account](https://azure.microsoft.com/free/dotnet/) if you don't have one.
+* Open a [free Azure account](https://azure.microsoft.com/pricing/purchase-options/azure-account?cid=msft_learn) if you don't have one.
 
 ## Create an ASP.NET Core web API
 
@@ -29,7 +29,7 @@ Visual Studio allows you to easily create a new ASP.NET Core web API project fro
 * In the **Configure your new project dialog**, name the project **WeatherAPI** and select **Next**.
 * In the **Additional information** dialog:
 * Confirm the Framework is **.NET 6.0 (Long-term support)**.
-* Confirm the checkbox for **Use controllers (uncheck to use minimal APIs)** is checked.
+* Confirm the checkbox for **Use controllers (uncheck to use Minimal APIs)** is checked.
 * Confirm the checkbox for **Enable OpenAPI support** is checked.
 * Select **Create**.
 
@@ -129,7 +129,7 @@ Complete the following steps to publish the ASP.NET Core web API to Azure API Ma
 
 Notice the name of the API is named *WeatherAPI*; however, we would like to call it *Weather Forecasts*. Complete the following steps to update the name:
 
-1. Add the following to `Program.cs` immediately after `servies.AddSwaggerGen();`
+1. Add the following to `Program.cs` immediately after `services.AddSwaggerGen();`
     
     ```csharp
     builder.Services.ConfigureSwaggerGen(setup =>

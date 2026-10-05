@@ -1,21 +1,17 @@
 ---
 title: Build a Blazor movie database app (Part 2 - Add and scaffold a model)
+ai-usage: ai-assisted
 author: guardrex
 description: This part of the Blazor movie database app tutorial explains how to add a movie class to the app and scaffold the database and UI from the movie class.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 09/15/2026
 uid: blazor/tutorials/movie-database-app/part-2
 zone_pivot_groups: tooling
 ---
 # Build a Blazor movie database app (Part 2 - Add and scaffold a model)
 
-<!-- UPDATE 9.0 Activate after release
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article is the second part of the Blazor movie database app tutorial that teaches you the basics of building an ASP.NET Core Blazor Web App with features to manage a movie database.
 
@@ -117,9 +113,21 @@ Select **Build** > **Build Solution** from the menu bar or press <kbd>F6</kbd> o
 
 ## Add Nuget packages and tools
 
-To add the required NuGet packages and tools, execute the following .NET CLI commands in the **Terminal** (**Terminal** menu > **New Terminal**).
+:::moniker range=">= aspnetcore-9.0"
 
-Paste all of the following commands at the prompt (`>`) of the **Terminal**. When you paste multiple commands, a warning appears stating that multiple commands will execute. Dismiss the warning and proceed with the paste operation.
+To add the `dotnet scaffold` tool, execute the following .NET CLI command in the **Terminal** (**Terminal** menu > **New Terminal**) opened to the project's root folder:
+
+```dotnetcli
+dotnet tool install --global Microsoft.dotnet-scaffold
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
+
+To add the required NuGet packages and tools, execute the following .NET CLI commands in the **Terminal** (**Terminal** menu > **New Terminal**) opened to the project's root folder.
+
+Paste all of the following commands at the prompt (`>`) of the **Terminal**. When you paste multiple commands, a warning may appear stating that multiple commands will execute. Dismiss the warning and proceed with the paste operation.
 
 When you paste multiple commands, all of the commands execute except the last one. The last command doesn't execute until you press <kbd>Enter</kbd> on the keyboard.
 
@@ -132,6 +140,7 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 dotnet add package Microsoft.EntityFrameworkCore.Tools
 dotnet add package Microsoft.AspNetCore.Components.QuickGrid
 dotnet add package Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter
+dotnet add package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
 ```
 
 > [!IMPORTANT]
@@ -142,11 +151,16 @@ dotnet add package Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdap
 
 The preceding commands add:
 
-* [Command-line interface (CLI) tools for EF Core](/ef/core/miscellaneous/cli/dotnet)
-* [`aspnet-codegenerator` scaffolding tool](xref:fundamentals/tools/dotnet-aspnet-codegenerator)
-* Design time tools for EF Core
-* The SQLite and SQL Server providers with the EF Core package as a dependency
-* [`Microsoft.VisualStudio.Web.CodeGeneration.Design`](https://www.nuget.org/packages/Microsoft.VisualStudio.Web.CodeGeneration.Design) for scaffolding
+* [Command-line interface (CLI) tools for EF Core](/ef/core/miscellaneous/cli/dotnet).
+* [`aspnet-codegenerator` scaffolding tool](xref:fundamentals/tools/dotnet-aspnet-codegenerator).
+* Design time tools for EF Core.
+* The SQLite and SQL Server providers with the EF Core package as a dependency.
+* [`Microsoft.VisualStudio.Web.CodeGeneration.Design`](https://www.nuget.org/packages/Microsoft.VisualStudio.Web.CodeGeneration.Design) for scaffolding.
+* [`Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore`](https://www.nuget.org/packages/Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore) to use the <xref:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter%2A> extension method in the `Program` file, which captures database-related exceptions.
+
+:::moniker-end
+
+Save any open files.
 
 In the **Command Palette** (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>), use the `.NET: Build` command to build the app.
 
@@ -158,9 +172,21 @@ Confirm that the app built successfully.
 
 ## Add Nuget packages and tools
 
+:::moniker range=">= aspnetcore-9.0"
+
+To add the `dotnet scaffold` tool, execute the following .NET CLI command in a command shell opened to the project's root folder:
+
+```dotnetcli
+dotnet tool install --global Microsoft.dotnet-scaffold
+```
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
+
 To add the required NuGet packages and tools, execute the following .NET CLI commands in a command shell opened to the project's root folder.
 
-Paste all of the following commands  at the prompt (`>`) of the command shell. When you paste multiple commands, a warning appears stating that multiple commands will execute. Dismiss the warning and proceed with the paste operation.
+Paste all of the following commands at the prompt (`>`) of the command shell. When you paste multiple commands, a warning may appear stating that multiple commands will execute. Dismiss the warning and proceed with the paste operation.
 
 When you paste multiple commands, all of the commands execute except the last one. The last command doesn't execute until you press <kbd>Enter</kbd> on the keyboard.
 
@@ -173,18 +199,21 @@ dotnet add package Microsoft.EntityFrameworkCore.SqlServer
 dotnet add package Microsoft.EntityFrameworkCore.Tools
 dotnet add package Microsoft.AspNetCore.Components.QuickGrid
 dotnet add package Microsoft.AspNetCore.Components.QuickGrid.EntityFrameworkAdapter
+dotnet add package Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore
 ```
-
-> [!IMPORTANT]
-> After the first eight commands execute, make sure that you press <kbd>Enter</kbd> on the keyboard to execute the last command.
 
 The preceding commands add:
 
-* [Command-line interface (CLI) tools for EF Core](/ef/core/miscellaneous/cli/dotnet)
-* [`aspnet-codegenerator` scaffolding tool](xref:fundamentals/tools/dotnet-aspnet-codegenerator)
-* Design time tools for EF Core
-* The SQLite and SQL Server providers with the EF Core package as a dependency
-* [`Microsoft.VisualStudio.Web.CodeGeneration.Design`](https://www.nuget.org/packages/Microsoft.VisualStudio.Web.CodeGeneration.Design) for scaffolding
+* [Command-line interface (CLI) tools for EF Core](/ef/core/miscellaneous/cli/dotnet).
+* [`aspnet-codegenerator` scaffolding tool](xref:fundamentals/tools/dotnet-aspnet-codegenerator).
+* Design time tools for EF Core.
+* The SQLite and SQL Server providers with the EF Core package as a dependency.
+* [`Microsoft.VisualStudio.Web.CodeGeneration.Design`](https://www.nuget.org/packages/Microsoft.VisualStudio.Web.CodeGeneration.Design) for scaffolding.
+* [`Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore`](https://www.nuget.org/packages/Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore) to use the <xref:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter%2A> extension method in the `Program` file, which captures database-related exceptions. 
+
+:::moniker-end
+
+Save any open files.
 
 In a command shell opened to the project's root folder, execute the [`dotnet build`](/dotnet/core/tools/dotnet-build) command:
 
@@ -229,18 +258,58 @@ Complete the **Add Razor Components using Entity Framework (CRUD)** dialog:
 
 In the **Terminal** (**Terminal** menu > **New Terminal**) opened to the project's root directory, execute the following command. SQLite is used as the database for users adopting VS Code tooling for this tutorial series.
 
+:::moniker range=">= aspnetcore-9.0"
+
+```dotnetcli
+dotnet scaffold
+```
+
+When the initializing prompt appears, press <kbd>Enter</kbd> on the keyboard.
+
+For the **Scaffolding Category**, use the arrow keys to select **Blazor**. Press <kbd>Enter</kbd>.
+
+For the **Command Name**, use the arrow keys to select **Razor Components with EntityFrameworkCore (CRUD)**. Press <kbd>Enter</kbd>.
+
+*CRUD* is an acronym for Create, Read, Update, and Delete. The scaffolder produces create, edit, delete, details, and index components for the app.
+
+For the **.NET project file**, press <kbd>Enter</kbd> to accept the app's project file (`BlazorWebAppMovies.csproj`).
+
+For the **Model Name**, confirm that **Movie** (`Movie` class) is selected. Press <kbd>Enter</kbd>.
+
+For the **Data Context Class**, type `BlazorWebAppMoviesContext`. Press <kbd>Enter</kbd>.
+
+For the **Database Provider**, use the arrow keys to select **sqlite-efcore**. Press <kbd>Enter</kbd>.
+
+For **Page**, confirm that **CRUD** is selected. Press <kbd>Enter</kbd>.
+
+When prompted to include prerelease packages, use the arrow keys to select **No**. Press <kbd>Enter</kbd>.
+
+Executing the `dotnet scaffold` command adds the following tools and packages to the app:
+
+* [Command-line interface (CLI) tools for EF Core](/ef/core/miscellaneous/cli/dotnet).
+* [`dotnet scaffold` tooling](https://devblogs.microsoft.com/dotnet/introducing-dotnet-scaffold/).
+* Design time tools for EF Core.
+* The SQLite provider with the EF Core package as a dependency.
+* [`Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore`](https://www.nuget.org/packages/Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore) to use the <xref:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter%2A> extension method in the `Program` file, which captures database-related exceptions. 
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
+
 ```dotnetcli
 dotnet aspnet-codegenerator blazor CRUD -dbProvider sqlite -dc BlazorWebAppMovies.Data.BlazorWebAppMoviesContext -m Movie -outDir Components/Pages
 ```
 
 *CRUD* is an acronym for Create, Read, Update, and Delete. The `blazor` generator with the `CRUD` template produces create, edit, delete, details, and index components for the app.
 
-The following table details the ASP.NET Core code generator options used in the preceding command:
+The following details the ASP.NET Core code generator options used in the preceding command:
 
 * `-dbProvider`: Database provider to use. Options include `sqlserver` (default), `sqlite`, `cosmos`, `postgres`.
 * `-dc`: The <xref:Microsoft.EntityFrameworkCore.DbContext> class to use, including the namespace (`BlazorWebAppMovies.Data`).
 * `-m`: The name of the model.
 * `-outDir`: The output directory for the generated components. A folder is created from the model name in the output directory to hold the components (for example, `MoviePages` in this case).
+
+:::moniker-end
 
 :::zone-end
 
@@ -248,18 +317,58 @@ The following table details the ASP.NET Core code generator options used in the 
 
 In a command shell opened to the project's root folder, execute the following command. SQLite is used as the database for users adopting .NET CLI tooling for this tutorial series.
 
+:::moniker range=">= aspnetcore-9.0"
+
+```dotnetcli
+dotnet scaffold
+```
+
+When the initializing prompt appears, press <kbd>Enter</kbd> on the keyboard.
+
+For the **Scaffolding Category**, use the arrow keys to select **Blazor**. Press <kbd>Enter</kbd>.
+
+For the **Command Name**, use the arrow keys to select **Razor Components with EntityFrameworkCore (CRUD)**. Press <kbd>Enter</kbd>.
+
+*CRUD* is an acronym for Create, Read, Update, and Delete. The scaffolder produces create, edit, delete, details, and index components for the app.
+
+For the **.NET project file**, press <kbd>Enter</kbd> to accept the app's project file (`BlazorWebAppMovies.csproj`).
+
+For the **Model Name**, confirm that **Movie** (`Movie` class) is selected. Press <kbd>Enter</kbd>.
+
+For the **Data Context Class**, type `BlazorWebAppMoviesContext`. Press <kbd>Enter</kbd>.
+
+For the **Database Provider**, use the arrow keys to select **sqlite-efcore**. Press <kbd>Enter</kbd>.
+
+For **Page**, confirm that **CRUD** is selected. Press <kbd>Enter</kbd>.
+
+When prompted to include prerelease packages, use the arrow keys to select **No**. Press <kbd>Enter</kbd>.
+
+Executing the `dotnet scaffold` command adds the following tools and packages to the app:
+
+* [Command-line interface (CLI) tools for EF Core](/ef/core/miscellaneous/cli/dotnet).
+* [`dotnet scaffold` tooling](https://devblogs.microsoft.com/dotnet/introducing-dotnet-scaffold/).
+* Design time tools for EF Core.
+* The SQLite provider with the EF Core package as a dependency.
+* [`Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore`](https://www.nuget.org/packages/Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore) to use the <xref:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter%2A> extension method in the `Program` file, which captures database-related exceptions. 
+
+:::moniker-end
+
+:::moniker range="< aspnetcore-9.0"
+
 ```dotnetcli
 dotnet aspnet-codegenerator blazor CRUD -dbProvider sqlite -dc BlazorWebAppMovies.Data.BlazorWebAppMoviesContext -m Movie -outDir Components/Pages
 ```
 
 *CRUD* is an acronym for Create, Read, Update, and Delete. The `blazor` generator with the `CRUD` template produces create, edit, delete, details, and index components for the app.
 
-The following table details the ASP.NET Core code generator options used in the preceding command:
+The following details the ASP.NET Core code generator options used in the preceding command:
 
 * `-dbProvider`: Database provider to use. Options include `sqlserver` (default), `sqlite`, `cosmos`, `postgres`.
 * `-dc`: The <xref:Microsoft.EntityFrameworkCore.DbContext> class to use, including the namespace (`BlazorWebAppMovies.Data`).
 * `-m`: The name of the model.
 * `-outDir`: The output directory for the generated components. A folder is created from the model name in the output directory to hold the components (for example, `MoviePages` in this case).
+
+:::moniker-end
 
 :::zone-end
 
@@ -287,13 +396,21 @@ The scaffolding process creates the following component files and movie database
 
 The component files in the `MoviePages` folder are described in greater detail in the next part of this tutorial. The database context is described later in this article.
 
-ASP.NET Core is built with dependency injection, which is a software design pattern for achieving [Inversion of Control (IoC)](/dotnet/standard/modern-web-apps-azure-architecture/architectural-principles#dependency-inversion) between classes and their dependencies. Services, such as the EF Core database context, are registered with dependency injection during application startup. These services are injected into Razor components for use by the components.
+:::zone pivot="vs"
 
-The [`QuickGrid`](xref:Microsoft.AspNetCore.Components.QuickGrid) component is a Razor component for efficiently displaying data in tabular form. The scaffolder places a `QuickGrid` component in the `Index` component (`Components/Pages/Index.razor`) to display movie entities. Calling <xref:Microsoft.Extensions.DependencyInjection.EntityFrameworkAdapterServiceCollectionExtensions.AddQuickGridEntityFrameworkAdapter%2A> on the service collection adds an EF Core adapter for `QuickGrid` to recognize EF Core-supplied <xref:System.Linq.IQueryable%601> instances and to resolve database queries asynchronously for efficiency.
+If the `MoviePages` folder and assets aren't present after scaffolding, return to the [Scaffold the model](#scaffold-the-model) section and rescaffold the `Movie` model, making sure that you select the **Razor Components using Entity Framework (CRUD)** scaffolder under **Installed** > **Common** > **Blazor** > **Razor Component** in the **Add New Scaffold Item** dialog.
+
+:::zone-end
+
+ASP.NET Core is built with dependency injection (DI), which is a software design pattern for achieving [Inversion of Control (IoC)](/dotnet/standard/modern-web-apps-azure-architecture/architectural-principles#dependency-inversion) between classes and their dependencies. Services, such as the EF Core database context, are registered with DI during application startup. These services are injected into Razor components for use by the components.
+
+The [`QuickGrid` component](xref:Microsoft.AspNetCore.Components.QuickGrid) is a Razor component for efficiently displaying data in tabular form. The scaffolder places a `QuickGrid` component in the `Index` component (`Components/Pages/Index.razor`) to display movie entities. Calling <xref:Microsoft.Extensions.DependencyInjection.EntityFrameworkAdapterServiceCollectionExtensions.AddQuickGridEntityFrameworkAdapter%2A> on the service collection adds an EF Core adapter for QuickGrid to recognize EF Core-supplied <xref:System.Linq.IQueryable%601> instances and to resolve database queries asynchronously for efficiency.
 
 In combination with <xref:Microsoft.AspNetCore.Builder.DeveloperExceptionPageExtensions.UseDeveloperExceptionPage%2A>, <xref:Microsoft.Extensions.DependencyInjection.DatabaseDeveloperPageExceptionFilterServiceExtensions.AddDatabaseDeveloperPageExceptionFilter%2A> captures database-related exceptions that can be resolved by using Entity Framework migrations. When these exceptions occur, an HTML response is generated with details about possible actions to resolve the issue.
 
-The following code is added to the `Program` file by the scaffolder:
+:::zone pivot="vs"
+
+The following code is added to the `Program` file by the scaffolder if the database provider is SQL Server. The first statement of the following code registers a database context factory in the DI container to create database context instances on demand. A database context is used to perform database operations, such as reading and updating database records.
 
 ```csharp
 builder.Services.AddDbContextFactory<BlazorWebAppMoviesContext>(options =>
@@ -307,22 +424,45 @@ builder.Services.AddQuickGridEntityFrameworkAdapter();
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 ```
 
-Static server-side rendering (static SSR) is enabled by calling:
+:::zone-end
 
-* The service collection extension method <xref:Microsoft.Extensions.DependencyInjection.RazorComponentsServiceCollectionExtensions.AddRazorComponents%2A> to register services for server-side rendering (SSR) of Razor components.
-* The request pipeline extension method <xref:Microsoft.AspNetCore.Builder.RazorComponentsEndpointRouteBuilderExtensions.MapRazorComponents%2A>, which maps the page components defined in the `App` component to the given assembly and renders the `App` component when a request matches a route to a component:
+:::zone pivot="vsc"
+
+The first statement reads and validates the connection string, and the second registers a database context factory in the DI container. A database context is used to perform database operations, such as reading and updating database records.
 
 ```csharp
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+var connectionString = 
+    builder.Configuration.GetConnectionString("BlazorWebAppMoviesContext") ?? 
+    throw new InvalidOperationException(
+        "Connection string 'BlazorWebAppMoviesContext' not found.");
 
-...
+builder.Services.AddDbContextFactory<BlazorWebAppMoviesContext>(options => options.UseSqlite(connectionString));
 
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
+builder.Services.AddQuickGridEntityFrameworkAdapter();
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 ```
 
-The extension methods <xref:Microsoft.Extensions.DependencyInjection.ServerRazorComponentsBuilderExtensions.AddInteractiveServerComponents%2A> and <xref:Microsoft.AspNetCore.Builder.ServerRazorComponentsEndpointConventionBuilderExtensions.AddInteractiveServerRenderMode%2A> make the app capable of adopting interactive SSR, which isn't relevant until the last part of the tutorial series on interactivity. Over the next several articles, the app's components only adopt static SSR.
+:::zone-end
+
+:::zone pivot="cli"
+
+The following code is added to the `Program` file by the scaffolder if the database provider is SQLite. The first statement reads and validates the connection string, and the second statement registers a database context factory in the DI container to create database context instances on demand. A database context is used to perform database operations, such as reading and updating database records.
+
+```csharp
+var connectionString = 
+    builder.Configuration.GetConnectionString("BlazorWebAppMoviesContext") ?? 
+    throw new InvalidOperationException(
+        "Connection string 'BlazorWebAppMoviesContext' not found.");
+
+builder.Services.AddDbContextFactory<BlazorWebAppMoviesContext>(options => options.UseSqlite(connectionString));
+
+builder.Services.AddQuickGridEntityFrameworkAdapter();
+
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+```
+
+:::zone-end
 
 ## Create the initial database schema using EF Core's migration feature
 
@@ -336,7 +476,7 @@ EF Core adopts the *code-first* approach for database design and maintenance:
 * Entity classes are created and updated first in the app.
 * The database is created and updated from the app's entity classes.
 
-This is the reverse procedure of *database-first* approaches, where the database is designed, built, and updated first. Adopting EF Core's code-first approach speeds up the process of app development because most of the difficult and time-consuming database creation and management procedures are handled transparently by the EF Core tooling, so you can focus on app development.
+This is the reverse procedure of *database-first* approaches, where the database is designed, built, and updated first. Adopting EF Core's code-first approach aims to speed up the process of app development because most of the difficult and time-consuming database creation and management procedures are handled transparently by the EF Core tooling, so you can focus on app development.
 
 :::zone pivot="vs"
 
@@ -430,7 +570,33 @@ Add a movie to the database. In the following example, the classic sci-fi movie 
 
 ![Adding The Matrix movie to the database with the 'Create' component](~/blazor/tutorials/movie-database-app/part-2/_static/create-new.png)
 
-When you select the **:::no-loc text="Create":::** button, the movie data is posted to the server and saved in the database. When the app returns to the `Index` page, the added entity appears:
+When you select the **:::no-loc text="Create":::** button, the movie data is posted to the server and saved in the database. 
+
+:::moniker range=">= aspnetcore-9.0 < aspnetcore-10.0"
+
+:::zone pivot="vs"
+
+In .NET 9, the Visual Studio debugger may break with a <xref:Microsoft.AspNetCore.Components.NavigationException> on the line that navigates back to the `Index` page:
+
+![Debugger regression: A navigation exception is thrown on the NavigateTo call.](~/blazor/tutorials/movie-database-app/part-2/_static/debugger_regression.png)
+
+To resolve this problem:
+
+1. Deselect the checkbox for **Break when this exception type is user-handled**.
+2. Select the **Continue** button in the menu bar to continue execution.
+
+The exception isn't thrown when a <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A> method is executed throughout the rest of the tutorial series.
+
+In .NET 10 or later:
+
+* Updates to the way that <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A> manages navigation never result in a <xref:Microsoft.AspNetCore.Components.NavigationException>.
+* The Visual Studio debugger doesn't break when processing <xref:Microsoft.AspNetCore.Components.NavigationManager.NavigateTo%2A> calls with a valid endpoint.
+
+:::zone-end
+
+:::moniker-end
+
+When the app returns to the `Index` page, the added entity appears:
 
 ![The Matrix movie shown in the movies 'Index' page](~/blazor/tutorials/movie-database-app/part-2/_static/movie-added.png)
 
@@ -470,7 +636,7 @@ Stop the app using the following approach:
 Stop the app using the following approach:
 
 1. Close the browser window.
-2. From the command shell, press <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS).
+2. From the command shell, press <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
 :::zone-end
 
@@ -483,7 +649,7 @@ Stop the app using the following approach:
 EF Core documentation:
 
 * [Entity Framework Core](/ef/core/)
-* [Entity Framework Core tools reference - .NET Core CLI](/ef/core/cli/dotnet)
+* [Entity Framework Core tools reference - .NET CLI](/ef/core/cli/dotnet)
 * [Data Types](/ef/core/modeling/relational/data-types)
 * <xref:Microsoft.EntityFrameworkCore.DbContext.SaveChangesAsync%2A>: The API document includes basic information on how entities are saved and change detection.
 * [Environment-based `Startup` class and methods](xref:fundamentals/environments#environment-based-startup-class-and-methods)

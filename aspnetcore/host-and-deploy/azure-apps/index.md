@@ -1,11 +1,10 @@
 ---
 title: Deploy ASP.NET Core apps to Azure App Service
-author: bradygaster
+author: wadepickett
 description: This article contains links to Azure host and deploy resources.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
-ms.date: 11/6/2020
+ms.date: 05/27/2025
 uid: host-and-deploy/azure-apps/index
 ---
 # Deploy ASP.NET Core apps to Azure App Service
@@ -25,8 +24,6 @@ Use Visual Studio to create and deploy an ASP.NET Core web app to Azure App Serv
 
 [Create an ASP.NET Core app in App Service on Linux](/azure/app-service/containers/quickstart-dotnetcore)  
 Use the command line to create and deploy an ASP.NET Core web app to Azure App Service on Linux.
-
-See the [ASP.NET Core on App Service Dashboard](https://aspnetcoreon.azurewebsites.net/) for the version of ASP.NET Core available on Azure App service.
 
 Subscribe to the [App Service Announcements](https://github.com/Azure/app-service-announcements/) repository and monitor the issues. The App Service team regularly posts announcements and scenarios arriving in App Service.
 
@@ -48,7 +45,7 @@ Understand and troubleshoot warnings and errors with ASP.NET Core projects.
 
 ### Platform
 
-The platform architecture (x86/x64) of an App Services app is set in the app's settings in the Azure Portal for apps that are hosted on an A-series compute (Basic) or higher hosting tier. Confirm that the app's publish settings (for example, in the Visual Studio [publish profile (.pubxml)](xref:host-and-deploy/visual-studio-publish-profiles)) match the setting in the app's service configuration in the Azure Portal.
+The platform architecture (x86/x64) of an App Services app is set in the app's settings in the Azure portal for apps that are hosted on an A-series compute (Basic) or higher hosting tier. Confirm that the app's publish settings (for example, in the Visual Studio [publish profile (.pubxml)](xref:host-and-deploy/visual-studio-publish-profiles)) match the setting in the app's service configuration in the Azure portal.
 
 :::moniker range=">= aspnetcore-2.2"
 
@@ -74,30 +71,16 @@ Include the following NuGet packages to provide automatic logging features for a
 
 The preceding packages must be explicitly referenced in the app's project file.
 
-## Override app configuration using the Azure Portal
+## Override app configuration using the Azure portal
 
-:::moniker range=">= aspnetcore-3.0"
+App settings in the Azure portal permit you to set environment variables for the app. For more information, see the following resources:
 
-App settings in the Azure Portal permit you to set environment variables for the app. Environment variables can be consumed by the [Environment Variables Configuration Provider](xref:fundamentals/configuration/index#environment-variables).
-
-When an app setting is created or modified in the Azure Portal and the **Save** button is selected, the Azure App is restarted. The environment variable is available to the app after the service restarts.
-
-Environment variables are loaded into the app's configuration when [CreateBuilder](/dotnet/api/microsoft.aspnetcore.builder.webapplication.createbuilder) is called to build the host. For more information, see the [Environment Variables Configuration Provider](xref:fundamentals/configuration/index#environment-variables).
-
-:::moniker-end
-:::moniker range="< aspnetcore-3.0"
-
-App settings in the Azure Portal permit you to set environment variables for the app. Environment variables can be consumed by the [Environment Variables Configuration Provider](xref:fundamentals/configuration/index#evcp).
-
-When an app setting is created or modified in the Azure Portal and the **Save** button is selected, the Azure App is restarted. The environment variable is available to the app after the service restarts.
-
-When an app uses the [Web Host](xref:fundamentals/host/web-host), environment variables are loaded into the app's configuration when <xref:Microsoft.AspNetCore.WebHost.CreateDefaultBuilder%2A> is called to build the host. For more information, see <xref:fundamentals/host/web-host> and the [Environment Variables Configuration Provider](xref:fundamentals/configuration/index#evcp).
-
-:::moniker-end
+* [Configure an App Service app (Azure documentation)](/azure/app-service/configure-common)
+* <xref:fundamentals/configuration/index#environment-variables-configuration-provider>
 
 ## Proxy server and load balancer scenarios
 
-The [IIS Integration Middleware](xref:host-and-deploy/iis/index#enable-the-iisintegration-components), which configures Forwarded Headers Middleware when hosting [out-of-process](xref:host-and-deploy/iis/index#out-of-process-hosting-model), and the ASP.NET Core Module are configured to forward the scheme (HTTP/HTTPS) and the remote IP address where the request originated. Additional configuration might be required for apps hosted behind additional proxy servers and load balancers. For more information, see [Configure ASP.NET Core to work with proxy servers and load balancers](xref:host-and-deploy/proxy-load-balancer).
+The [IIS integration middleware](xref:host-and-deploy/iis/index#enable-the-iisintegration-components), which configures forwarded headers middleware when hosting [out-of-process](xref:host-and-deploy/iis/index#out-of-process-hosting-model), and the ASP.NET Core Module are configured to forward the scheme (HTTP/HTTPS) and the remote IP address where the request originated. Additional configuration might be required for apps hosted behind additional proxy servers and load balancers. For more information, see [Configure ASP.NET Core to work with proxy servers and load balancers](xref:host-and-deploy/proxy-load-balancer).
 
 ## Monitoring and logging
 
@@ -132,9 +115,9 @@ See the common deployment configuration errors for apps hosted by Azure App Serv
 
 ## Data Protection key ring and deployment slots
 
-[Data Protection keys](xref:security/data-protection/implementation/key-management#data-protection-implementation-key-management) are persisted to the *%HOME%\ASP.NET\DataProtection-Keys* folder. This folder is backed by network storage and is synchronized across all machines hosting the app. Keys aren't protected at rest. This folder supplies the key ring to all instances of an app in a single deployment slot. Separate deployment slots, such as Staging and Production, don't share a key ring.
+[ASP.NET Core Data Protection keys](xref:security/data-protection/implementation/key-management#data-protection-implementation-key-management) are persisted to the *%HOME%\ASP.NET\DataProtection-Keys* folder. This folder is backed by network storage and is synchronized across all machines hosting the app. Keys aren't protected at rest. This folder supplies the key ring to all instances of an app in a single deployment slot. Separate deployment slots, such as Staging and Production, don't share a key ring.
 
-When swapping between deployment slots, any system using data protection won't be able to decrypt stored data using the key ring inside the previous slot. ASP.NET Cookie Middleware uses data protection to protect its cookies. This leads to users being signed out of an app that uses the standard ASP.NET Cookie Middleware. For a slot-independent key ring solution, use an external key ring provider, such as:
+When swapping between deployment slots, any system using data protection won't be able to decrypt stored data using the key ring inside the previous slot. ASP.NET cookie middleware uses data protection to protect its cookies. This leads to users being signed out of an app that uses the standard ASP.NET cookie middleware. For a slot-independent key ring solution, use an external key ring provider, such as:
 
 * Azure Blob Storage
 * Azure Key Vault
@@ -152,8 +135,6 @@ To deploy an app that uses a preview release of .NET Core, see the following res
 * [Deploy a self-contained preview app](#deploy-a-self-contained-preview-app)
 * [Use Docker with Web Apps for containers](#use-docker-with-web-apps-for-containers)
 * [Install the preview site extension](#install-the-preview-site-extension)
-
-See the [ASP.NET Core on App Service Dashboard](https://aspnetcoreon.azurewebsites.net/) for the version of ASP.NET Core available on Azure App service.
 
 See [Select the .NET Core version to use](/dotnet/core/versions/selection) for information on selecting the version of the .NET SDK for self-contained deployments.
 
@@ -204,7 +185,7 @@ The Docker Hub at `https://hub.docker.com/_/microsoft-dotnet` contains the lates
 
 If a problem occurs using the preview site extension, open an [dotnet/AspNetCore issue](https://github.com/dotnet/AspNetCore/issues).
 
-1. From the Azure Portal, navigate to the App Service.
+1. From the Azure portal, navigate to the App Service.
 1. Select the web app.
 1. Type "ex" in the search box to filter for "Extensions" or scroll down the list of management tools.
 1. Select **Extensions**.
@@ -227,9 +208,9 @@ When the operation completes, the latest .NET Core preview is installed. Verify 
    The command returns `True` when the x64 preview runtime is installed.
 
 > [!NOTE]
-> The platform architecture (x86/x64) of an App Services app is set in the app's settings in the Azure Portal for apps that are hosted on an A-series compute (Basic) or higher hosting tier. Confirm that the app's publish settings (for example, in the Visual Studio [publish profile (.pubxml)](xref:host-and-deploy/visual-studio-publish-profiles)) match the setting in the app's service configuration in the Azure portal.
+> The platform architecture (x86/x64) of an App Services app is set in the app's settings in the Azure portal for apps that are hosted on an A-series compute (Basic) or higher hosting tier. Confirm that the app's publish settings (for example, in the Visual Studio [publish profile (.pubxml)](xref:host-and-deploy/visual-studio-publish-profiles)) match the setting in the app's service configuration in the Azure portal.
 >
-> If the app is run in in-process mode and the platform architecture is configured for 64-bit (x64), the ASP.NET Core Module uses the 64-bit preview runtime, if present. Install the **ASP.NET Core {X.Y} (x64) Runtime** extension using the Azure Portal.
+> If the app is run in in-process mode and the platform architecture is configured for 64-bit (x64), the ASP.NET Core Module uses the 64-bit preview runtime, if present. Install the **ASP.NET Core {X.Y} (x64) Runtime** extension using the Azure portal.
 >
 > After installing the x64 preview runtime, run the following command in the Azure Kudu PowerShell command window to verify the installation. Substitute the ASP.NET Core runtime version for `{X.Y}` in the following command:
 >
@@ -241,7 +222,7 @@ When the operation completes, the latest .NET Core preview is installed. Verify 
 
 **Use the preview site extension with an ARM template**
 
-If an ARM template is used to create and deploy apps, the `Microsoft.Web/sites/siteextensions` resource type can be used to add the site extension to a web app. In the following example, the ASP.NET Core 5.0 (x64) Runtime site extension (`AspNetCoreRuntime.5.0.x64`) is added to the app:
+If an ARM template is used to create and deploy apps, the `Microsoft.Web/sites/siteextensions` resource type can be used to add the site extension to a web app. In the following example, the .NET 5 (x64) Runtime site extension (`AspNetCoreRuntime.5.0.x64`) is added to the app:
 
 [!code-json[](index/sample/arm.json)]
 

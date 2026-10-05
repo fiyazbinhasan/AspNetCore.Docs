@@ -24,21 +24,17 @@ This document shows how to get started with gRPC services using ASP.NET Core.
 
 [!INCLUDE[](~/includes/net-prereqs-vsc-8.0.md)]
 
-# [Visual Studio for Mac](#tab/visual-studio-mac)
-
-[!INCLUDE[](~/includes/net-prereqs-mac-8.0.md)]
-
 ---
 
 ## Get started with gRPC service in ASP.NET Core
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/grpc/grpc-start/sample) ([how to download](xref:index#how-to-download-a-sample)).
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/grpc/grpc-start/sample) ([how to download](xref:fundamentals/index#how-to-download-a-sample)).
 
 # [Visual Studio](#tab/visual-studio)
 
 See [Get started with gRPC services](xref:tutorials/grpc/grpc-start) for detailed instructions on how to create a gRPC project.
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 Run `dotnet new grpc -o GrpcGreeter` from the command line.
 
@@ -56,7 +52,6 @@ In `Program.cs`:
 * Each gRPC service is added to the routing pipeline through the `MapGrpcService` method.
 
 [!code-csharp[](~/tutorials/grpc/grpc-start/sample/sample6/GrpcGreeter/Program.cs?highlight=9,14)]
-[!INCLUDE[about the series](~/includes/code-comments-loc.md)]
 
 ASP.NET Core middleware and features share the routing pipeline, therefore an app can be configured to serve additional request handlers. The additional request handlers, such as MVC controllers, work in parallel with the configured gRPC services.
 
@@ -153,14 +148,28 @@ For more information about using the `Microsoft.AspNetCore.App` framework refere
 
 ## Integration with ASP.NET Core APIs
 
-gRPC services have full access to the ASP.NET Core features such as [Dependency Injection](xref:fundamentals/dependency-injection) (DI) and [Logging](xref:fundamentals/logging/index). For example, the service implementation can resolve a logger service from the DI container via the constructor:
+gRPC services have full access to the ASP.NET Core features such as [dependency injection](xref:fundamentals/dependency-injection) (DI) and [logging](xref:fundamentals/logging/index). For example, the service implementation can resolve a logger service from the DI container.
+
+Constructor injection:
 
 ```csharp
 public class GreeterService : Greeter.GreeterBase
 {
+    private readonly ILogger<GreeterService> _logger;
+
     public GreeterService(ILogger<GreeterService> logger)
     {
+        _logger = logger;
     }
+}
+```
+
+Primary constructor injection (.NET 8 or later):
+
+```csharp
+public class GreeterService(ILogger<GreeterService> logger) : Greeter.GreeterBase
+{
+    ...
 }
 ```
 

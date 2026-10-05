@@ -3,18 +3,13 @@ title: ASP.NET Core Razor class libraries (RCLs) with static server-side renderi
 author: guardrex
 description: Learn how component authors can support static server-side rendering (static SSR) in ASP.NET Core Razor class libraries (RCLs).
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/class-libraries-with-static-ssr
 ---
 # ASP.NET Core Razor class libraries (RCLs) with static server-side rendering (static SSR)
 
-<!-- UPDATE 9.0 Activate after release and INCLUDE is updated
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article provides guidance for component library authors considering support for static server-side rendering (static SSR).
 
@@ -33,7 +28,7 @@ All existing components can still be used with static SSR. However, the cost of 
 
 &dagger;There's a special exception for the `@onsubmit` event handler for forms, which is always functional, regardless of render mode.
 
-This is equivalent to how components behave during [prerendering](xref:blazor/fundamentals/index#client-and-server-rendering-concepts), before a Blazor circuit or the .NET WebAssembly runtime is started.
+This is equivalent to how components behave during [prerendering](xref:blazor/fundamentals/index#client-and-server-rendering-concepts), before Blazor's SignalR circuit or the .NET WebAssembly runtime is started.
 
 For components whose only role is to produce read-only DOM content, these behaviors for static SSR are completely sufficient. However, library authors must consider what approach to take when including interactive components in their libraries.
 
@@ -97,11 +92,11 @@ Reusable Razor components may include forms (either `<form>` or `<EditForm>`), a
 Consider the following example:
 
 ```razor
-<EditForm Enhance FormName="NewProduct" Model="Model" OnValidSubmit="SaveProduct">
+<EditForm Enhance FormName="NewProduct" Model="Model" OnValidSubmit="Save">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
-    <p><label>Name: <InputText @bind-Value="Item.Name" /></label></p>
+    <p><label>Name: <InputText @bind-Value="Model!.Name" /></label></p>
 
     <button type="submit">Submit</button>
 </EditForm>
@@ -129,7 +124,7 @@ Reusable components are free to receive an <xref:Microsoft.AspNetCore.Http.HttpC
 
 ```csharp
 [CascadingParameter]
-public HttpContext? Context { get; set; }
+private HttpContext? Context { get; set; }
 ```
 
 The value is `null` during interactive rendering and is only set during static SSR.

@@ -1,7 +1,7 @@
 ---
 author: tdykstra
 ms.author: tdykstra
-ms.date: 04/10/2024
+ms.date: 08/07/2024
 ---
 
 :::moniker range=">= aspnetcore-7.0 <= aspnetcore-8.0"
@@ -56,7 +56,7 @@ The `200` status code is returned with `application/json` Content-Type header an
 
 The `IResult` interface defines a contract that represents the result of an HTTP endpoint. The static [Results](<xref:Microsoft.AspNetCore.Http.Results>) class and the static [TypedResults](<xref:Microsoft.AspNetCore.Http.TypedResults>) are used to create various `IResult` objects that represent different types of responses.
 
-### TypedResults vs Results
+### `TypedResults` versus `Results`
 
 The <xref:Microsoft.AspNetCore.Http.Results> and <xref:Microsoft.AspNetCore.Http.TypedResults> static classes provide similar sets of results helpers. The `TypedResults` class is the *typed* equivalent of the `Results` class. However, the `Results` helpers' return type is <xref:Microsoft.AspNetCore.Http.IResult>, while each `TypedResults` helper's return type is one of the `IResult` implementation types. The difference means that for `Results` helpers a conversion is needed when the concrete type is needed, for example, for unit testing. The implementation types are defined in the <xref:Microsoft.AspNetCore.Http.HttpResults> namespace.
 
@@ -73,9 +73,9 @@ In order to document this endpoint correctly the extensions method `Produces` is
 
 :::code language="csharp" source="~/tutorials/min-web-api/samples/7.x/todo/Program.cs" id="snippet_112b":::
 
-For more information about describing a response type, see [OpenAPI support in minimal APIs](/aspnet/core/fundamentals/openapi/aspnetcore-openapi#describe-response-types-1).
+For more information about describing a response type, see [OpenAPI support in Minimal APIs](/aspnet/core/fundamentals/openapi/aspnetcore-openapi#describe-response-types-1).
 
-As mentioned previously, when using `TypedResults`, a conversion is not needed. Consider the following minimal API which returns a `TypedResults` class
+As mentioned previously, when using `TypedResults`, a conversion is not needed. Consider the following Minimal API which returns a `TypedResults` class
 
 :::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/samples/MinApiTestsSample/WebMinRouteGroup/TodoEndpointsV1.cs" id="snippet_1":::
 
@@ -232,7 +232,7 @@ public static void PopulateMetadata(MethodInfo method, EndpointBuilder builder)
 
 ## Configure JSON serialization options
 
-By default, minimal API apps use [`Web defaults`](/dotnet/standard/serialization/system-text-json-configure-options#web-defaults-for-jsonserializeroptions) options during JSON serialization and deserialization.
+By default, Minimal API apps use [`Web defaults`](/dotnet/standard/serialization/system-text-json-configure-options#web-defaults-for-jsonserializeroptions) options during JSON serialization and deserialization.
 
 ### Configure JSON serialization options globally
 

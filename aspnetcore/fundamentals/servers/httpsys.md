@@ -1,11 +1,11 @@
 ---
 title: HTTP.sys web server implementation in ASP.NET Core
+ai-usage: ai-assisted
 author: tdykstra
 description: Learn about HTTP.sys, a web server for ASP.NET Core on Windows. Built on the HTTP.sys kernel-mode driver, HTTP.sys is an alternative to Kestrel that can be used for direct connection to the Internet without IIS.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 10/30/2023
+ms.date: 07/29/2026
 uid: fundamentals/servers/httpsys
 ---
 # HTTP.sys web server implementation in ASP.NET Core
@@ -14,7 +14,7 @@ uid: fundamentals/servers/httpsys
 
 By [Tom Dykstra](https://github.com/tdykstra) and [Chris Ross](https://github.com/Tratcher)
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-10.0"
 
 [HTTP.sys](/iis/get-started/introduction-to-iis/introduction-to-iis-architecture#hypertext-transfer-protocol-stack-httpsys) is a [web server for ASP.NET Core](xref:fundamentals/servers/index) that only runs on Windows. HTTP.sys is an alternative to [Kestrel](xref:fundamentals/servers/kestrel) server and offers some features that Kestrel doesn't provide.
 
@@ -27,16 +27,19 @@ HTTP.sys supports the following features:
 * Port sharing
 * HTTPS with SNI
 * HTTP/2 over TLS (Windows 10 or later)
+* HTTP/3 over TLS (Windows 11 or later)
 * Direct file transmission
 * Response caching
 * WebSockets (Windows 8 or later)
+* Customizable security descriptors
+* Automatic memory pool eviction
 
 Supported Windows versions:
 
 * Windows 7 or later
 * Windows Server 2008 R2 or later
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/servers/httpsys/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/servers/httpsys/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## When to use HTTP.sys
 
@@ -60,7 +63,7 @@ HTTP.sys is mature technology that protects against many types of attacks and pr
 * [Application-Layer Protocol Negotiation (ALPN)](https://tools.ietf.org/html/rfc7301#section-3) connection
 * TLS 1.2 or later connection
 
-If an HTTP/2 connection is established, [HttpRequest.Protocol](xref:Microsoft.AspNetCore.Http.HttpRequest.Protocol*) reports `HTTP/2`.
+If an HTTP/2 connection is established, [HttpRequest.Protocol](xref:Microsoft.AspNetCore.Http.HttpRequest.Protocol%2A) reports `HTTP/2`.
 
 HTTP/2 is enabled by default. If an HTTP/2 connection isn't established, the connection falls back to HTTP/1.1. In a future release of Windows, HTTP/2 configuration flags will be available, including the ability to disable HTTP/2 with HTTP.sys.
 
@@ -76,7 +79,7 @@ The preceding Windows 11 Build versions may require the use of a [Windows Inside
 
 HTTP/3 is discovered as an upgrade from HTTP/1.1 or HTTP/2 via the `alt-svc` header. That means the first request will normally use HTTP/1.1 or HTTP/2 before switching to HTTP/3. Http.Sys doesn't automatically add the `alt-svc` header, it must be added by the application. The following code is a middleware example that adds the `alt-svc` response header.
 
-```C#
+```csharp
 app.Use((context, next) =>
 {
     context.Response.Headers.AltSvc = "h3=\":443\"";
@@ -86,16 +89,41 @@ app.Use((context, next) =>
 
 Place the preceding code early in the request pipeline.
 
-Http.Sys also supports sending an AltSvc HTTP/2 protocol message rather than a response header to notify the client that HTTP/3 is available. See the [EnableAltSvc registry key](https://techcommunity.microsoft.com/t5/networking-blog/enabling-http-3-support-on-windows-server-2022/ba-p/2676880). This requires netsh sslcert bindings that use host names rather than IP addresses.
+Http.Sys also supports sending an AltSvc HTTP/2 protocol message rather than a response header to notify the client that HTTP/3 is available. See the [EnableAltSvc registry key](https://techcommunity.microsoft.com/t5/networking-blog/enabling-http-3-support-on-windows-server-2022/ba-p/2676880).
+
+> [!NOTE]
+> This requires netsh sslcert bindings that use host names rather than IP addresses. Replace `ipport` with `hostnameport` in the `netsh http add sslcert` commands below, and replace the IP address with the hostname, for example, `www.example.com`. There's also a known issue where using `hostnameport` fails unless the `certstorename` parameter is specified. By default, use `certstorename=MY`.
 
 ## Kernel mode authentication with Kerberos
 
 HTTP.sys delegates to kernel mode authentication with the Kerberos authentication protocol. User mode authentication isn't supported with Kerberos and HTTP.sys. The machine account must be used to decrypt the Kerberos token/ticket that's obtained from Active Directory and forwarded by the client to the server to authenticate the user. Register the Service Principal Name (SPN) for the host, not the user of the app.
 
+### Enable channel binding token (CBT) hardening
+
+Channel binding tokens (CBT) tie Windows authentication to the underlying TLS channel, which helps mitigate NTLM relay and man-in-the-middle attacks. For HTTPS endpoints that use Windows authentication with HTTP.sys, you can opt in to CBT hardening by setting the `Microsoft.AspNetCore.Server.HttpSys.EnableCBTHardening` AppContext switch to `true`.
+
+Enable the switch in your project's `runtimeconfig.template.json` file:
+
+```json
+{
+  "configProperties": {
+    "Microsoft.AspNetCore.Server.HttpSys.EnableCBTHardening": true
+  }
+}
+```
+
+Or set the switch programmatically before building the host in `Program.cs`:
+
+```csharp
+AppContext.SetSwitch("Microsoft.AspNetCore.Server.HttpSys.EnableCBTHardening", true);
+```
+
+> [!WARNING]
+> CBT hardening is off by default. Enabling it can cause Windows authentication to fail for clients or proxies that don't support channel binding. Test thoroughly in your environment before enabling in production.
+
 ### Support for kernel-mode response buffering
 
 In some scenarios, high volumes of small writes with high latency can cause significant performance impact to `HTTP.sys`. This impact is due to the lack of a <xref:System.IO.Pipelines.Pipe> buffer in the `HTTP.sys` implementation. To improve performance in these scenarios, support for response buffering is included in `HTTP.sys`. Enable buffering by setting [HttpSysOptions.EnableKernelResponseBuffering](https://github.com/dotnet/aspnetcore/blob/main/src/Servers/HttpSys/src/HttpSysOptions.cs#L120) to `true`.
-
 Response buffering should be enabled by an app that does synchronous I/O, or asynchronous I/O with no more than one outstanding write at a time. In these scenarios, response buffering can significantly improve throughput over high-latency connections.
 
 Apps that use asynchronous I/O and that may have more than one write outstanding at a time should **_not_** use this flag. Enabling this flag can result in higher CPU and memory usage by HTTP.Sys.
@@ -111,6 +139,18 @@ Call the <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderHttpSysExtensions.UseH
 Additional HTTP.sys configuration is handled through [registry settings](https://support.microsoft.com/help/820129/http-sys-registry-settings-for-windows).
 
 For more information about HTTP.sys options, see <xref:Microsoft.AspNetCore.Server.HttpSys.HttpSysOptions>.
+
+### Customize security descriptors
+
+A *request queue* in HTTP.sys is a kernel-level structure that temporarily stores incoming HTTP requests until your application is ready to process them. Manage access to the request queue by using the [RequestQueueSecurityDescriptor](https://source.dot.net/#Microsoft.AspNetCore.Server.HttpSys/HttpSysOptions.cs,a556950881fd2d87) property on <xref:Microsoft.AspNetCore.Server.HttpSys.HttpSysOptions>. Set it to a <xref:System.Security.AccessControl.GenericSecurityDescriptor> instance when configuring your HTTP.sys server.
+
+By customizing the security descriptor, you can allow or deny specific users or groups access to the request queue. This is useful in scenarios where you want to restrict or delegate HTTP.sys request handling at the operating system level.
+
+For example, the following code allows all authenticated users but denies guests:
+
+[!code-csharp[](~/fundamentals/servers/httpsys/samples_snapshot/10.x/HttpSysConfig/Program.cs)]
+
+The `RequestQueueSecurityDescriptor` property applies only when creating a new request queue. The property doesn't affect existing request queues.
 
 <a name="maxrequestbodysize"></a>
 
@@ -149,10 +189,10 @@ In Visual Studio, the default launch profile is for IIS Express. To run the proj
 
    Install either self-signed or CA-signed certificates in the server's **Local Machine** > **Personal** store.
 
-1. If the app is a [framework-dependent deployment](/dotnet/core/deploying/#framework-dependent-deployments-fdd), install .NET Core, .NET Framework, or both (if the app is a .NET Core app targeting the .NET Framework).
+1. If the app is a [framework-dependent deployment](/dotnet/core/deploying/#framework-dependent-deployments-fdd), install .NET, .NET Framework, or both (if the app is a .NET app targeting the .NET Framework).
 
-   * **.NET Core**: If the app requires .NET Core, obtain and run the **.NET Core Runtime** installer from [.NET Core Downloads](https://dotnet.microsoft.com/download). Don't install the full SDK on the server.
-   * **.NET Framework**: If the app requires .NET Framework, see the [.NET Framework installation guide](/dotnet/framework/install/). Install the required .NET Framework. The installer for the latest .NET Framework is available from the [.NET Core Downloads](https://dotnet.microsoft.com/download) page.
+   * **.NET**: If the app requires .NET, obtain and run the **.NET Runtime** installer from [.NET Downloads](https://dotnet.microsoft.com/download). Don't install the full SDK on the server.
+   * **.NET Framework**: If the app requires .NET Framework, see the [.NET Framework installation guide](/dotnet/framework/install/). Install the required .NET Framework. The installer for the latest .NET Framework is available from the [.NET Downloads](https://dotnet.microsoft.com/download) page.
 
    If the app is a [self-contained deployment](/dotnet/core/deploying/#self-contained-deployments-scd), the app includes the runtime in its deployment. No framework installation is required on the server.
 
@@ -183,7 +223,7 @@ In Visual Studio, the default launch profile is for IIS Express. To run the proj
    > [!WARNING]
    > Top-level wildcard bindings (`http://*:80/` and `http://+:80`) should **not** be used. Top-level wildcard bindings create app security vulnerabilities. This applies to both strong and weak wildcards. Use explicit host names or IP addresses rather than wildcards. Subdomain wildcard binding (for example, `*.mysub.com`) isn't a security risk if you control the entire parent domain (as opposed to `*.com`, which is vulnerable). For more information, see [RFC 9110: Section 7.2: Host and :authority](https://www.rfc-editor.org/rfc/rfc9110#field.host).
 
-   [!INCLUDE [http-ports](~/includes/http-ports.md)]
+   [!INCLUDE[](~/includes/http-ports.md)]
 
    These configuration keys are equivalent to top-level wildcard bindings. They're convenient for development and container scenarios, but avoid wildcards when running on a machine that may also host other services.
 
@@ -288,11 +328,11 @@ For apps hosted by HTTP.sys that interact with requests from the Internet or a c
 <!--
 <xref:Microsoft.AspNetCore.Server.HttpSys.IHttpSysRequestTimingFeature> 
 -->
-[IHttpSysRequestTimingFeature](https://source.dot.net/#Microsoft.AspNetCore.Server.HttpSys/IHttpSysRequestTimingFeature.cs,3c5dc86dc837b1f4) provides detailed timing information for requests:
+[IHttpSysRequestTimingFeature](/dotnet/api/microsoft.aspnetcore.server.httpsys.ihttpsysrequesttimingfeature)  provides detailed timing information for requests:
 
 * Timestamps are obtained using [QueryPerformanceCounter](/windows/win32/api/profileapi/nf-profileapi-queryperformancecounter).
 * The timestamp frequency can be obtained via [QueryPerformanceFrequency](/windows/win32/api/profileapi/nf-profileapi-queryperformancefrequency).
-* The index of the timing can be cast to [HttpSysRequestTimingType](https://source.dot.net/#Microsoft.AspNetCore.Server.HttpSys/HttpSysRequestTimingType.cs,e62e7bcd02f8589e) to know what the timing represents.
+* The index of the timing can be cast to [HttpSysRequestTimingType](/dotnet/api/microsoft.aspnetcore.server.httpsys.httpsysrequesttimingtype) to know what the timing represents.
 * The value may be 0 if the timing isn't available for the current request.
 * Requires Windows 10 version 2004, Windows Server 2022, or later.
 
@@ -302,7 +342,7 @@ For apps hosted by HTTP.sys that interact with requests from the Internet or a c
 
 :::code language="csharp" source="~/fundamentals/request-features/samples/8.x/IHttpSysRequestTimingFeature/Program.cs" id="snippet_WithTryGetTimestamp":::
 
-[IHttpSysRequestTimingFeature.TryGetElapsedTime](https://source.dot.net/#Microsoft.AspNetCore.Server.HttpSys/IHttpSysRequestTimingFeature.cs,3c5dc86dc837b1f4) gives the elapsed time between two specified timings:
+[IHttpSysRequestTimingFeature.TryGetElapsedTime](/dotnet/api/microsoft.aspnetcore.server.httpsys.ihttpsysrequesttimingfeature.trygetelapsedtime yields the elapsed time between two specified timings:
 
 :::code language="csharp" source="~/fundamentals/request-features/samples/8.x/IHttpSysRequestTimingFeature/Program.cs" id="snippet_WithTryGetElapsedTime":::
 
@@ -327,6 +367,8 @@ Requirements to run gRPC with HTTP.sys:
 
 For information about how to get traces from HTTP.sys, see [HTTP.sys Manageability Scenarios](/windows/win32/http/http-sys-manageability-scenarios).
 
+[!INCLUDE[](includes/memory-eviction2.md)]
+
 ## Additional resources
 
 * [Enable Windows Authentication with HTTP.sys](xref:security/authentication/windowsauth#httpsys)
@@ -338,3 +380,4 @@ For information about how to get traces from HTTP.sys, see [HTTP.sys Manageabili
 :::moniker-end
 
 [!INCLUDE [httpsys5-7](~/fundamentals/servers/httpsys/includes/httpsys5-7.md)]
+[!INCLUDE [httpsys8-9](~/fundamentals/servers/httpsys/includes/httpsys8-9.md)]

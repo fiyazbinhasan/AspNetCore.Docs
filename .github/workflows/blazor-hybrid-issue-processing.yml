@@ -13,6 +13,14 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### 👋 ***Thanks for your issue!*** 😊
+
+            *Stand-by!* A green dinosaur 🦖 will be along shortly to assist.`
+            })
             await github.rest.issues.addLabels({
               issue_number: context.issue.number,
               owner: context.repo.owner,

@@ -76,7 +76,7 @@ The `Pages/Index2.cshtml.cs` page model:
 
 By convention, the `PageModel` class file has the same name as the Razor Page file with `.cs` appended. For example, the previous Razor Page is `Pages/Index2.cshtml`. The file containing the `PageModel` class is named `Pages/Index2.cshtml.cs`.
 
-The associations of URL paths to pages are determined by the page's location in the file system. The following table shows a Razor Page path and the matching URL:
+The associations of URL paths to pages are determined by the page's location in the file system. The following table shows a Razor Page path and the matching URL.
 
 | File name and path               | matching URL |
 | ----------------- | ------------ |
@@ -571,7 +571,7 @@ To configure advanced options, use the <xref:Microsoft.Extensions.DependencyInje
 
 [!code-csharp[](~/razor-pages/index/3.0sample/RazorPagesContacts/StartupRPoptions.cs?name=snippet)]
 
-Use the <xref:Microsoft.AspNetCore.Mvc.RazorPages.RazorPagesOptions> to set the root directory for pages, or add application model conventions for pages. For more information on conventions, see [Razor Pages authorization conventions](xref:security/authorization/razor-pages-authorization).
+Use the <xref:Microsoft.AspNetCore.Mvc.RazorPages.RazorPagesOptions> to set the root directory for pages, or add application model conventions for pages. For more information on conventions, see [Razor Pages authorization conventions](xref:razor-pages/security/authorization/conventions).
 
 To precompile views, see [Razor view compilation](xref:mvc/views/view-compilation).
 
@@ -590,13 +590,13 @@ Add <xref:Microsoft.Extensions.DependencyInjection.MvcRazorPagesMvcCoreBuilderEx
 ## Additional resources
 
 * See [Get started with Razor Pages](xref:tutorials/razor-pages/razor-pages-start), which builds on this introduction.
-* [Authorize attribute and Razor Pages](xref:security/authorization/simple#aarp)
+* [`[Authorize]` attribute in Razor Pages apps](xref:razor-pages/security/authorization/simple#authorize-attribute-in-razor-pages-apps)
 * [Download or view sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/index/3.0sample)
 * <xref:index>
 * <xref:mvc/views/razor>
 * <xref:mvc/controllers/areas>
 * <xref:tutorials/razor-pages/razor-pages-start>
-* <xref:security/authorization/razor-pages-authorization>
+* <xref:razor-pages/security/authorization/conventions>
 * <xref:razor-pages/razor-pages-conventions>
 * <xref:test/razor-pages-tests>
 * <xref:mvc/views/partial>

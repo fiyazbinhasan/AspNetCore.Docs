@@ -1,10 +1,10 @@
 ---
 title: Globalization and localization in ASP.NET Core
-author: rick-anderson
+author: wadepickett
 description: Learn how ASP.NET Core provides services and middleware for localizing content into different languages and cultures.
-ms.author: riande
+ms.author: wpickett
 monikerRange: '>= aspnetcore-3.1'
-ms.date: 02/23/2023
+ms.date: 06/20/2025
 uid: fundamentals/localization
 ---
 # Globalization and localization in ASP.NET Core
@@ -42,7 +42,7 @@ Globalizing and localizing an app involves the following tasks:
 * [Provide localized resources for the cultures the app supports](xref:fundamentals/localization/provide-resources)
 * [Implement a strategy to select the culture for each request](xref:fundamentals/localization/select-language-culture)
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/localization/sample) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 <!-- 
 Move mini TOC from ## Additional resources to here
@@ -58,7 +58,6 @@ Move mini TOC from ## Additional resources to here
 * <xref:fundamentals/troubleshoot-aspnet-core-localization>
 * [Globalizing and localizing .NET applications](/dotnet/standard/globalization-localization/index)
 * [Resources in .resx Files](/dotnet/framework/resources/working-with-resx-files-programmatically)
-* [Microsoft Multilingual App Toolkit](https://marketplace.visualstudio.com/items?itemName=MultilingualAppToolkit.MultilingualAppToolkit-18308)
 * [Localization & Generics](http://hishambinateya.com/localization-and-generics)
 
 :::moniker-end

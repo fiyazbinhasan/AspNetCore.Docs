@@ -1,11 +1,11 @@
 ---
 title: ASP.NET Core Razor components
+ai-usage: ai-assisted
 author: guardrex
 description: Learn how to create and use Razor components in Blazor apps, including guidance on Razor syntax, component naming, namespaces, and component parameters.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 07/19/2024
+ms.author: wpickett
+ms.date: 07/14/2026
 uid: blazor/components/index
 ---
 # ASP.NET Core Razor components
@@ -28,7 +28,7 @@ Although "Razor components" shares some naming with other ASP.NET Core content-r
 :::moniker range=">= aspnetcore-8.0"
 
 > [!IMPORTANT]
-> When using a Blazor Web App, most of the Blazor documentation example components ***require*** interactivity to function and demonstrate the concepts covered by the articles. When you test an example component provided by an article, make sure that either the app adopts global interactivity or the component adopts an interactive render mode. More information on this subject is provided by <xref:blazor/components/render-modes>, which is the next article in the table of contents after this article.
+> When using a Blazor Web App, most of the Blazor documentation example components ***require*** interactivity to function and demonstrate the concepts covered by the articles. *Interactivity* makes it possible for users to interact with rendered components. This includes app responses to [Document Object Model (DOM)](https://developer.mozilla.org/docs/Web/API/Document_Object_Model/Introduction) events and state changes tied to C# members via Blazor's event handlers and binding. When you test an example component provided by an article in a Blazor Web App, make sure that either the app adopts global interactivity or the component adopts an interactive render mode. More information on this subject is provided by <xref:blazor/components/render-modes>, which is the next article in the table of contents after this article.
 
 :::moniker-end
 
@@ -66,6 +66,9 @@ Components use [Razor syntax](xref:mvc/views/razor). Two Razor features are exte
     * Third-party API namespaces (alphabetical order)
     * App namespaces (alphabetical order)
   * Other directives (alphabetical order)
+
+  > [!NOTE]
+  > A *render mode* is only applied in Blazor Web Apps and includes modes that establish user interactivity with the rendered component. For more information, see <xref:blazor/components/render-modes>.
 
   No blank lines appear among the directives. One blank line appears between the directives and the first line of Razor markup.
 
@@ -126,14 +129,14 @@ Typically, a component's namespace is derived from the app's root namespace and 
 * The `Counter` component's namespace is `BlazorSample.Components.Pages`.
 * The fully qualified type name of the component is `BlazorSample.Components.Pages.Counter`.
 
-For custom folders that hold components, add an [`@using`][2] directive to the parent component or to the app's `_Imports.razor` file. The following example makes components in the `AdminComponents` folder available:
+For custom folders that hold components, add an [`@using`][2] directive to the parent component or to the app's imports file (`_Imports.razor`). The following example makes components in the `AdminComponents` folder available:
 
 ```razor
 @using BlazorSample.AdminComponents
 ```
 
 > [!NOTE]
-> [`@using`][2] directives in the `_Imports.razor` file are only applied to Razor files (`.razor`), not C# files (`.cs`).
+> [`@using`][2] directives in the imports file (`_Imports.razor`) are only applied to Razor files (`.razor`), not C# files (`.cs`).
 
 Aliased [`using`](/dotnet/csharp/language-reference/keywords/using-directive) statements are supported. In the following example, the public `WeatherForecast` class of the `GridRendering` component is made available as `WeatherForecast` in a component elsewhere in the app:
 
@@ -185,14 +188,14 @@ Typically, a component's namespace is derived from the app's root namespace and 
 * The `Counter` component's namespace is `BlazorSample.Pages`.
 * The fully qualified type name of the component is `BlazorSample.Pages.Counter`.
 
-For custom folders that hold components, add an [`@using`][2] directive to the parent component or to the app's `_Imports.razor` file. The following example makes components in the `AdminComponents` folder available:
+For custom folders that hold components, add an [`@using`][2] directive to the parent component or to the app's imports file (`_Imports.razor`). The following example makes components in the `AdminComponents` folder available:
 
 ```razor
 @using BlazorSample.AdminComponents
 ```
 
 > [!NOTE]
-> [`@using`][2] directives in the `_Imports.razor` file are only applied to Razor files (`.razor`), not C# files (`.cs`).
+> [`@using`][2] directives in the imports file (`_Imports.razor`) are only applied to Razor files (`.razor`), not C# files (`.cs`).
 
 Aliased [`using`](/dotnet/csharp/language-reference/keywords/using-directive) statements are supported. In the following example, the public `WeatherForecast` class of the `GridRendering` component is made available as `WeatherForecast` in a component elsewhere in the app:
 
@@ -366,7 +369,7 @@ namespace BlazorSample.Pages
 
 :::moniker-end
 
-[`@using`][2] directives in the `_Imports.razor` file are only applied to Razor files (`.razor`), not C# files (`.cs`). Add namespaces to a partial class file as needed.
+[`@using`][2] directives in the imports file (`_Imports.razor`) are only applied to Razor files (`.razor`), not C# files (`.cs`). Add namespaces to a partial class file as needed.
 
 Typical namespaces used by components:
 
@@ -525,54 +528,6 @@ In the following example, the `BlazorRocksBase1` base class derives from <xref:M
 
 :::moniker-end
 
-### Routing
-
-Routing in Blazor is achieved by providing a route template to each accessible component in the app with an [`@page`][9] directive. When a Razor file with an [`@page`][9] directive is compiled, the generated class is given a <xref:Microsoft.AspNetCore.Mvc.RouteAttribute> specifying the route template. At runtime, the router searches for component classes with a <xref:Microsoft.AspNetCore.Mvc.RouteAttribute> and renders whichever component has a route template that matches the requested URL.
-
-The following `HelloWorld` component uses a route template of `/hello-world`, and the rendered webpage for the component is reached at the relative URL `/hello-world`.
-
-`HelloWorld.razor`:
-
-:::moniker range=">= aspnetcore-9.0"
-
-:::code language="razor" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/Components/Pages/HelloWorld.razor":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
-
-:::code language="razor" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/Components/Pages/HelloWorld.razor":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
-
-:::code language="razor" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/Pages/index/HelloWorld.razor":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
-
-:::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/index/HelloWorld.razor":::
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
-
-:::code language="razor" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/Pages/index/HelloWorld.razor":::
-
-:::moniker-end
-
-:::moniker range="< aspnetcore-5.0"
-
-:::code language="razor" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/Pages/index/HelloWorld.razor":::
-
-:::moniker-end
-
-The preceding component loads in the browser at `/hello-world` regardless of whether or not you add the component to the app's UI navigation. Optionally, components can be added to the `NavMenu` component so that a link to the component appears in the app's UI-based navigation.
-
-For the preceding `HelloWorld` component, you can add a `NavLink` component to the `NavMenu` component. For more information, including descriptions of the `NavLink` and `NavMenu` components, see <xref:blazor/fundamentals/routing>.
-
 ### Markup
 
 A component's UI is defined using [Razor syntax](xref:mvc/views/razor), which consists of Razor markup, C#, and HTML. When an app is compiled, the HTML markup and C# rendering logic are converted into a component class. The name of the generated class matches the name of the file.
@@ -635,7 +590,7 @@ Razor syntax for C# control structures, directives, and directive attributes are
 
 ### Asynchronous methods (`async`) don't support returning `void`
 
-The Blazor framework doesn't track `void`-returning asynchronous methods (`async`). As a result, exceptions aren't caught if `void` is returned. Always return a <xref:System.Threading.Tasks.Task> from asynchronous methods.
+The Blazor framework doesn't track `void`-returning asynchronous methods (`async`). As a result, the entire process fails when an exception isn't caught if `void` is returned. Always return a <xref:System.Threading.Tasks.Task>/<xref:System.Threading.Tasks.ValueTask> from asynchronous methods.
 
 ### Nested components
 
@@ -727,45 +682,54 @@ The `Heading` component example shown in this section doesn't have an [`@page`][
 
 ## Component parameters
 
-*Component parameters* pass data to components and are defined using public [C# properties](/dotnet/csharp/programming-guide/classes-and-structs/properties) on the component class with the [`[Parameter]` attribute](xref:Microsoft.AspNetCore.Components.ParameterAttribute). In the following example, a built-in reference type (<xref:System.String?displayProperty=fullName>) and a user-defined reference type (`PanelBody`) are passed as component parameters.
+*Component parameters* pass data to components and are defined using public [C# properties](/dotnet/csharp/programming-guide/classes-and-structs/properties) on the component class with the [`[Parameter]` attribute](xref:Microsoft.AspNetCore.Components.ParameterAttribute).
 
-`PanelBody.cs`:
+In the following `ParameterChild` component, component parameters include:
 
-:::moniker range=">= aspnetcore-9.0"
+* Built-in reference types.
 
-:::code language="csharp" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/PanelBody.cs":::
+  * <xref:System.String?displayProperty=fullName> to pass a title in `Title`.
+  * <xref:System.Int32?displayProperty=fullName> to pass a count in `Count`.
 
-:::moniker-end
+* A user-defined reference type (`PanelBody`) to pass a Bootstrap card body in `Body`.
 
-:::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
+  `PanelBody.cs`:
 
-:::code language="csharp" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/PanelBody.cs":::
+  :::moniker range=">= aspnetcore-9.0"
 
-:::moniker-end
+  :::code language="csharp" source="~/../blazor-samples/9.0/BlazorSample_BlazorWebApp/PanelBody.cs":::
 
-:::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
+  :::moniker-end
 
-:::code language="csharp" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/PanelBody.cs":::
+  :::moniker range=">= aspnetcore-8.0 < aspnetcore-9.0"
 
-:::moniker-end
+  :::code language="csharp" source="~/../blazor-samples/8.0/BlazorSample_BlazorWebApp/PanelBody.cs":::
 
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
+  :::moniker-end
 
-:::code language="csharp" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/PanelBody.cs":::
+  :::moniker range=">= aspnetcore-7.0 < aspnetcore-8.0"
 
-:::moniker-end
+  :::code language="csharp" source="~/../blazor-samples/7.0/BlazorSample_WebAssembly/PanelBody.cs":::
 
-:::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
+  :::moniker-end
 
-:::code language="csharp" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/PanelBody.cs":::
+  :::moniker range=">= aspnetcore-6.0 < aspnetcore-7.0"
 
-:::moniker-end
+  :::code language="csharp" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/PanelBody.cs":::
 
-:::moniker range="< aspnetcore-5.0"
+  :::moniker-end
 
-:::code language="csharp" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/PanelBody.cs":::
+  :::moniker range=">= aspnetcore-5.0 < aspnetcore-6.0"
 
-:::moniker-end
+  :::code language="csharp" source="~/../blazor-samples/5.0/BlazorSample_WebAssembly/PanelBody.cs":::
+
+  :::moniker-end
+
+  :::moniker range="< aspnetcore-5.0"
+
+  :::code language="csharp" source="~/../blazor-samples/3.1/BlazorSample_WebAssembly/PanelBody.cs":::
+
+  :::moniker-end
 
 `ParameterChild.razor`:
 
@@ -808,10 +772,10 @@ The `Heading` component example shown in this section doesn't have an [`@page`][
 > [!WARNING]
 > Providing initial values for component parameters is supported, but don't create a component that writes to its own parameters after the component is rendered for the first time. For more information, see <xref:blazor/components/overwriting-parameters>.
 
-The `Title` and `Body` component parameters of the `ParameterChild` component are set by arguments in the HTML tag that renders the instance of the component. The following `ParameterParent` component renders two `ParameterChild` components:
+The component parameters of the `ParameterChild` component can be set by arguments in the HTML tag that renders an instance of the `ParameterChild` component. The following parent component renders two `ParameterChild` components:
 
 * The first `ParameterChild` component is rendered without supplying parameter arguments.
-* The second `ParameterChild` component receives values for `Title` and `Body` from the `ParameterParent` component, which uses an [explicit C# expression](xref:mvc/views/razor#explicit-razor-expressions) to set the values of the `PanelBody`'s properties.
+* The second `ParameterChild` component receives values for `Title` and `Body` from the parent component, which uses an [explicit C# expression](xref:mvc/views/razor#explicit-razor-expressions) to set the values of the `PanelBody`'s properties.
 
 :::moniker range=">= aspnetcore-9.0"
 
@@ -861,24 +825,24 @@ The `Title` and `Body` component parameters of the `ParameterChild` component ar
 
 :::moniker-end
 
-The following rendered HTML markup from the `ParameterParent` component shows `ParameterChild` component default values when the `ParameterParent` component doesn't supply component parameter values. When the `ParameterParent` component provides component parameter values, they replace the `ParameterChild` component's default values.
+The following rendered HTML markup from the parent component shows `ParameterChild` component default values when the parent component doesn't supply component parameter values. When the parent component provides component parameter values, they replace the `ParameterChild` component's default values.
 
 > [!NOTE]
-> For clarity, rendered CSS style classes aren't shown in the following rendered HTML markup.
+> For clarity, most of the rendered CSS style classes and some elements aren't shown in the following rendered HTML markup. The main concept demonstrated by the following example is that the parent component assigned values to the child component using its component parameters.
 
 ```html
 <h1>Child component (without attribute values)</h1>
 
-<div>
-    <div>Set By Child</div>
-    <div>Set by child.</div>
+<div>Set By Child</div>
+<div style="font-style:normal">
+    <p>Card content set by child.</p>
 </div>
 
 <h1>Child component (with attribute values)</h1>
 
-<div>
-    <div>Set by Parent</div>
-    <div>Set by parent.</div>
+<div>Set by Parent</div>
+<div style="font-style:italic">
+    <p>Set by parent.</p>
 </div>
 ```
 
@@ -886,19 +850,21 @@ Assign a C# field, property, or result of a method to a component parameter as a
 
 If the component parameter is of type string, then the attribute value is instead treated as a C# string literal. If you want to specify a C# expression instead, then use the `@` prefix.
 
-The following `ParameterParent2` component displays four instances of the preceding `ParameterChild` component and sets their `Title` parameter values to:
+The following parent component displays four instances of the preceding `ParameterChild` component and sets their `Title` parameter values to:
 
 * The value of the `title` field.
 * The result of the `GetTitle` C# method.
 * The current local date in long format with <xref:System.DateTime.ToLongDateString%2A>, which uses an [implicit C# expression](xref:mvc/views/razor#implicit-razor-expressions).
 * The `panelData` object's `Title` property.
 
+The fifth `ParameterChild` component instance also sets the `Count` parameter. Note how a `string`-typed parameter requires an `@` prefix to ensure that an expression isn't treated as a string literal. However, `Count` is a nullable integer (<xref:System.Int32?displayProperty=fullName>), so `Count` can receive the value of `count` without an `@` prefix. You can establish an alternative code convention that requires developers in your organization to always prefix with `@`. Either way, we merely recommend that you adopt a consistent approach for how component parameters are passed in Razor markup.
+
 Quotes around parameter attribute values are optional in most cases per the HTML5 specification. For example, `Value=this` is supported, instead of `Value="this"`. However, we recommend using quotes because it's easier to remember and widely adopted across web-based technologies.
 
 Throughout the documentation, code examples:
 
 * Always use quotes. Example: `Value="this"`.
-* Don't use the `@` prefix with nonliterals unless required. Example: `Count="ct"`, where `ct` is a number-typed variable. `Count="@ct"` is a valid stylistic approach, but the documentation and examples don't adopt the convention.
+* Don't use the `@` prefix with nonliterals unless required. Example: `Count="count"`, where `count` is a number-typed variable. `Count="@count"` is a valid stylistic approach, but the documentation and examples don't adopt the convention.
 * Always avoid `@` for literals, outside of Razor expressions. Example: `IsFixed="true"`. This includes keywords (for example, `this`) and `null`, but you can choose to use them if you wish. For example, `IsFixed="@true"` is uncommon but supported.
 
 :::moniker range=">= aspnetcore-9.0"
@@ -947,21 +913,21 @@ Throughout the documentation, code examples:
 > Correct (`Title` is a string parameter, `Count` is a number-typed parameter):
 >
 > ```razor
-> <ParameterChild Title="@title" Count="ct" />
+> <ParameterChild Title="@title" Count="count" />
 > ```
 >
 > ```razor
-> <ParameterChild Title="@title" Count="@ct" />
+> <ParameterChild Title="@title" Count="@count" />
 > ```
 >
 > Incorrect:
 >
 > ```razor
-> <ParameterChild @Title="@title" @Count="ct" />
+> <ParameterChild @Title="@title" @Count="count" />
 > ```
 >
 > ```razor
-> <ParameterChild @Title="@title" @Count="@ct" />
+> <ParameterChild @Title="@title" @Count="@count" />
 > ```
 
 Unlike in Razor pages (`.cshtml`), Blazor can't perform asynchronous work in a Razor expression while rendering a component. This is because Blazor is designed for rendering interactive UIs. In an interactive UI, the screen must always display something, so it doesn't make sense to block the rendering flow. Instead, asynchronous work is performed during one of the [asynchronous lifecycle events](xref:blazor/components/lifecycle). After each asynchronous lifecycle event, the component may render again. The following Razor syntax is **not** supported:
@@ -1057,14 +1023,14 @@ For more information, see <xref:mvc/views/razor>.
 > [!WARNING]
 > Providing initial values for component parameters is supported, but don't create a component that writes to its own parameters after the component is rendered for the first time. For more information, see <xref:blazor/components/overwriting-parameters>.
 
-Component parameters should be declared as *auto-properties*, meaning that they shouldn't contain custom logic in their `get` or `set` accessors. For example, the following `StartData` property is an auto-property:
+Component parameters should be declared as [automatically-implemented properties (*auto properties*)](/dotnet/csharp/programming-guide/classes-and-structs/auto-implemented-properties), meaning that they shouldn't contain custom logic in their `get` or `set` accessors. For example, the following `StartData` property is an auto property:
 
 ```csharp
 [Parameter]
 public DateTime StartData { get; set; }
 ```
 
-Don't place custom logic in the `get` or `set` accessor because component parameters are purely intended for use as a channel for a parent component to flow information to a child component. If a `set` accessor of a child component property contains logic that causes rerendering of the parent component, an infinite rendering loop results.
+Don't place custom logic in the `get` or `set` accessor because component parameters are purely intended for use as a channel for a parent component to flow information to a child component. If a `set` accessor of a child component property contains logic that causes rerendering of the parent component, an infinite rendering loop results. Other side effects include unexpected extra renderings and parameter value overwrites.
 
 To transform a received parameter value:
 
@@ -1194,6 +1160,127 @@ Quote &copy;2005 [Universal Pictures](https://www.uphe.com): [Serenity](https://
 :::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_Server/Pages/index/RenderNamedTupleParent.razor":::
 
 Quote &copy;2005 [Universal Pictures](https://www.uphe.com): [Serenity](https://www.uphe.com/movies/serenity-2005) ([Nathan Fillion](https://www.imdb.com/name/nm0277213/))
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+Support for [C# union types](/dotnet/csharp/language-reference/builtin-types/union) allows a single component parameter to represent a value that's exactly one of a fixed set of types with compiler-enforced exhaustive pattern matching. A component parameter is set by direct assignment when a component is rendered from Razor markup or through <xref:Microsoft.AspNetCore.Components.Rendering.RenderTreeBuilder.AddComponentParameter%2A?displayProperty=nameWithType>.
+
+<!-- UPDATE 11.0 - Remove the NOTE at GA -->
+
+> [!NOTE]
+> During the preview of .NET 11, the following example requires the app's project file to specify the "`preview`" C# language version:
+>
+> ```xml
+> <LangVersion>preview</LangVersion>
+> ```
+
+The following C# union type, `SlotContent`, accepts text, a <xref:Microsoft.AspNetCore.Components.MarkupString>, or a <xref:Microsoft.AspNetCore.Components.RenderFragment>:
+
+```csharp
+using Microsoft.AspNetCore.Components;
+
+public union SlotContent(string, MarkupString, RenderFragment);
+```
+
+The following `Slot` component exposes a component parameter typed to the `SlotContent` union and renders the union's content using two implementations of the [C# `switch` expression](/dotnet/csharp/language-reference/operators/switch-expression), one through an assignment to a <xref:Microsoft.AspNetCore.Components.RenderFragment> (`ContentSwitch`) and one via an inline `switch` expression. In the following example, the [`[EditorRequired]` attribute](xref:Microsoft.AspNetCore.Components.EditorRequiredAttribute) specifies that `Content` is a required component parameter at design-time or build-time.
+
+`Slot.razor`:
+
+```razor
+<h2><code>ContentSwitch</code></h2>
+
+<div>
+    @ContentSwitch()
+</div>
+
+<h2>Inline <code>switch</code> expression</h2>
+
+<div>
+    @switch (Content)
+    {
+        case string text:
+            @text
+            break;
+        case MarkupString html:
+            @html
+            break;
+        case RenderFragment fragment:
+            @fragment
+            break;
+        default:
+            <em>Empty slot!</em>
+            break;
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired] 
+    public SlotContent Content { get; set; }
+
+    private RenderFragment ContentSwitch() => Content switch
+    {
+        string text => @<span>@text</span>,
+        MarkupString html => @<span>@html</span>,
+        RenderFragment fragment => fragment,
+        _ => @<em>Empty slot!</em>
+    };
+}
+```
+
+The following `SlotExample` component uses the preceding `SlotContent` type and `Slot` component.
+
+`SlotExample.razor`:
+
+```razor
+@page "/slot-example"
+
+<h1>Plain text</h1>
+
+<Slot Content="@("Simple plain text slot")" />
+
+<h1><code>MarkupString</code></h1>
+
+<Slot Content='@((MarkupString)"<strong>Bold HTML slot</strong>")' />
+
+<h1><code>RenderFragment</code></h1>
+
+<Slot Content="@content" />
+
+@code {
+    private SlotContent content;
+
+    protected override void OnInitialized()
+    {
+        content = new SlotContent((RenderFragment)(b =>
+        {
+            b.OpenElement(0, "button");
+            b.AddAttribute(1, "onclick", EventCallback.Factory.Create(this, Increment));
+            b.AddContent(2, "Count: ");
+            b.AddContent(3, currentCount);
+            b.CloseElement();
+        }));
+    }
+
+    private int currentCount = 0;
+
+    private void Increment() => currentCount++;
+}
+```
+
+<!-- UPDATE 11.0 - Remove the following paragraph per resolution of the PU issue -->
+
+The string-literal shortcut applies only to parameters declared as `string`. A parameter declared as a C# union type, even one whose cases include `string`, isn't a `string`-typed parameter, so the attribute value must be a C# expression. Use the `@` prefix, as demonstrated by `Content="@("Simple plain text slot")"` in the preceding example.
+
+<!-- UPDATE 11.0 - Track on https://github.com/dotnet/razor/issues/13200 for 
+                   the following feature. -->
+
+Populating a union-typed parameter via a [child content render fragment](#child-content-render-fragments) (`<Slot>...</Slot>`) isn't supported at this time but might be introduced in a future preview release.
+
+<!-- UPDATE 13.0 - Remove the following cross-link when C# unions get some time on them (target removal for .NET 13) -->
+
+For more information, see [Explore union types in C# 15](https://devblogs.microsoft.com/dotnet/csharp-15-union-types/).
 
 :::moniker-end
 
@@ -1378,7 +1465,7 @@ You can factor out child components purely as a way of reusing rendering logic. 
 }
 ```
 
-For more information, see [Reuse rendering logic](xref:blazor/performance#define-reusable-renderfragments-in-code).
+For more information, see [Reuse rendering logic](xref:blazor/performance/rendering#define-reusable-renderfragments-in-code).
 
 ## Loop variables with component parameters and child content
 
@@ -1658,6 +1745,50 @@ Rendered output of the preceding code:
 <p>Pet: Nutty Rex</p>
 ```
 
+When the Razor delegate must return more than one HTML element, wrap the result in a `<text>` tag for an [explicit delimited transition](xref:mvc/views/razor#explicit-delimited-transition):
+
+```razor
+@RenderTwoElements()
+
+<h2>ReturnIf</h2>
+@ReturnIf()
+
+<h2>ReturnForeach</h2>
+@ReturnForeach()
+
+@code {
+    private bool showTrueStatement = true;
+
+    private RenderFragment RenderTwoElements() =>
+        @<text>
+            <h2>Render Two Elements</h2>
+            @ChildFragment
+        </text>;
+
+    private RenderFragment ChildFragment => @<p>This is a paragraph.</p>;
+
+    private RenderFragment ReturnIf() =>
+        @<text>
+            @if (showTrueStatement)
+            {
+                <p>This is true!</p>
+            }
+            else
+            {
+                <p>This is false!</p>
+            }
+        </text>;
+
+    private RenderFragment ReturnForeach() =>
+        @<text>
+            @foreach (var item in new[] { 1, 2, 3 })
+            {
+                <p>Item: @item</p>
+            }
+        </text>;
+}
+```
+
 ## Static assets
 
 Blazor follows the convention of ASP.NET Core apps for static assets. Static assets are located in the project's [`web root` (`wwwroot`) folder](xref:fundamentals/index#web-root) or folders under the `wwwroot` folder.
@@ -1670,7 +1801,7 @@ Use a base-relative path (`/`) to refer to the web root for a static asset. In t
 
 Components do **not** support tilde-slash notation (`~/`).
 
-For information on setting an app's base path, see <xref:blazor/host-and-deploy/index#app-base-path>.
+For information on setting an app's base path, see <xref:blazor/host-and-deploy/app-base-path>.
 
 ## Tag Helpers aren't supported in components
 
@@ -1749,7 +1880,7 @@ Unless the [`@preservewhitespace`](xref:mvc/views/razor#preservewhitespace) dire
 Whitespace removal might affect the rendered output when using a CSS rule, such as `white-space: pre`. To disable this performance optimization and preserve the whitespace, take one of the following actions:
 
 * Add the `@preservewhitespace true` directive at the top of the Razor file (`.razor`) to apply the preference to a specific component.
-* Add the `@preservewhitespace true` directive inside an `_Imports.razor` file to apply the preference to a subdirectory or to the entire project.
+* Add the `@preservewhitespace true` directive inside an imports file (`_Imports.razor`) to apply the preference to a subdirectory or to the entire project.
 
 In most cases, no action is required, as apps typically continue to behave normally (but faster). If stripping whitespace causes a rendering problem for a particular component, use `@preservewhitespace true` in that component to disable this optimization.
 
@@ -1843,8 +1974,6 @@ In the preceding code, the CSS selector, `#app`, indicates that the `App` compon
 
 MVC and Razor Pages apps can also use the [Component Tag Helper](xref:Microsoft.AspNetCore.Mvc.TagHelpers.ComponentTagHelper) to register statically-rendered Blazor WebAssembly root components:
 
-:::moniker range=">= aspnetcore-6.0"
-
 ```cshtml
 <component type="typeof(App)" render-mode="WebAssemblyPrerendered" />
 ```
@@ -1853,21 +1982,8 @@ Statically-rendered components can only be added to the app. They can't be remov
 
 For more information, see the following resources:
 
-:::moniker-end
-
-:::moniker range=">= aspnetcore-8.0"
-
 * <xref:mvc/views/tag-helpers/builtin-th/component-tag-helper>
 * <xref:blazor/components/integration>
-
-:::moniker-end
-
-:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
-
-* <xref:mvc/views/tag-helpers/builtin-th/component-tag-helper>
-* <xref:blazor/components/prerendering-and-integration>
-
-:::moniker-end
 
 <!--Reference links in article-->
 [1]: <xref:mvc/views/razor#code>

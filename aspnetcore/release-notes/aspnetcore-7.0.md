@@ -1,15 +1,14 @@
 ---
-title: What's new in ASP.NET Core 7.0
-author: rick-anderson
-description: Learn about the new features in ASP.NET Core 7.0.
-ms.author: riande
-ms.custom: mvc
+title: What's new in ASP.NET Core in .NET 7
+author: wadepickett
+description: Learn about the new features in ASP.NET Core in .NET 7.
+ms.author: wpickett
 ms.date: 11/07/2022
 uid: aspnetcore-7
 ---
-# What's new in ASP.NET Core 7.0
+# What's new in ASP.NET Core in .NET 7
 
-This article highlights the most significant changes in ASP.NET Core 7.0 with links to relevant documentation.
+This article highlights the most significant changes in ASP.NET Core in .NET 7 with links to relevant documentation.
 
 ## Rate limiting middleware in ASP.NET Core
 
@@ -53,7 +52,7 @@ In rare cases, automatic DI can break apps that have a type in DI that is also a
 
 [!code-csharp[](~/release-notes/aspnetcore-7/samples/ApiController/Program.cs?name=snippet_dis&highlight=8-11)]
 
-In ASP.NET Core 7.0, types in DI are checked at app startup with <xref:Microsoft.Extensions.DependencyInjection.IServiceProviderIsService> to determine if an argument in an API controller action comes from DI or from the other sources.
+In .NET 7, types in DI are checked at app startup with <xref:Microsoft.Extensions.DependencyInjection.IServiceProviderIsService> to determine if an argument in an API controller action comes from DI or from the other sources.
 
 The new mechanism to infer binding source of API Controller action parameters uses the following rules:
 
@@ -122,9 +121,9 @@ We introduced new [`Results.Stream`](/dotnet/api/microsoft.aspnetcore.http.resul
 
 For more information, see [Stream examples](xref:fundamentals/minimal-apis?view=aspnetcore-7.0&preserve-view=true#stream7)
 
-### Typed results for minimal APIs
+### Typed results for Minimal APIs
 
-In .NET 6, the <xref:Microsoft.AspNetCore.Http.IResult> interface was introduced to represent values returned from minimal APIs that don't utilize the implicit support for JSON serializing the returned object to the HTTP response. The static [Results](/dotnet/api/microsoft.aspnetcore.http.results) class is used to create varying `IResult` objects that represent different types of responses. For example, setting the response status code or redirecting to another URL. The `IResult` implementing framework types returned from these methods were internal however, making it difficult to verify the specific `IResult` type being returned from methods in a unit test.
+In .NET 6, the <xref:Microsoft.AspNetCore.Http.IResult> interface was introduced to represent values returned from Minimal APIs that don't utilize the implicit support for JSON serializing the returned object to the HTTP response. The static [Results](/dotnet/api/microsoft.aspnetcore.http.results) class is used to create varying `IResult` objects that represent different types of responses. For example, setting the response status code or redirecting to another URL. The `IResult` implementing framework types returned from these methods were internal however, making it difficult to verify the specific `IResult` type being returned from methods in a unit test.
 
 In .NET 7 the types implementing `IResult` are public, allowing for type assertions when testing. For example:
 
@@ -153,7 +152,7 @@ The following interfaces in the <xref:Microsoft.AspNetCore.Http> namespace provi
 
 For more information, see [IHttpResult interfaces](xref:fundamentals/minimal-apis/responses#httpresultinterfaces7).
 
-### OpenAPI improvements for minimal APIs
+### OpenAPI improvements for Minimal APIs
 
 <a name="openapinuget"></a>
 
@@ -173,7 +172,7 @@ The [`WithOpenApi`](https://github.com/dotnet/aspnetcore/blob/8a4b4deb09c04134f2
 
 Minimal APIs now support annotating operations with descriptions and summaries for OpenAPI spec generation. You can call extension methods <xref:Microsoft.AspNetCore.Http.OpenApiRouteHandlerBuilderExtensions.WithDescription%2A> and <xref:Microsoft.AspNetCore.Http.OpenApiRouteHandlerBuilderExtensions.WithSummary%2A> or use attributes [[EndpointDescription]](xref:Microsoft.AspNetCore.Http.EndpointDescriptionAttribute) and [[EndpointSummary]](xref:Microsoft.AspNetCore.Http.EndpointSummaryAttribute)).
 
-For more information, see [OpenAPI in minimal API apps](xref:fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-7.0)
+For more information, see [OpenAPI in Minimal API apps](xref:fundamentals/openapi/aspnetcore-openapi?view=aspnetcore-7.0)
 
 ### File uploads using IFormFile and IFormFileCollection
 
@@ -195,7 +194,7 @@ The [`[AsParameters]` attribute](xref:Microsoft.AspNetCore.Http.AsParametersAttr
 
 The problem details service implements the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> interface, which supports creating [Problem Details for HTTP APIs](https://www.rfc-editor.org/rfc/rfc7807.html).
 
-For more information, see [Problem details service](xref:web-api/handle-errors#pds7).
+For more information, see [Problem details service](xref:fundamentals/error-handling-api#pds7).
 
 ### Route groups
 
@@ -211,7 +210,7 @@ gRPC JSON transcoding is an extension for ASP.NET Core that creates RESTful JSON
 * ASP.NET Core gRPC apps to support both gRPC and RESTful JSON APIs without replicating functionality.
 * Experimental support for generating OpenAPI from transcoded RESTful APIs by integrating with [Swashbuckle](xref:tutorials/get-started-with-swashbuckle).
 
-For more information, see [gRPC JSON transcoding in ASP.NET Core gRPC apps](xref:grpc/json-transcoding?view=aspnetcore-7.0) and <xref:grpc/json-transcoding-openapi>.
+For more information, see [gRPC JSON transcoding in ASP.NET Core gRPC apps](xref:grpc/json-transcoding?view=aspnetcore-7.0).
 
 ### gRPC health checks in ASP.NET Core
 
@@ -437,7 +436,7 @@ For more information, see [Developers targeting browser-wasm can use Web Crypto 
 
 You can now inject services into custom validation attributes. Blazor sets up the `ValidationContext` so that it can be used as a service provider.
 
-For more information, see <xref:blazor/forms/validation?view=aspnetcore-7.0#custom-validation-attributes>.
+For more information, see <xref:blazor/forms/validation?view=aspnetcore-7.0#inject-services-into-a-custom-validation-attribute>.
 
 ### `Input*` components outside of an `EditContext`/`EditForm`
 
@@ -605,13 +604,15 @@ In .NET 7, Kestrel's memory pool is partitioned the same way as its I/O queue, w
 
 ### `ServerReady` event to measure startup time
 
-Apps using [EventSource](/dotnet/api/system.diagnostics.tracing.eventsource) can measure the startup time to understand and optimize startup performance. The new [`ServerReady`](https://source.dot.net/#Microsoft.AspNetCore.Hosting/Internal/HostingEventSource.cs,76) event in <xref:Microsoft.AspNetCore.Hosting?displayProperty=fullName> represents the point where the server is ready to respond to requests.
+Apps using <!--keep--> [EventSource](/dotnet/api/system.diagnostics.tracing.eventsource) can measure the startup time to understand and optimize startup performance. The new [`ServerReady`](https://source.dot.net/#Microsoft.AspNetCore.Hosting/Internal/HostingEventSource.cs,76) event in <xref:Microsoft.AspNetCore.Hosting?displayProperty=fullName> represents the point where the server is ready to respond to requests.
 
 ## Server
 
 ### New ServerReady event for measuring startup time
 
-The [`ServerReady`](https://github.com/dotnet/aspnetcore/blob/v7.0.0-preview.5.22303.8/src/Hosting/Hosting/src/Internal/HostingEventSource.cs#L75-L79) event has been added to measure [startup time](https://github.com/dotnet/aspnetcore/blob/v7.0.0-preview.5.22303.8/src/Hosting/Hosting/src/GenericHost/GenericWebHostService.cs#L138) of ASP.NET Core apps.
+The [`ServerReady`](https://github.com/dotnet/aspnetcore/blob/main/src/Hosting/Hosting/src/Internal/HostingEventSource.cs#L76-L79) event has been added to measure [startup time](https://github.com/dotnet/aspnetcore/blob/main/src/Hosting/Hosting/src/GenericHost/GenericWebHostService.cs#L162) of ASP.NET Core apps.
+
+[!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
 
 ## IIS
 
@@ -698,3 +699,7 @@ The new [Request decompression middleware](xref:fundamentals/middleware/request-
 * Eliminates the need to write code to handle compressed requests.
 
 For more information, see [Request decompression middleware](xref:fundamentals/middleware/request-decompression?view=aspnetcore-7.0&preserve-view=true).
+
+## Breaking changes
+
+Use the articles in [Breaking changes in .NET](/dotnet/core/compatibility/breaking-changes) to find breaking changes that might apply when upgrading an app to a newer version of .NET.

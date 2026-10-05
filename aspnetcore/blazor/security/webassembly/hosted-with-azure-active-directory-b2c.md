@@ -3,12 +3,15 @@ title: Secure a hosted ASP.NET Core Blazor WebAssembly app with Azure Active Dir
 author: guardrex
 description: Learn how to secure a hosted ASP.NET Core Blazor WebAssembly app with Azure Active Directory B2C.
 monikerRange: '>= aspnetcore-3.1 < aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 06/07/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/security/webassembly/hosted-with-azure-active-directory-b2c
 ---
 # Secure a hosted ASP.NET Core Blazor WebAssembly app with Azure Active Directory B2C
+
+[!INCLUDE[](~/blazor/security/includes/hosted-blazor-webassembly-notice.md)]
+
+[!INCLUDE[](~/includes/azure-active-directory-b2c-eol-support-notice.md)]
 
 This article explains how to create a [hosted Blazor WebAssembly solution](xref:blazor/hosting-models#blazor-webassembly) that uses [Azure Active Directory (AAD) B2C](/azure/active-directory-b2c/overview) for authentication.
 
@@ -157,6 +160,12 @@ To configure the app to receive the value from the `name` claim type:
       });
   ```
 
+## Remote authentication paths
+
+*This section pertains to the solution's **:::no-loc text="Client":::** app.*
+
+[!INCLUDE[](~/blazor/security/includes/remote-authentication-paths.md)]
+
 ## Parts of the solution
 
 This section describes the parts of a solution generated from the Blazor WebAssembly project template and describes how the solution's **:::no-loc text="Client":::** and **:::no-loc text="Server":::** projects are configured for reference. There's no specific guidance to follow in this section for a basic working application if you created the app using the guidance in the [Walkthrough](#walkthrough) section. The guidance in this section is helpful for updating an app to authenticate and authorize users. However, an alternative approach to updating an app is to create a new app from the guidance in the [Walkthrough](#walkthrough) section and moving the app's components, classes, and resources to the new app.
@@ -207,7 +216,7 @@ The **:::no-loc text="Server":::** app of a hosted Blazor solution created from 
 
 *This section pertains to the solution's **:::no-loc text="Server":::** app.*
 
-The `AddAuthentication` method sets up authentication services within the app and configures the JWT Bearer handler as the default authentication method. The <xref:Microsoft.Identity.Web.MicrosoftIdentityWebApiAuthenticationBuilderExtensions.AddMicrosoftIdentityWebApi%2A> method configures services to protect the web API with Microsoft identity platform v2.0. This method expects an `AzureAdB2C` section in the app's configuration with the necessary settings to initialize authentication options.
+The `AddAuthentication` method sets up authentication services within the app and configures the JWT bearer handler as the default authentication method. The <xref:Microsoft.Identity.Web.MicrosoftIdentityWebApiAuthenticationBuilderExtensions.AddMicrosoftIdentityWebApi%2A> method configures services to protect the web API with Microsoft identity platform v2.0. This method expects an `AzureAdB2C` section in the app's configuration with the necessary settings to initialize authentication options.
 
 ```csharp
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -324,7 +333,7 @@ builder.Services.AddMsalAuthentication(options =>
 
 The `{SCOPE URI}` is the default access token scope (for example, `https://contoso.onmicrosoft.com/00001111-aaaa-2222-bbbb-3333cccc4444/API.Access` or the custom URI that you configured in the Azure portal).
 
-The <xref:Microsoft.Extensions.DependencyInjection.MsalWebAssemblyServiceCollectionExtensions.AddMsalAuthentication%2A> method accepts a callback to configure the parameters required to authenticate an app. The values required for configuring the app can be obtained from the Azure Portal AAD configuration when you register the app.
+The <xref:Microsoft.Extensions.DependencyInjection.MsalWebAssemblyServiceCollectionExtensions.AddMsalAuthentication%2A> method accepts a callback to configure the parameters required to authenticate an app. The values required for configuring the app can be obtained from the Azure portal AAD configuration when you register the app.
 
 ### Access token scopes
 
@@ -376,7 +385,13 @@ For more information, see the following sections of the *Additional scenarios* a
 
 *This section pertains to the solution's **:::no-loc text="Client":::** app.*
 
-[!INCLUDE[](~/blazor/security/includes/imports-file-hosted.md)]
+The <xref:Microsoft.AspNetCore.Components.Authorization?displayProperty=fullName> namespace is made available throughout the app via the imports file (`_Imports.razor`):
+
+```razor
+...
+@using Microsoft.AspNetCore.Components.Authorization
+...
+```
 
 ### Index page
 

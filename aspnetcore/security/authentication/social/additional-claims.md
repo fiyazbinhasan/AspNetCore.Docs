@@ -1,10 +1,9 @@
 ---
 title: Persist additional claims and tokens from external providers in ASP.NET Core
-author: rick-anderson
+author: tdykstra
 description: Learn how to establish additional claims and tokens from external providers.
 monikerRange: '>= aspnetcore-2.1'
-ms.author: riande
-ms.custom: mvc
+ms.author: tdykstra
 ms.date: 02/18/2021
 uid: security/authentication/social/additional-claims
 ---
@@ -46,7 +45,7 @@ Specify the list of permissions to retrieve from the provider by specifying the 
 | Microsoft | `https://login.microsoftonline.com/common/oauth2/v2.0/authorize` |
 | Twitter   | `https://api.twitter.com/oauth/authenticate`                     |
 
-In the sample app, Google's `profile`, `email`, and `openid` scopes are automatically added by the framework when <xref:Microsoft.Extensions.DependencyInjection.GoogleExtensions.AddGoogle%2A> is called on the <xref:Microsoft.AspNetCore.Authentication.AuthenticationBuilder>. If the app requires additional scopes, add them to the options. In the following example, the Google `https://www.googleapis.com/auth/user.birthday.read` scope is added to retrieve a user's birthday:
+In the sample app, Google's `profile`, `email`, and `openid` scopes are automatically added by the framework when `Microsoft.Extensions.DependencyInjection.GoogleOpenIdConnectExtensions.AddGoogleOpenIdConnect` is called on the <xref:Microsoft.AspNetCore.Authentication.AuthenticationBuilder>. If the app requires additional scopes, add them to the options. In the following example, the Google `https://www.googleapis.com/auth/user.birthday.read` scope is added to retrieve a user's birthday:
 
 ```csharp
 options.Scope.Add("https://www.googleapis.com/auth/user.birthday.read");
@@ -74,13 +73,13 @@ By default, a user's claims are stored in the authentication cookie. If the auth
 If a large amount of user data is required for processing user requests:
 
 * Limit the number and size of user claims for request processing to only what the app requires.
-* Use a custom <xref:Microsoft.AspNetCore.Authentication.Cookies.ITicketStore> for the Cookie Authentication Middleware's <xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions.SessionStore> to store identity across requests. Preserve large quantities of identity information on the server while only sending a small session identifier key to the client.
+* Use a custom <xref:Microsoft.AspNetCore.Authentication.Cookies.ITicketStore> for the cookie authentication middleware's <xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions.SessionStore> to store identity across requests. Preserve large quantities of identity information on the server while only sending a small session identifier key to the client.
 
 ## Save the access token
 
 <xref:Microsoft.AspNetCore.Authentication.RemoteAuthenticationOptions.SaveTokens*> defines whether access and refresh tokens should be stored in the <xref:Microsoft.AspNetCore.Http.Authentication.AuthenticationProperties> after a successful authorization. `SaveTokens` is set to `false` by default to reduce the size of the final authentication cookie.
 
-The sample app sets the value of `SaveTokens` to `true` in <xref:Microsoft.AspNetCore.Authentication.Google.GoogleOptions>:
+The sample app sets the value of `SaveTokens` to `true` in <xref:Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions>:
 
 [!code-csharp[](additional-claims/samples/6.x/ClaimsSample/Program.cs?name=snippet_AddGoogle2&highlight=9)]
 
@@ -91,7 +90,7 @@ The sample app saves the access token in `OnPostConfirmationAsync` (new user reg
 [!code-csharp[](additional-claims/samples/6.x/ClaimsSample/Areas/Identity/Pages/Account/ExternalLogin.cshtml.cs?name=snippet_OnPostConfirmationAsync&highlight=49-53,73)]
 
 > [!NOTE]
-> For information on passing tokens to the Razor components of a server-side Blazor app, see <xref:blazor/security/server/additional-scenarios#pass-tokens-to-a-server-side-blazor-app>.
+> For information on passing tokens to the Razor components of a server-side Blazor app, see <xref:blazor/security/additional-scenarios#pass-tokens-to-a-server-side-blazor-app>.
 
 ## How to add additional custom tokens
 
@@ -111,7 +110,7 @@ For more information, see <xref:Microsoft.AspNetCore.Authentication.OAuth.Claims
 
 Claims are copied from external providers to the user database on first registration, not on sign in. If additional claims are enabled in an app after a user registers to use the app, call [SignInManager.RefreshSignInAsync](xref:Microsoft.AspNetCore.Identity.SignInManager%601) on a user to force the generation of a new authentication cookie.
 
-In the Development environment working with test user accounts, delete and recreate the user account. For production systems, new claims added to the app can be backfilled into user accounts. After [scaffolding the `ExternalLogin` page](xref:security/authentication/scaffold-identity) into the app at `Areas/Pages/Identity/Account/Manage`, add the following code to the `ExternalLoginModel` in the `ExternalLogin.cshtml.cs` file.
+In the `Development` environment working with test user accounts, delete and recreate the user account. For production systems, new claims added to the app can be backfilled into user accounts. After [scaffolding the `ExternalLogin` page](xref:security/authentication/scaffold-identity) into the app at `Areas/Pages/Identity/Account/Manage`, add the following code to the `ExternalLoginModel` in the `ExternalLogin.cshtml.cs` file.
 
 Add a dictionary of added claims. Use the dictionary keys to hold the claim types, and use the values to hold a default value. Add the following line to the top of the class. The following example assumes that one claim is added for the user's Google picture with a generic headshot image as the default value:
 
@@ -172,7 +171,7 @@ Authentication Properties
 
 [!INCLUDE[Forward request information when behind a proxy or load balancer section](includes/forwarded-headers-middleware.md)]
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authentication/social/additional-claims/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authentication/social/additional-claims/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 :::moniker-end
 
@@ -180,7 +179,7 @@ Authentication Properties
 
 An ASP.NET Core app can establish additional claims and tokens from external authentication providers, such as Facebook, Google, Microsoft, and Twitter. Each provider reveals different information about users on its platform, but the pattern for receiving and transforming user data into additional claims is the same.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authentication/social/additional-claims/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authentication/social/additional-claims/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Prerequisites
 
@@ -242,7 +241,7 @@ By default, a user's claims are stored in the authentication cookie. If the auth
 If a large amount of user data is required for processing user requests:
 
 * Limit the number and size of user claims for request processing to only what the app requires.
-* Use a custom <xref:Microsoft.AspNetCore.Authentication.Cookies.ITicketStore> for the Cookie Authentication Middleware's <xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions.SessionStore> to store identity across requests. Preserve large quantities of identity information on the server while only sending a small session identifier key to the client.
+* Use a custom <xref:Microsoft.AspNetCore.Authentication.Cookies.ITicketStore> for the cookie authentication middleware's <xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions.SessionStore> to store identity across requests. Preserve large quantities of identity information on the server while only sending a small session identifier key to the client.
 
 ## Save the access token
 
@@ -259,7 +258,7 @@ The sample app saves the access token in `OnPostConfirmationAsync` (new user reg
 [!code-csharp[](additional-claims/samples/3.x/ClaimsSample/Areas/Identity/Pages/Account/ExternalLogin.cshtml.cs?name=snippet_OnPostConfirmationAsync&highlight=54-56)]
 
 > [!NOTE]
-> For information on passing tokens to the Razor components of a server-side Blazor app, see <xref:blazor/security/server/additional-scenarios#pass-tokens-to-a-server-side-blazor-app>.
+> For information on passing tokens to the Razor components of a server-side Blazor app, see <xref:blazor/security/additional-scenarios#pass-tokens-to-a-server-side-blazor-app>.
 
 ## How to add additional custom tokens
 
@@ -279,7 +278,7 @@ For more information, see <xref:Microsoft.AspNetCore.Authentication.OAuth.Claims
 
 Claims are copied from external providers to the user database on first registration, not on sign in. If additional claims are enabled in an app after a user registers to use the app, call [SignInManager.RefreshSignInAsync](xref:Microsoft.AspNetCore.Identity.SignInManager%601) on a user to force the generation of a new authentication cookie.
 
-In the Development environment working with test user accounts, you can simply delete and recreate the user account. For production systems, new claims added to the app can be backfilled into user accounts. After [scaffolding the `ExternalLogin` page](xref:security/authentication/scaffold-identity) into the app at `Areas/Pages/Identity/Account/Manage`, add the following code to the `ExternalLoginModel` in the `ExternalLogin.cshtml.cs` file.
+In the `Development` environment working with test user accounts, you can simply delete and recreate the user account. For production systems, new claims added to the app can be backfilled into user accounts. After [scaffolding the `ExternalLogin` page](xref:security/authentication/scaffold-identity) into the app at `Areas/Pages/Identity/Account/Manage`, add the following code to the `ExternalLoginModel` in the `ExternalLogin.cshtml.cs` file.
 
 Add a dictionary of added claims. Use the dictionary keys to hold the claim types, and use the values to hold a default value. Add the following line to the top of the class. The following example assumes that one claim is added for the user's Google picture with a generic headshot image as the default value:
 
@@ -450,7 +449,7 @@ Authentication Properties
 
 An ASP.NET Core app can establish additional claims and tokens from external authentication providers, such as Facebook, Google, Microsoft, and Twitter. Each provider reveals different information about users on its platform, but the pattern for receiving and transforming user data into additional claims is the same.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authentication/social/additional-claims/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/security/authentication/social/additional-claims/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## Prerequisites
 
@@ -510,7 +509,7 @@ By default, a user's claims are stored in the authentication cookie. If the auth
 If a large amount of user data is required for processing user requests:
 
 * Limit the number and size of user claims for request processing to only what the app requires.
-* Use a custom <xref:Microsoft.AspNetCore.Authentication.Cookies.ITicketStore> for the Cookie Authentication Middleware's <xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions.SessionStore> to store identity across requests. Preserve large quantities of identity information on the server while only sending a small session identifier key to the client.
+* Use a custom <xref:Microsoft.AspNetCore.Authentication.Cookies.ITicketStore> for the cookie authentication middleware's <xref:Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationOptions.SessionStore> to store identity across requests. Preserve large quantities of identity information on the server while only sending a small session identifier key to the client.
 
 ## Save the access token
 

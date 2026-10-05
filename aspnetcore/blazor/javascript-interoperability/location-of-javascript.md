@@ -3,9 +3,8 @@ title: JavaScript location in ASP.NET Core Blazor apps
 author: guardrex
 description: Learn where to place and how to load JavaScript in Blazor apps.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 10/03/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/js-interop/javascript-location
 ---
 # JavaScript location in ASP.NET Core Blazor apps
@@ -33,17 +32,19 @@ Load JavaScript (JS) code using any of the following approaches:
 
 :::moniker-end
 
+Inline JavaScript isn't recommended for Blazor apps. We recommend using [JS collocation](#load-a-script-from-an-external-javascript-file-js-collocated-with-a-component) combined with [JS modules](#javascript-isolation-in-javascript-modules).
+
+## Location of `<script>` tags
+
 :::moniker range=">= aspnetcore-8.0"
 
-> [!WARNING]
-> Only place a `<script>` tag in a component file (`.razor`) if the component is guaranteed to adopt [static server-side rendering (static SSR)](xref:blazor/fundamentals/index#client-and-server-rendering-concepts) because the `<script>` tag can't be updated dynamically.
+Only place a `<script>` tag in a component file (`.razor`) if the component is guaranteed to adopt [static server-side rendering (static SSR)](xref:blazor/fundamentals/index#client-and-server-rendering-concepts) without [enhanced navigation](xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling). Placing a `<script>` tag in a component file doesn't produce a compile-time warning or error, but script loading behavior might not match your expectations in components that adopt an interactive render mode or static SSR with enhanced navigation.
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-8.0"
 
-> [!WARNING]
-> Don't place a `<script>` tag in a component file (`.razor`) because the `<script>` tag can't be updated dynamically.
+Don't place a `<script>` tag in a component file (`.razor`) because the `<script>` tag can't be updated dynamically. Placing a `<script>` tag in a component file produces a compile-time error.
 
 :::moniker-end
 
@@ -57,11 +58,11 @@ Load JavaScript (JS) code using any of the following approaches:
 :::moniker range="< aspnetcore-5.0"
 
 > [!NOTE]
-> Documentation examples place scripts into a `<script>` tag or load global scripts from external files. These approaches pollute the client with global functions. Placing JS into separate [JS modules](https://developer.mozilla.org/docs/Web/JavaScript/Guide/Modules) that can be imported when needed is **not** supported in Blazor earlier than ASP.NET Core 5.0. If the app requires the use of JS modules for JS isolation, we recommend using ASP.NET Core 5.0 or later to build the app. For more information, use the **Version** dropdown list to select a 5.0 or later version of this article and see the *JavaScript isolation in JavaScript modules* section.
+> Documentation examples place scripts into a `<script>` tag or load global scripts from external files. These approaches pollute the client with global functions. Placing JS into separate [JS modules](https://developer.mozilla.org/docs/Web/JavaScript/Guide/Modules) that can be imported when needed is **not** supported in Blazor earlier than .NET 5. If the app requires the use of JS modules for JS isolation, we recommend using .NET 5 or later to build the app. For more information, use the **Version** dropdown list to select a .NET 5 or later version of this article and see the *JavaScript isolation in JavaScript modules* section.
 
 :::moniker-end
 
-### Load a script in `<head>` markup
+## Load a script in `<head>` markup
 
 *The approach in this section isn't generally recommended.*
 
@@ -84,7 +85,19 @@ Loading JS from the `<head>` isn't the best approach for the following reasons:
 * JS interop may fail if the script depends on Blazor. We recommend loading scripts using one of the other approaches, not via the `<head>` markup.
 * The page may become interactive slower due to the time it takes to parse the JS in the script.
 
-### Load a script in `<body>` markup
+:::moniker range=">= aspnetcore-8.0"
+
+In component markup, scripts can be loaded via a [`HeadContent` component](xref:blazor/components/control-head-content) with the usual caveat that the approach slows down page load on the client, which we recommend avoiding. When a script is loaded with a `HeadContent` component in a Blazor Server app, Blazor WebAssembly app, or a Blazor Web App using either an interactive render mode (interactive SSR, CSR) or static SSR with enhanced navigation, navigating away from the component's page removes the `<script>` tag from the rendered `<head>` content but doesn't unload the script's JavaScript code, including event handlers that the script registers, exposed variables, and methods that the script provides. Only Blazor Web Apps using static SSR without enhanced navigation unload JavaScript code when the user navigates away from the page. Generally, you're better off adding `<script>` tags to the physical `<head>` content, unless you explicitly desire to keep such script references in the components that use them and don't mind that the code isn't unloaded on navigation events.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-6.0 < aspnetcore-8.0"
+
+In component markup, scripts can be loaded via a [`HeadContent` component](xref:blazor/components/control-head-content) with the usual caveat that the approach slows down page load on the client, which we recommend avoiding. When a script is loaded with a `HeadContent` component, navigating away from the component's page removes the `<script>` tag from the rendered `<head>` content but doesn't unload the script's JavaScript code, including event handlers that the script registers, exposed variables, and methods that the script provides. Generally, you're better off adding `<script>` tags to the physical `<head>` content, unless you explicitly desire to keep such script references in the components that use them and don't mind that the code isn't unloaded on navigation events.
+
+:::moniker-end
+
+## Load a script in `<body>` markup
 
 Place the JavaScript tags (`<script>...</script>`) inside the [closing `</body>` element](xref:blazor/project-structure#location-of-head-and-body-content) after the Blazor script reference:
 
@@ -105,7 +118,7 @@ Place the JavaScript tags (`<script>...</script>`) inside the [closing `</body>`
 
 :::moniker range=">= aspnetcore-6.0"
 
-### Load a script from an external JavaScript file (`.js`) collocated with a component
+## Load a script from an external JavaScript file (`.js`) collocated with a component
 
 [!INCLUDE[](~/blazor/includes/js-interop/js-collocation.md)]
 
@@ -170,7 +183,7 @@ For more information, see <xref:blazor/components/class-libraries>.
 
 :::moniker range=">= aspnetcore-6.0"
 
-### Inject a script before or after Blazor starts
+## Inject a script before or after Blazor starts
 
 To ensure scripts load before or after Blazor starts, use a JavaScript initializer. For more information and examples, see <xref:blazor/fundamentals/startup#javascript-initializers>.
 
@@ -178,7 +191,7 @@ To ensure scripts load before or after Blazor starts, use a JavaScript initializ
 
 :::moniker range="< aspnetcore-6.0"
 
-### Inject a script after Blazor starts
+## Inject a script after Blazor starts
 
 To inject a script after Blazor starts, chain to the `Promise` that results from a manual start of Blazor. For more information and an example, see <xref:blazor/fundamentals/startup#inject-a-script-after-blazor-starts>.
 
@@ -193,14 +206,9 @@ JS isolation provides the following benefits:
 * Imported JS no longer pollutes the global namespace.
 * Consumers of a library and components aren't required to import the related JS.
 
-For more information, see <xref:blazor/js-interop/call-javascript-from-dotnet#javascript-isolation-in-javascript-modules>.
+In server-side scenarios, always trap <xref:Microsoft.JSInterop.JSDisconnectedException> in case loss of Blazor's SignalR circuit prevents a JS interop call from disposing a module, which results in an unhandled exception. Blazor WebAssembly apps don't use a SignalR connection during JS interop, so there's no need to trap <xref:Microsoft.JSInterop.JSDisconnectedException> in Blazor WebAssembly apps for module disposal.
 
-[Dynamic import with the `import()` operator](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Operators/import) is supported with ASP.NET Core and Blazor:
+For more information, see the following resources:
 
-```javascript
-if ({CONDITION}) import("/additionalModule.js");
-```
-
-In the preceding example, the `{CONDITION}` placeholder represents a conditional check to determine if the module should be loaded.
-
-For browser compatibility, see [Can I use: JavaScript modules: dynamic import](https://caniuse.com/es6-module-dynamic-import).
+* [JavaScript isolation in JavaScript modules](xref:blazor/js-interop/call-javascript-from-dotnet#javascript-isolation-in-javascript-modules)
+* [JavaScript interop calls without a circuit](xref:blazor/js-interop/index#javascript-interop-calls-without-a-circuit)

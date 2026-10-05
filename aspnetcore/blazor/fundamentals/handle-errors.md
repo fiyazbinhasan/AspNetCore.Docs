@@ -3,9 +3,8 @@ title: Handle errors in ASP.NET Core Blazor apps
 author: guardrex
 description: Discover how ASP.NET Core Blazor manages unhandled exceptions and how to develop apps that detect and handle errors.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/16/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/fundamentals/handle-errors
 ---
 # Handle errors in ASP.NET Core Blazor apps
@@ -532,7 +531,7 @@ The following `ProcessError` component example merely logs errors, but methods o
 ```razor
 @inject ILogger<ProcessError> Logger
 
-<CascadingValue Value="this">
+<CascadingValue Value="this" IsFixed="true">
     @ChildContent
 </CascadingValue>
 
@@ -555,6 +554,8 @@ The following `ProcessError` component example merely logs errors, but methods o
 
 > [!NOTE]
 > For more information on <xref:Microsoft.AspNetCore.Components.RenderFragment>, see <xref:blazor/components/index#child-content-render-fragments>.
+>
+> <xref:Microsoft.AspNetCore.Components.CascadingValue%601.IsFixed%2A?displayProperty=nameWithType> is used to indicate that a cascading parameter doesn't change after initialization.
 
 :::moniker-end
 
@@ -594,7 +595,7 @@ To process errors in a component:
 
   ```csharp
   [CascadingParameter]
-  public ProcessError? ProcessError { get; set; }
+  private ProcessError? ProcessError { get; set; }
   ```
 
 * Call an error processing method in any `catch` block with an appropriate exception type. The example `ProcessError` component only offers a single `LogError` method, but the error processing component can provide any number of error processing methods to address alternative error processing requirements throughout the app. The following `Counter` component `@code` block example includes the `ProcessError` cascading parameter and traps an exception for logging when the count is greater than five:
@@ -604,7 +605,7 @@ To process errors in a component:
       private int currentCount = 0;
 
       [CascadingParameter]
-      public ProcessError? ProcessError { get; set; }
+      private ProcessError? ProcessError { get; set; }
 
       private void IncrementCount()
       {
@@ -648,7 +649,7 @@ The following `ProcessError` component passes itself as a [`CascadingValue`](xre
 @using Microsoft.Extensions.Logging
 @inject ILogger<ProcessError> Logger
 
-<CascadingValue Value="this">
+<CascadingValue Value="this" IsFixed="true">
     @ChildContent
 </CascadingValue>
 
@@ -666,6 +667,8 @@ The following `ProcessError` component passes itself as a [`CascadingValue`](xre
 
 > [!NOTE]
 > For more information on <xref:Microsoft.AspNetCore.Components.RenderFragment>, see <xref:blazor/components/index#child-content-render-fragments>.
+>
+> <xref:Microsoft.AspNetCore.Components.CascadingValue%601.IsFixed%2A?displayProperty=nameWithType> is used to indicate that a cascading parameter doesn't change after initialization.
 
 In the `App` component, wrap the <xref:Microsoft.AspNetCore.Components.Routing.Router> component with the `ProcessError` component. This permits the `ProcessError` component to cascade down to any component of the app where the `ProcessError` component is received as a [`CascadingParameter`](xref:blazor/components/cascading-values-and-parameters#cascadingparameter-attribute).
 
@@ -685,7 +688,7 @@ To process errors in a component:
 
   ```razor
   [CascadingParameter]
-  public ProcessError ProcessError { get; set; }
+  private ProcessError ProcessError { get; set; }
   ```
 
 * Call an error processing method in any `catch` block with an appropriate exception type. The example `ProcessError` component only offers a single `LogError` method, but the error processing component can provide any number of error processing methods to address alternative error processing requirements throughout the app.
@@ -719,7 +722,7 @@ Because the approaches in this section handle errors with a [`try-catch`](/dotne
 If an unhandled exception occurs, the exception is logged to <xref:Microsoft.Extensions.Logging.ILogger> instances configured in the service container. Blazor apps log console output with the Console Logging Provider. Consider logging to a location on the server (or backend web API for client-side apps) with a provider that manages log size and log rotation. Alternatively, the app can use an Application Performance Management (APM) service, such as [Azure Application Insights (Azure Monitor)](/azure/azure-monitor/app/app-insights-overview).
 
 > [!NOTE]
-> Native [Application Insights](/azure/azure-monitor/app/app-insights-overview) features to support client-side apps and native Blazor framework support for [Google Analytics](https://analytics.google.com/analytics/web/) might become available in future releases of these technologies. For more information, see [Support App Insights in Blazor WASM Client Side (microsoft/ApplicationInsights-dotnet #2143)](https://github.com/microsoft/ApplicationInsights-dotnet/issues/2143) and [Web analytics and diagnostics (includes links to community implementations) (dotnet/aspnetcore #5461)](https://github.com/dotnet/aspnetcore/issues/5461). In the meantime, a client-side app can use the [Application Insights JavaScript SDK](/azure/azure-monitor/app/javascript) with [JS interop](xref:blazor/js-interop/call-javascript-from-dotnet) to log errors directly to Application Insights from a client-side app.
+> Native [Application Insights](/azure/azure-monitor/app/app-insights-overview) features to support client-side apps and native Blazor framework support for [Google Analytics](https://analytics.google.com/analytics/web/) might become available in future releases of these technologies. For more information, see [Support App Insights in Blazor WASM Client Side (`microsoft/ApplicationInsights-dotnet` #2143)](https://github.com/microsoft/ApplicationInsights-dotnet/issues/2143) and [Web analytics and diagnostics (includes links to community implementations) (`dotnet/aspnetcore` #5461)](https://github.com/dotnet/aspnetcore/issues/5461). In the meantime, a client-side app can use the [Application Insights JavaScript SDK](/azure/azure-monitor/app/javascript) with [JS interop](xref:blazor/js-interop/call-javascript-from-dotnet) to log errors directly to Application Insights from a client-side app.
 
 During development in a Blazor app operating over a circuit, the app usually sends the full details of exceptions to the browser's console to aid in debugging. In production, detailed errors aren't sent to clients, but an exception's full details are logged on the server.
 
@@ -747,7 +750,7 @@ For more information, see the following articles:
 * <xref:fundamentals/error-handling>&Dagger;
 * <xref:web-api/index>
 
-&dagger;Native [Application Insights](/azure/azure-monitor/app/app-insights-overview) features to support client-side apps and native Blazor framework support for [Google Analytics](https://analytics.google.com/analytics/web/) might become available in future releases of these technologies. For more information, see [Support App Insights in Blazor WASM Client Side (microsoft/ApplicationInsights-dotnet #2143)](https://github.com/microsoft/ApplicationInsights-dotnet/issues/2143) and [Web analytics and diagnostics (includes links to community implementations) (dotnet/aspnetcore #5461)](https://github.com/dotnet/aspnetcore/issues/5461). In the meantime, a client-side app can use the [Application Insights JavaScript SDK](/azure/azure-monitor/app/javascript) with [JS interop](xref:blazor/js-interop/call-javascript-from-dotnet) to log errors directly to Application Insights from a client-side app.
+&dagger;Native [Application Insights](/azure/azure-monitor/app/app-insights-overview) features to support client-side apps and native Blazor framework support for [Google Analytics](https://analytics.google.com/analytics/web/) might become available in future releases of these technologies. For more information, see [Support App Insights in Blazor WASM Client Side (`microsoft/ApplicationInsights-dotnet` #2143)](https://github.com/microsoft/ApplicationInsights-dotnet/issues/2143) and [Web analytics and diagnostics (includes links to community implementations) (`dotnet/aspnetcore` #5461)](https://github.com/dotnet/aspnetcore/issues/5461). In the meantime, a client-side app can use the [Application Insights JavaScript SDK](/azure/azure-monitor/app/javascript) with [JS interop](xref:blazor/js-interop/call-javascript-from-dotnet) to log errors directly to Application Insights from a client-side app.
 
 &Dagger;Applies to server-side ASP.NET Core apps that are web API backend apps for Blazor apps. Client-side apps trap and send error information to a web API, which logs the error information to a persistent logging provider.
 
@@ -891,7 +894,7 @@ If the component's `Dispose` method throws an unhandled exception in a Blazor ap
 
 If disposal logic may throw exceptions, the app should trap the exceptions using a [`try-catch`](/dotnet/csharp/language-reference/keywords/try-catch) statement with error handling and logging.
 
-For more information on component disposal, see <xref:blazor/components/lifecycle#component-disposal-with-idisposable-and-iasyncdisposable>.
+For more information on component disposal, see <xref:blazor/components/component-disposal>.
 
 ### JavaScript interop
 
@@ -960,7 +963,7 @@ Infinite loops during rendering:
 * Causes the rendering process to continue forever.
 * Is equivalent to creating an unterminated loop.
 
-In these scenarios, the Blazor fails and usually attempts to:
+In these scenarios, Blazor fails and usually attempts to:
 
 * Consume as much CPU time as permitted by the operating system, indefinitely.
 * Consume an unlimited amount of memory. Consuming unlimited memory is equivalent to the scenario where an unterminated loop adds entries to a collection on every iteration.
@@ -985,7 +988,18 @@ Consider manual render tree builder logic on the same level of complexity and wi
 
 ## Additional resources
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-10.0"
+
+* [Handle caught exceptions outside of a Razor component's lifecycle](xref:blazor/components/sync-context#handle-caught-exceptions-outside-of-a-razor-components-lifecycle)
+* [Not Found responses](xref:blazor/fundamentals/navigation#not-found-responses)
+* <xref:blazor/fundamentals/logging>
+* <xref:fundamentals/error-handling>&dagger;
+* <xref:web-api/index>
+* [Blazor samples GitHub repository (`dotnet/blazor-samples`)](https://github.com/dotnet/blazor-samples) ([how to download](xref:blazor/fundamentals/index#sample-apps))
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0 < aspnetcore-10.0"
 
 * [Handle caught exceptions outside of a Razor component's lifecycle](xref:blazor/components/sync-context#handle-caught-exceptions-outside-of-a-razor-components-lifecycle)
 * <xref:blazor/fundamentals/logging>

@@ -2,7 +2,12 @@
 :::moniker range=">= aspnetcore-6.0 < aspnetcore-9.0"
 
 > [!NOTE]
-> Swashbuckle is not available in .NET 9 and later. For an alternative, see <xref:fundamentals/openapi/overview?view=aspnetcore-9.0&preserve-view=true>.
+> In .NET 9 and later, ASP.NET Core includes built-in OpenAPI support. Swashbuckle is no longer included by default, but it remains available as a community package you can add manually to ASP.NET Core projects targeting .NET 9 or later.
+> 
+> • To understand the built‑in OpenAPI features, see <xref:fundamentals/openapi/overview?view=aspnetcore-9.0&preserve-view=true>.  
+> • To add and use the Swagger UI provided by the `Swashbuckle.AspNetCore.SwaggerUI` package for interactive exploration or local ad‑hoc testing, see <xref:fundamentals/openapi/using-openapi-documents#use-swagger-ui-for-local-ad-hoc-testing>.
+>
+>The following instructions apply when using Swashbuckle with .NET versions earlier than 9.
 
 There are three main components to Swashbuckle:
 
@@ -34,14 +39,6 @@ Swashbuckle can be added with the following approaches:
   * Enter "Swashbuckle.AspNetCore" in the search box
   * Select the latest "Swashbuckle.AspNetCore" package from the **Browse** tab and click **Install**
 
-### [Visual Studio for Mac](#tab/visual-studio-mac)
-
-* Right-click the *Packages* folder in **Solution Pad** > **Add Packages...**
-* Set the **Add Packages** window's **Source** drop-down to "nuget.org"
-* Ensure the "Show pre-release packages" option is enabled
-* Enter "Swashbuckle.AspNetCore" in the search box
-* Select the latest "Swashbuckle.AspNetCore" package from the results pane and click **Add Package**
-
 ### [Visual Studio Code](#tab/visual-studio-code)
 
 Run the following command from the **Integrated Terminal**:
@@ -66,13 +63,13 @@ Add the Swagger generator to the services collection in `Program.cs`:
 
 :::code language="csharp" source="~/tutorials/web-api-help-pages-using-swagger/samples/6.x/SwashbuckleSample/Snippets/Program.cs" id="snippet_ServicesDefault" highlight="3,4":::
 
-The call to <xref:Microsoft.Extensions.DependencyInjection.EndpointMetadataApiExplorerServiceCollectionExtensions.AddEndpointsApiExplorer%2A> shown in the preceding example is required only for [minimal APIs](/aspnet/core/fundamentals/minimal-apis/overview). For more information, see [this StackOverflow post](https://stackoverflow.com/a/71933535).
+The call to <xref:Microsoft.Extensions.DependencyInjection.EndpointMetadataApiExplorerServiceCollectionExtensions.AddEndpointsApiExplorer%2A> shown in the preceding example is required only for [Minimal APIs](/aspnet/core/fundamentals/apis). For more information, see [this StackOverflow post](https://stackoverflow.com/a/71933535).
 
 Enable the middleware for serving the generated JSON document and the Swagger UI, also in `Program.cs`:
 
 :::code language="csharp" source="~/tutorials/web-api-help-pages-using-swagger/samples/6.x/SwashbuckleSample/Program.cs" id="snippet_Middleware" highlight="3,4":::
 
-The preceding code adds the Swagger middleware only if the current environment is set to Development. The `UseSwaggerUI` method call enables an embedded version of the Swagger UI tool.
+The preceding code adds the Swagger middleware only if the current environment is set to `Development`. The `UseSwaggerUI` method call enables an embedded version of the Swagger UI tool.
 
 Launch the app and navigate to `https://localhost:<port>/swagger/v1/swagger.json`. The generated document describing the endpoints appears as shown in [OpenAPI specification (openapi.json)](xref:tutorials/web-api-help-pages-using-swagger#openapi-specification-openapijson).
 
@@ -117,17 +114,6 @@ XML comments can be enabled with the following approaches:
 #### [Visual Studio](#tab/visual-studio)
 
 * Right-click the project in **Solution Explorer** and select *`Edit <project_name>.csproj`*.
-* Add [GenerateDocumentationFile](/dotnet/core/project-sdk/msbuild-props#generatedocumentationfile)  to the `.csproj` file:
-
-```XML
-<PropertyGroup>
-  <GenerateDocumentationFile>true</GenerateDocumentationFile>
-</PropertyGroup>
-```
-
-#### [Visual Studio for Mac](#tab/visual-studio-mac)
-
-* From the *Solution Pad*, press **control** and click the project name. Navigate to **Tools** > **Edit File**.
 * Add [GenerateDocumentationFile](/dotnet/core/project-sdk/msbuild-props#generatedocumentationfile)  to the `.csproj` file:
 
 ```XML
@@ -240,7 +226,7 @@ To support the `[ProducesResponseType]` decoration, the [Swashbuckle.AspNetCore.
 
 The default UI is both functional and presentable. However, API documentation pages should represent your brand or theme. Branding the Swashbuckle components requires adding the resources to serve static files and building the folder structure to host those files.
 
-Enable Static File Middleware:
+Enable static file middleware:
 
 [!code-csharp[](~/tutorials/web-api-help-pages-using-swagger/samples/6.x/SwashbuckleSample/Snippets/Program.cs?name=snippet_MiddlewareStaticFiles&highlight=2)]
 
@@ -250,14 +236,14 @@ To inject additional CSS stylesheets, add them to the project's *wwwroot* folder
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * [Improve the developer experience of an API with Swagger documentation](/training/modules/improve-api-developer-experience-with-swagger/)
 
 :::moniker-end
 
 :::moniker range="< aspnetcore-6.0"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 There are three main components to Swashbuckle:
 
@@ -288,14 +274,6 @@ Swashbuckle can be added with the following approaches:
   * Ensure the "Include prerelease" option is enabled
   * Enter "Swashbuckle.AspNetCore" in the search box
   * Select the latest "Swashbuckle.AspNetCore" package from the **Browse** tab and click **Install**
-
-### [Visual Studio for Mac](#tab/visual-studio-mac)
-
-* Right-click the *Packages* folder in **Solution Pad** > **Add Packages...**
-* Set the **Add Packages** window's **Source** drop-down to "nuget.org"
-* Ensure the "Show pre-release packages" option is enabled
-* Enter "Swashbuckle.AspNetCore" in the search box
-* Select the latest "Swashbuckle.AspNetCore" package from the results pane and click **Add Package**
 
 ### [Visual Studio Code](#tab/visual-studio-code)
 
@@ -329,7 +307,7 @@ In the `Startup.Configure` method, enable the middleware for serving the generat
 > Swashbuckle relies on MVC's <xref:Microsoft.AspNetCore.Mvc.ApiExplorer> to discover the routes and endpoints. If the project calls <xref:Microsoft.Extensions.DependencyInjection.MvcServiceCollectionExtensions.AddMvc%2A>, routes and endpoints are discovered automatically. When calling <xref:Microsoft.Extensions.DependencyInjection.MvcCoreServiceCollectionExtensions.AddMvcCore%2A>, the <xref:Microsoft.Extensions.DependencyInjection.MvcApiExplorerMvcCoreBuilderExtensions.AddApiExplorer%2A> method must be explicitly called. For more information, see [Swashbuckle, ApiExplorer, and Routing](https://github.com/domaindrivendev/Swashbuckle.AspNetCore#swashbuckle-apiexplorer-and-routing).
 
 In development, the preceding `UseSwaggerUI` method call enables an embedded version of the Swagger UI tool. This depends on
-the [Static File Middleware](xref:fundamentals/static-files). If targeting .NET Framework or .NET Core 1.x, add the [Microsoft.AspNetCore.StaticFiles](https://www.nuget.org/packages/Microsoft.AspNetCore.StaticFiles/) NuGet package to the project.
+the [static file middleware](xref:fundamentals/static-files). If targeting .NET Framework or .NET Core 1.x, add the [Microsoft.AspNetCore.StaticFiles](https://www.nuget.org/packages/Microsoft.AspNetCore.StaticFiles/) NuGet package to the project.
 
 Launch the app, and navigate to `http://localhost:<port>/swagger/v1/swagger.json`. The generated document describing the endpoints appears as shown in [OpenAPI specification (openapi.json)](xref:tutorials/web-api-help-pages-using-swagger#openapi-specification-openapijson).
 
@@ -382,13 +360,6 @@ XML comments can be enabled with the following approaches:
 #### [Visual Studio](#tab/visual-studio)
 
 * Right-click the project in **Solution Explorer** and select *`Edit <project_name>.csproj`*.
-* Manually add the highlighted lines to the `.csproj` file:
-
-:::code language="xml" source="~/tutorials/web-api-help-pages-using-swagger/samples/2.1/TodoApi.Swashbuckle/TodoApi.csproj" range="8-11" highlight="1-2,4":::
-
-#### [Visual Studio for Mac](#tab/visual-studio-mac)
-
-* From the *Solution Pad*, press **control** and click the project name. Navigate to **Tools** > **Edit File**.
 * Manually add the highlighted lines to the `.csproj` file:
 
 :::code language="xml" source="~/tutorials/web-api-help-pages-using-swagger/samples/2.1/TodoApi.Swashbuckle/TodoApi.csproj" range="8-11" highlight="1-2,4":::
@@ -560,7 +531,7 @@ If targeting .NET Framework or .NET Core 1.x, add the [Microsoft.AspNetCore.Stat
 
 The preceding NuGet package is already installed if targeting .NET Core 2.x and using the [metapackage](xref:fundamentals/metapackage).
 
-Enable Static File Middleware:
+Enable static file middleware:
 
 :::code language="csharp" source="~/tutorials/web-api-help-pages-using-swagger/samples/3.x/TodoApi.Swashbuckle/Startup.cs" id="snippet_Configure" highlight="3":::
 

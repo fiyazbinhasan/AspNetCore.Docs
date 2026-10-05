@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor event handling
 author: guardrex
 description: Learn about Blazor's event handling features, including event argument types, event callbacks, and managing default browser events.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 07/02/2026
 uid: blazor/components/event-handling
 ---
 # ASP.NET Core Blazor event handling
@@ -14,6 +13,8 @@ uid: blazor/components/event-handling
 
 This article explains Blazor's event handling features, including event argument types, event callbacks, and managing default browser events.
 
+The [`Microsoft.AspNetCore.Components.Web` NuGet package](https://www.nuget.org/packages/Microsoft.AspNetCore.Components.Web) (<xref:Microsoft.AspNetCore.Components.Web?displayProperty=fullName> namespace) contains types for supplying information about browser events to the Blazor framework. Blazor apps target the package implicitly, while [Razor class libraries](xref:blazor/components/class-libraries) include an explicit package reference in the library's project file (`.csproj`).
+
 ## Delegate event handlers
 
 Specify delegate event handlers in Razor component markup with [`@on{DOM EVENT}="{DELEGATE}"`](xref:mvc/views/razor#onevent) Razor syntax:
@@ -21,12 +22,14 @@ Specify delegate event handlers in Razor component markup with [`@on{DOM EVENT}=
 * The `{DOM EVENT}` placeholder is a [DOM event](https://developer.mozilla.org/docs/Web/Events) (for example, `click`).
 * The `{DELEGATE}` placeholder is the C# delegate event handler.
 
+For supported events, see <xref:Microsoft.AspNetCore.Components.Web.EventHandlers>.
+
 For event handling:
 
 :::moniker range=">= aspnetcore-8.0"
 
 * Delegate event handlers in Blazor Web Apps are only called in components that adopt an interactive render mode. The examples throughout this article assume that the app adopts an interactive render mode globally in the app's root component, typically the `App` component. For more information, see <xref:blazor/components/render-modes#apply-a-render-mode-to-the-entire-app>.
-* Asynchronous delegate event handlers that return a <xref:System.Threading.Tasks.Task> are supported.
+* Asynchronous delegate event handlers that return a <xref:System.Threading.Tasks.Task> (`async Task`) are supported by Blazor and adopted by Blazor Web App and Blazor WebAssembly documentation examples.
 * Delegate event handlers automatically trigger a UI render, so there's no need to manually call [`StateHasChanged`](xref:blazor/components/lifecycle#state-changes-statehaschanged).
 * Exceptions are logged.
 
@@ -34,11 +37,14 @@ For event handling:
 
 :::moniker range="< aspnetcore-8.0"
 
-* Asynchronous delegate event handlers that return a <xref:System.Threading.Tasks.Task> are supported.
+* Asynchronous delegate event handlers that return a <xref:System.Threading.Tasks.Task> (`async Task`) are supported by Blazor and adopted by Blazor Server and Blazor WebAssembly documentation examples.
 * Delegate event handlers automatically trigger a UI render, so there's no need to manually call [`StateHasChanged`](xref:blazor/components/lifecycle#state-changes-statehaschanged).
 * Exceptions are logged.
 
 :::moniker-end
+
+> [!IMPORTANT]
+> The Blazor framework doesn't track `void`-returning asynchronous methods (`async`). As a result, the entire process fails when an exception isn't caught if `void` is returned. Always return a <xref:System.Threading.Tasks.Task>/<xref:System.Threading.Tasks.ValueTask> from asynchronous methods.
 
 The following code:
 
@@ -244,7 +250,7 @@ function eventArgsCreator(event) {
 }
 ```
 
-The `event` parameter is a [DOM Event (MDN documentation)](https://developer.mozilla.org/docs/Web/API/Event).
+The `event` parameter is a [DOM Event](https://developer.mozilla.org/docs/Web/API/Event).
 
 Register the custom event with the preceding handler in a [JavaScript initializer](xref:blazor/fundamentals/startup#javascript-initializers). Provide the appropriate browser event name to `browserEventName`, which for the example shown in this section is `click` for a button selection in the UI.
 
@@ -349,7 +355,7 @@ Register the event handler on one or more HTML elements. Access the data that wa
 }
 ```
 
-If the `@oncustomevent` attribute isn't recognized by [IntelliSense](/visualstudio/ide/using-intellisense), make sure that the component or the `_Imports.razor` file contains an `@using` statement for the namespace containing the `EventHandler` class.
+If the `@oncustomevent` attribute isn't recognized by [IntelliSense](/visualstudio/ide/using-intellisense), make sure that the component or the imports file (`_Imports.razor`) contains an `@using` statement for the namespace containing the `EventHandler` class.
 
 Whenever the custom event is fired on the DOM, the event handler is called with the data passed from the JavaScript.
 
@@ -577,7 +583,7 @@ It's often convenient to close over additional values using C# method parameters
 
 :::moniker-end
 
-Creating a large number of event delegates in a loop may cause poor rendering performance. For more information, see <xref:blazor/performance#avoid-recreating-delegates-for-many-repeated-elements-or-components>.
+Creating a large number of event delegates in a loop may cause poor rendering performance. For more information, see <xref:blazor/performance/rendering#avoid-recreating-delegates-for-many-repeated-elements-or-components>.
 
 Avoid using a loop variable directly in a lambda expression, such as `i` in the preceding `for` loop example. Otherwise, the same variable is used by all lambda expressions, which results in use of the same value in all lambdas. Capture the variable's value in a local variable. In the preceding example:
 

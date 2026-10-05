@@ -1,10 +1,9 @@
 ---
 title: Manage users and groups in SignalR
-author: bradygaster
+author: wadepickett
 description: Overview of ASP.NET Core SignalR User and Group management.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
 ms.date: 04/04/2024
 uid: signalr/groups
 ---
@@ -15,7 +14,7 @@ By [Brennan Conroy](https://github.com/BrennanConroy)
 
 SignalR allows messages to be sent to all connections associated with a specific user and to named groups of connections.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/groups/sample/) [(how to download)](xref:index#how-to-download-a-sample)
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/signalr/groups/sample/) [(how to download)](xref:fundamentals/index#how-to-download-a-sample)
 
 ## Users in SignalR
 

@@ -1,6 +1,6 @@
 :::moniker range="< aspnetcore-5.0"
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/razor-pages/razor-pages-start/sample/RazorPagesMovie30) ([how to download](xref:index#how-to-download-a-sample)).
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/razor-pages/razor-pages-start/sample/RazorPagesMovie30) ([how to download](xref:fundamentals/index#how-to-download-a-sample)).
 
 In this section [Entity Framework](/ef/core/get-started/aspnetcore/new-db) Code First Migrations is used to:
 
@@ -14,7 +14,7 @@ When using EF Code First to automatically create a database, Code First:
 
 Automatic verification that the schema and model are in sync makes it easier to find inconsistent database code issues.
 
-## Adding a Rating Property to the Movie Model
+## Add a `Rating` property to the `Movie` model
 
 1. Open the `Models/Movie.cs` file and add a `Rating` property:
 
@@ -97,7 +97,7 @@ Another option is to delete the database and use migrations to re-create the dat
   Update-Database
   ```
 
-# [Visual Studio Code / Visual Studio for Mac](#tab/visual-studio-code+visual-studio-mac)
+# [Visual Studio Code](#tab/visual-studio-code)
 
 ### Drop and re-create the database
 

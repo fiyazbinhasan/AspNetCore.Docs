@@ -1,22 +1,22 @@
 ---
 title: WebSockets support in ASP.NET Core
+ai-usage: ai-assisted
 author: wadepickett
 description: Learn how to get started with WebSockets in ASP.NET Core.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: wpickett
-ms.custom: mvc
-ms.date: 04/23/2024
+ms.date: 08/19/2026
 uid: fundamentals/websockets
 ---
 # WebSockets support in ASP.NET Core
 
 [!INCLUDE[](~/includes/not-latest-version.md)]
 
-:::moniker range=">= aspnetcore-8.0"
+:::moniker range=">= aspnetcore-9.0"
 
 This article explains how to get started with WebSockets in ASP.NET Core. [WebSocket](https://wikipedia.org/wiki/WebSocket) ([RFC 6455](https://tools.ietf.org/html/rfc6455)) is a protocol that enables two-way persistent communication channels over TCP connections. It's used in apps that benefit from fast, real-time communication, such as chat, dashboard, and game apps.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/websockets/samples) ([how to download](xref:index#how-to-download-a-sample), [how to run](#sample-app)).
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/websockets/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample), [how to run](#sample-app)).
 
 ## Http/2 WebSockets support
 
@@ -33,7 +33,7 @@ These supported features are available in Kestrel on all HTTP/2 enabled platform
 > HTTP/2 WebSockets use CONNECT requests rather than GET, so your own routes and controllers may need updating.
 > For more information, see [Add HTTP/2 WebSockets support for existing controllers](#add-http2-websockets-support-for-existing-controllers) in this article.
 >
-> Chrome and Edge have HTTP/2 WebSockets enabled by default, and you can enable it in FireFox on the `about:config` page with the `network.http.spdy.websockets` flag.
+> Chrome, Edge, and Firefox (version 128 and later) have HTTP/2 WebSockets enabled by default. You can verify or change this setting in Firefox by opening `about:config` and locating the `network.http.http2.websockets` preference.
 
 WebSockets were originally designed for HTTP/1.1 but have since been adapted to work over HTTP/2. ([RFC 8441](https://www.rfc-editor.org/rfc/rfc8441))
 
@@ -77,6 +77,7 @@ Add the WebSockets middleware in `Program.cs`:
 The following settings can be configured:
 
 * <xref:Microsoft.AspNetCore.Builder.WebSocketOptions.KeepAliveInterval%2A> - How frequently to send "ping" frames to the client to ensure proxies keep the connection open. The default is two minutes.
+* <xref:Microsoft.AspNetCore.Builder.WebSocketOptions.KeepAliveTimeout%2A> - How long to wait for a "pong" frame from the client after sending a "ping" frame. If the timeout is exceeded, the WebSocket connection is aborted and `WebSocket.ReceiveAsync` throws an exception. The default is `Timeout.InfiniteTimeSpan` (disabled). For more information, see [Handle client disconnects](#handle-client-disconnects) in this article.
 * <xref:Microsoft.AspNetCore.Builder.WebSocketOptions.AllowedOrigins%2A> - A list of allowed Origin header values for WebSocket requests. By default, all origins are allowed. For more information, see [WebSocket origin restriction](#websocket-origin-restriction) in this article.
 
 :::code language="csharp" source="~/fundamentals/websockets/samples/8.x/WebSocketsSample/Program.cs" id="snippet_UseWebSockets":::
@@ -156,6 +157,25 @@ The server isn't automatically informed when the client disconnects due to loss 
 
 If the client isn't always sending messages and you don't want to time out just because the connection goes idle, have the client use a timer to send a ping message every X seconds. On the server, if a message hasn't arrived within 2\*X seconds after the previous one, terminate the connection and report that the client disconnected. Wait for twice the expected time interval to leave extra time for network delays that might hold up the ping message.
 
+### Keep-alive timeout
+
+The WebSockets middleware can be configured with a keep-alive timeout. The keep-alive timeout aborts the WebSocket connection and throws an exception from `WebSocket.ReceiveAsync` if both of the following conditions are met:
+
+* The server sends a ping frame using the WebSocket protocol.
+* The client doesn't reply with a pong frame within the specified timeout.
+
+The server automatically sends the ping frame and configures its frequency with <xref:Microsoft.AspNetCore.Builder.WebSocketOptions.KeepAliveInterval%2A>.
+
+The keep-alive timeout setting is useful for detecting connections that might be slow or ungracefully disconnected. The default is `Timeout.InfiniteTimeSpan`, which disables the timeout.
+
+The keep-alive timeout can be configured globally for the WebSocket middleware:
+
+:::code language="csharp" source="~/fundamentals/websockets/samples/9.x/WebSocketsSample/Program.cs" id="snippet_WebSocket_KeepAliveTimeout_Global":::
+
+Or configured per accepted WebSocket:
+
+:::code language="csharp" source="~/fundamentals/websockets/samples/9.x/WebSocketsSample/Program.cs" id="snippet_KeepAliveTimeout_Per_Accepted_WebSocket":::
+
 ## WebSocket origin restriction
 
 The protections provided by CORS don't apply to WebSockets. Browsers do **not**:
@@ -233,6 +253,7 @@ Select **Connect** to send a WebSocket request to the URL shown. Enter a test me
 
 :::moniker-end
 
+[!INCLUDE[](~/fundamentals/websockets/includes/websockets8.md)]
 [!INCLUDE[](~/fundamentals/websockets/includes/websockets7.md)]
 [!INCLUDE[](~/fundamentals/websockets/includes/websockets6.md)]
 [!INCLUDE[](~/fundamentals/websockets/includes/websockets3-5.md)]

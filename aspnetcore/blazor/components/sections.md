@@ -3,18 +3,13 @@ title: ASP.NET Core Blazor sections
 author: guardrex
 description: Learn how to control the content in a Razor component from a child Razor component.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/sections
 ---
 # ASP.NET Core Blazor sections
 
-<!-- UPDATE 9.0 Activate after release and INCLUDE is updated
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article explains how to control the content in a Razor component from a child Razor component.
 
@@ -32,7 +27,7 @@ Although the argument passed to <xref:Microsoft.AspNetCore.Components.Sections.S
 
 In the following example, the app's main layout component implements an increment counter button for the app's `Counter` component.
 
-If the namespace for sections isn't in the `_Imports.razor` file, add it:
+If the namespace for sections isn't in the imports file (`_Imports.razor`), add it:
 
 ```razor
 @using Microsoft.AspNetCore.Components.Sections
@@ -89,6 +84,10 @@ When the `Counter` component is accessed, the `MainLayout` component renders the
 > [!NOTE]
 > <xref:Microsoft.AspNetCore.Components.Sections.SectionOutlet> and <xref:Microsoft.AspNetCore.Components.Sections.SectionContent> components can only set either <xref:Microsoft.AspNetCore.Components.Sections.SectionOutlet.SectionId%2A> or <xref:Microsoft.AspNetCore.Components.Sections.SectionOutlet.SectionName%2A>, not both.
 
+## `RenderFragment` caching rules and section rendering behavior
+
+When a <xref:Microsoft.AspNetCore.Components.Sections.SectionContent>'s <xref:Microsoft.AspNetCore.Components.RenderFragment> content changes, which is a different instance than the component where it's rendered, Blazor completely destroys and recreates the section instead of attempting to update the section's content. Unlike normal rendering, the section's content could come from different instances, and it doesn't make sense to attempt processing content from two separate components, which might lead to unexpected results. For a detailed explanation on this behavior, see [Inconsistent component initialization with Blazor SectionOutlet/SectionContent and CascadingValue (`dotnet/aspnetcore` #58316)](https://github.com/dotnet/aspnetcore/issues/58316).
+
 ## Section interaction with other Blazor features
 
 A section interacts with other Blazor features in the following ways:
@@ -96,3 +95,4 @@ A section interacts with other Blazor features in the following ways:
 * [Cascading values](xref:blazor/components/cascading-values-and-parameters) flow into section content from where the content is defined by the <xref:Microsoft.AspNetCore.Components.Sections.SectionContent> component.
 * Unhandled exceptions are handled by [error boundaries](xref:blazor/fundamentals/handle-errors#error-boundaries) defined around a <xref:Microsoft.AspNetCore.Components.Sections.SectionContent> component.
 * A Razor component configured for [streaming rendering](xref:blazor/components/rendering#streaming-rendering) also configures section content provided by a <xref:Microsoft.AspNetCore.Components.Sections.SectionContent> component to use streaming rendering.
+* A section that contains interactive components is statically rendered (non-functional) in a layout component in a Blazor Web App that adopts per-page/component rendering. For more information, see <xref:blazor/components/layouts#statically-rendered-layout-components>.

@@ -1,24 +1,30 @@
 ---
 title: Create responses in Minimal API applications
 author: brunolins16
-description: Learn how to create responses for minimal APIs in ASP.NET Core.
-ms.author: brolivei
+description: Learn how to create responses for Minimal APIs in ASP.NET Core.
+ms.author: wpickett
+ms.reviewer: brolivei
 monikerRange: '>= aspnetcore-7.0'
-ms.date: 06/04/2024
+ms.date: 06/16/2026
 uid: fundamentals/minimal-apis/responses
+ai-usage: ai-assisted
 ---
 
 # How to create responses in Minimal API apps
 
 [!INCLUDE[](~/includes/not-latest-version.md)]
 
-:::moniker range="> aspnetcore-8.0"
+This article explains how to create responses for Minimal API endpoints in ASP.NET Core. Minimal APIs provide several ways to return data and HTTP status codes.
+
+:::moniker range=">= aspnetcore-10.0"
 
 Minimal endpoints support the following types of return values:
 
 1. `string` - This includes `Task<string>` and `ValueTask<string>`.
 1. `T` (Any other type) - This includes `Task<T>` and `ValueTask<T>`.
 1. `IResult` based - This includes `Task<IResult>` and `ValueTask<IResult>`.
+
+[!INCLUDE[](~/includes/api-endpoint-auth.md)]
 
 ## `string` return values
 
@@ -60,7 +66,7 @@ The `200` status code is returned with `application/json` Content-Type header an
 
 The `IResult` interface defines a contract that represents the result of an HTTP endpoint. The static [Results](<xref:Microsoft.AspNetCore.Http.Results>) class and the static [TypedResults](<xref:Microsoft.AspNetCore.Http.TypedResults>) are used to create various `IResult` objects that represent different types of responses.
 
-### TypedResults vs Results
+### `TypedResults` versus `Results`
 
 The <xref:Microsoft.AspNetCore.Http.Results> and <xref:Microsoft.AspNetCore.Http.TypedResults> static classes provide similar sets of results helpers. The `TypedResults` class is the *typed* equivalent of the `Results` class. However, the `Results` helpers' return type is <xref:Microsoft.AspNetCore.Http.IResult>, while each `TypedResults` helper's return type is one of the `IResult` implementation types. The difference means that for `Results` helpers a conversion is needed when the concrete type is needed, for example, for unit testing. The implementation types are defined in the <xref:Microsoft.AspNetCore.Http.HttpResults> namespace.
 
@@ -77,15 +83,9 @@ In order to document this endpoint correctly the extensions method `Produces` is
 
 :::code language="csharp" source="~/tutorials/min-web-api/samples/7.x/todo/Program.cs" id="snippet_112b":::
 
-For more information about describing a response type, see [OpenAPI support in minimal APIs](/aspnet/core/fundamentals/openapi/aspnetcore-openapi#describe-response-types-1).
+For more information about describing a response type, see [OpenAPI support in Minimal APIs](/aspnet/core/fundamentals/openapi/aspnetcore-openapi#describe-response-types-1).
 
-As mentioned previously, when using `TypedResults`, a conversion is not needed. Consider the following minimal API which returns a `TypedResults` class
-
-:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/samples/MinApiTestsSample/WebMinRouteGroup/TodoEndpointsV1.cs" id="snippet_1":::
-
-The following test checks for the full concrete type:
-
-:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/samples/MinApiTestsSample/UnitTests/TodoInMemoryTests.cs" id="snippet_11" highlight="26":::
+For examples on testing result types, see the [Test documentation](/aspnet/core/fundamentals/minimal-apis/test-min-api#unit-test-iresult-implementation-types).
 
 Because all methods on `Results` return `IResult` in their signature, the compiler automatically infers that as the request delegate return type when returning different results from a single endpoint. `TypedResults` requires the use of `Results<T1, TN>` from such delegates.
 
@@ -97,7 +97,7 @@ The following method does not compile, because `TypedResults.Ok` and `TypedResul
 
 :::code language="csharp" source="~/tutorials/min-web-api/samples/7.x/todo/Program.cs" id="snippet_111":::
 
-To use `TypedResults`, the return type must be fully declared, which when asynchronous requires the `Task<>` wrapper. Using `TypedResults` is more verbose, but that's the trade-off for having the type information be statically available and thus capable of self-describing to OpenAPI:
+To use `TypedResults`, the return type must be fully declared; when the method is asynchronous, the declaration requires wrapping the return type in a `Task<>`. Using `TypedResults` is more verbose, but that's the trade-off for having the type information be statically available and thus capable of self-describing to OpenAPI:
 
 :::code language="csharp" source="~/tutorials/min-web-api/samples/7.x/todo/Program.cs" id="snippet_1b":::
 
@@ -120,11 +120,11 @@ In order to document this endpoint correctly the extension method `Produces` is 
 
 :::code language="csharp" source="~/fundamentals/minimal-apis/9.0-samples/Snippets/Program.cs" id="snippet_04":::
 
-<a name="binr7"></a>
+<a name="binr10"></a>
 
 ### Built-in results
 
-[!INCLUDE [results-helpers](includes/results-helpers.md)]
+[!INCLUDE [results-helpers](~/fundamentals/minimal-apis/includes/results-helpers.md)]
 
 The following sections demonstrate the usage of the common result helpers.
 
@@ -145,6 +145,28 @@ The following sections demonstrate the usage of the common result helpers.
 :::code language="csharp" source="~/fundamentals/minimal-apis/9.0-samples/Snippets/Program.cs" id="snippet_07":::
 
 The preceding example returns a 500 status code.
+
+#### Problem and ValidationProblem
+
+:::code language="csharp" source="~/fundamentals/minimal-apis/9.0-samples/Snippets/Program.cs" id="snippet_12":::
+
+#### Customize validation error responses using IProblemDetailsService
+
+Customize error responses from Minimal API validation logic with an <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> implementation. Register this service in your application's service collection to enable more consistent and user-specific error responses. Support for Minimal API validation was introduced in ASP.NET Core in .NET 10.
+
+To implement custom validation error responses:
+
+* Implement <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> or use the default implementation
+* Register the service in the DI container
+* The validation system automatically uses the registered service to format validation error responses
+
+The following example shows how to register and configure the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> to customize validation error responses:
+
+:::code language="csharp" source="~/fundamentals/minimal-apis/10.0-samples/MinApiIproblemDetailsService/Program.cs" id="snippet_register_IProblemDetailsService_implementation" :::
+
+When a validation error occurs, the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> will be used to generate the error response, including any customizations added in the `CustomizeProblemDetails` callback.
+
+For a complete app example, see the [Minimal API sample app](https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/fundamentals/minimal-apis/10.0-samples/MinApiIproblemDetailsService/Program.cs) demonstrating how to customize validation error responses using the <xref:Microsoft.AspNetCore.Http.IProblemDetailsService> in ASP.NET Core Minimal APIs.
 
 #### Text
 
@@ -167,6 +189,20 @@ The following example streams an image from [Azure Blob storage](/azure/storage/
 The following example streams a video from an Azure Blob:
 
 [!code-csharp[](~/fundamentals/minimal-apis/resultsStream/7.0-samples/ResultsStreamSample/Program.cs?name=snippet_video)]
+
+#### Server-Sent Events (SSE)
+
+The [TypedResults.ServerSentEvents](https://source.dot.net/#Microsoft.AspNetCore.Http.Results/TypedResults.cs,051e6796e1492f84) API supports returning a [ServerSentEvents](xref:System.Net.ServerSentEvents) result.
+
+[Server-Sent Events](https://developer.mozilla.org/docs/Web/API/Server-sent_events) is a server push technology that allows a server to send a stream of event messages to a client over a single HTTP connection. In .NET, the event messages are represented as [`SseItem<T>`](/dotnet/api/system.net.serversentevents.sseitem-1) objects, which may contain an event type, an ID, and a data payload of type `T`.
+
+The [TypedResults](xref:Microsoft.AspNetCore.Http.TypedResults) class has a static method called [ServerSentEvents](https://source.dot.net/#Microsoft.AspNetCore.Http.Results/TypedResults.cs,ceb980606eb9e295) that can be used to return a `ServerSentEvents` result. The first parameter to this method is an `IAsyncEnumerable<SseItem<T>>` that represents the stream of event messages to be sent to the client.
+
+The following example illustrates how to use the `TypedResults.ServerSentEvents` API to return a stream of heart rate events as JSON objects to the client:
+
+:::code language="csharp" source="~/fundamentals/minimal-apis/10.0-samples/MinimalServerSentEvents/Program.cs" id="snippet_item" :::
+
+For more information, see the [Minimal API sample app](https://github.com/dotnet/AspNetCore.Docs/blob/main/aspnetcore/fundamentals/minimal-apis/10.0-samples/MinimalServerSentEvents/Program.cs) using the `TypedResults.ServerSentEvents` API to return a stream of heart rate events as string, `ServerSentEvents`, and JSON objects to the client.
 
 #### Redirect
 
@@ -195,6 +231,134 @@ Here's an example of a filter that uses one of these interfaces:
 
 For more information, see [Filters in Minimal API apps](xref:fundamentals/minimal-apis/min-api-filters) and [IResult implementation types](xref:fundamentals/minimal-apis/test-min-api#iresult-implementation-types).
 
+## File result return values
+
+When an API endpoint returns content other than JSON, or supports HTTP protocol features like conditional or range requests,
+ASP.NET Core provides result types that handle the necessary HTTP protocol details for you.
+These result types are referred to as "file results", but the functionality is useful for scenarios beyond serving files on disk.
+There are file result types for both Minimal APIs and controller-based APIs, and they share a common underlying implementation and behavior.
+
+To access this functionality, the API endpoint creates and returns a file result object - an instance of one of these file result types.
+The file result object encapsulates the content to be sent, the content type, and any additional parameters like a download file name.
+The result object implements a method -- `ExecuteAsync(HttpContext)` for Minimal APIs or `ExecuteResultAsync(ActionContext)` for controllers -- that the framework calls to write the response.
+This method sets the `Content-Type` header and, when a file name is provided, the `Content-Disposition` header.
+It also handles conditional request headers and range request headers when the appropriate parameters are set on the result object.
+
+### File result types
+
+In Minimal APIs, the most common and recommended way to create a file result is [`TypedResults.File`](xref:Microsoft.AspNetCore.Http.TypedResults.File%2A), which accepts a `byte[]` or `Stream` and returns a [`FileContentHttpResult`](xref:Microsoft.AspNetCore.Http.HttpResults.FileContentHttpResult) or [`FileStreamHttpResult`](xref:Microsoft.AspNetCore.Http.HttpResults.FileStreamHttpResult).
+
+Alternatives include [`TypedResults.Bytes`](xref:Microsoft.AspNetCore.Http.TypedResults.Bytes%2A) for an explicit byte-array helper,
+[`TypedResults.PhysicalFile`](xref:Microsoft.AspNetCore.Http.TypedResults.PhysicalFile%2A) for serving files by absolute path, or
+[`Results.File`](xref:Microsoft.AspNetCore.Http.Results.File%2A) / [`Results.Bytes`](xref:Microsoft.AspNetCore.Http.Results.Bytes%2A) when you only need the `IResult` interface.
+
+ASP.NET Core also provides [static files middleware](xref:fundamentals/static-files) that serves files relative to the web root (`wwwroot`) without requiring an explicit endpoint.
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/FileEndpoints.cs" id="snippet_file_types":::
+
+In controller-based APIs, the [`ControllerBase.File()`](xref:Microsoft.AspNetCore.Mvc.ControllerBase.File%2A) helper method accepts either a `byte[]` or `Stream` and returns the appropriate concrete result type ([`FileContentResult`](xref:Microsoft.AspNetCore.Mvc.FileContentResult), [`FileStreamResult`](xref:Microsoft.AspNetCore.Mvc.FileStreamResult)).
+
+Alternatives include returning a [`VirtualFileResult`](xref:Microsoft.AspNetCore.Mvc.VirtualFileResult) for files relative to the web root, or a [`PhysicalFileResult`](xref:Microsoft.AspNetCore.Mvc.PhysicalFileResult) for files by absolute path, but these are less common as the static files middleware usually handles those scenarios.
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/Controllers/FilesController.cs" id="snippet_file_types":::
+
+### OpenAPI support for file results
+
+File result types don't automatically contribute response metadata to the generated OpenAPI document.
+To get a proper response description in the OpenAPI document, you must specify this metadata explicitly.
+
+In Minimal APIs, use the [`Produces<TResponse>()`](xref:Microsoft.AspNetCore.Http.OpenApiRouteHandlerBuilderExtensions.Produces%2A)
+extension method to provide the OpenAPI metadata for the response. This metadata determines the status code, content type, and schema for the response in the OpenAPI document.
+For a file result, it's important to specify the content type, such as `application/pdf`, and to use an appropriate `TResponse` to get the desired schema.
+You can also specify the status code in the `Produces` extension method if it differs from the default of `200 OK`.
+Common status codes are defined in the [`StatusCodes`](xref:Microsoft.AspNetCore.Http.StatusCodes) class, and common content types are defined in the [`MediaTypeNames`](xref:System.Net.Mime.MediaTypeNames) class.
+For example:
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/FileEndpoints.cs" id="snippet_openapi":::
+
+Conceptually, `TResponse` represents the type of the response body, but the appropriate schema for a file result depends
+more on the body content than the CLR type. Therefore, it may be necessary to specify a `TResponse` that doesn't match
+the CLR type of the content in the file result in order to get the desired OpenAPI schema.
+
+In particular, there are three common schemas for file results:
+
+- **binary content**, such as PDFs, images, or videos, where the schema should be `type: string, format: binary`.
+  The recommended `TResponse` for this case is `Stream`. The framework has special logic to map
+  this type to the `binary` format in the OpenAPI schema.
+  <!-- Hope we can change this to IBinaryContent if #67145 is approved and implemented -->
+- **text content**, such as CSV or plain text. Here the schema should be simply `type: string` with no `format`. Use `string` as the `TResponse` for this case.
+- **base64-encoded content**, where the schema should be `type: string, format: byte`. It's uncommon to base64-encode file content in an API response, but for legacy reasons this is the schema produced when the `TResponse` is `byte[]`.
+
+In a controller-based app, use the [`[Produces]`](xref:Microsoft.AspNetCore.Mvc.ProducesAttribute) or the [`[ProducesResponseType]`](xref:Microsoft.AspNetCore.Mvc.ProducesResponseTypeAttribute) attribute:
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/Controllers/FilesController.cs" id="snippet_openapi":::
+
+As with Minimal APIs, you should choose the `Type` parameter of the `[Produces]` and `[ProducesResponseType]` attributes
+that corresponds to the desired OpenAPI schema for your file result responses:
+* **binary content**: Use `FileContentResult` or `FileStreamResult` to get the `binary` format in the OpenAPI schema.
+* **text content**: Use `string` to get a simple `type: string` schema.
+* **base64-encoded content**: Use `byte[]` to get the `byte` format in the OpenAPI schema, though this is uncommon for file results.
+
+### File result support for conditional requests
+
+File results support [conditional requests](https://www.rfc-editor.org/rfc/rfc9110#section-13) for cache validation. Set the `lastModified` and/or `entityTag` parameters when creating the result object, and the framework automatically inspects incoming `If-None-Match` and `If-Modified-Since` headers. If the resource hasn't changed, the framework returns `304 Not Modified` with no body — no additional code is needed.
+
+| Parameter | Purpose |
+|-----------|---------|
+| `lastModified` | Sets the `Last-Modified` response header. If the client sends `If-Modified-Since` and the file hasn't changed, the framework returns `304 Not Modified` with no body. |
+| `entityTag` | Sets the `ETag` response header. If the client sends `If-None-Match` with a matching ETag, the framework returns `304 Not Modified` with no body. |
+
+> [!NOTE]
+> Precondition checks (`If-Match`, `If-Unmodified-Since`) typically require custom logic in the endpoint to verify preconditions *before* performing their function.
+
+The following example demonstrates how to use file results to enable cache validation for a configuration endpoint.
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/FileEndpoints.cs" id="snippet_conditional":::
+
+This example also illustrates how to document the `304 Not Modified` response in the OpenAPI document using the `Produces` extension method, and including the `if-none-match` and `if-modified-since` headers as parameters so they're included in the OpenAPI schema for the endpoint.
+
+A controller-based API can achieve the same behavior using the `File` helper method and the `[ProducesResponseType]` attribute:
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/Controllers/FilesController.cs" id="snippet_conditional":::
+
+### File result support for range requests
+
+**Range requests** allow clients to request only a portion of a file rather than the entire content. A client sends a `Range` header specifying byte offsets, and the server responds with `206 Partial Content` containing just those bytes. This enables resumable downloads, parallel chunked downloads, and efficient seeking in media players.
+
+Range requests can also be conditional: the client sends an `If-Range` header containing an ETag or date alongside the `Range` header, and the server returns the partial content only if the resource hasn't changed. If it has changed, the server ignores the range and returns the full resource instead. `If-Range` is only evaluated when `entityTag` or `lastModified` is also set on the file result.
+
+Set `enableRangeProcessing` to `true` to enable range processing. The following examples enable range processing for a video streaming endpoint, and document the additional response types in the OpenAPI metadata.
+
+**Minimal API:**
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/FileEndpoints.cs" id="snippet_range":::
+
+**Controller:**
+
+:::code language="csharp" source="~/../AspNetCore.Docs.Samples/fundamentals/minimal-apis/FileResults/10.x/Controllers/FilesController.cs" id="snippet_range":::
+
+With this configuration, the framework automatically handles the following HTTP interactions:
+
+* **Full request**: Returns `200 OK` with the complete file.
+* **Range request** (`Range: bytes=0-1023`): Returns `206 Partial Content` with the `Content-Range` header and only the requested bytes.
+* **Invalid range**: Returns `416 Range Not Satisfiable`.
+
+## Modifying Headers
+
+Use the `HttpResponse` object to modify response headers:
+
+```csharp
+app.MapGet("/", (HttpContext context) => {
+    // Set a custom header
+    context.Response.Headers["X-Custom-Header"] = "CustomValue";
+
+    // Set a known header
+    context.Response.Headers.CacheControl = $"public,max-age=3600";
+
+    return "Hello World";
+});
+```
+
 ## Customizing responses
 
 Applications can control responses by implementing a custom <xref:Microsoft.AspNetCore.Http.IResult> type. The following code is an example of an HTML result type:
@@ -219,7 +383,7 @@ An alternative approach is using the <xref:Microsoft.AspNetCore.Mvc.ProducesAttr
 
 ## Configure JSON serialization options
 
-By default, minimal API apps use [`Web defaults`](/dotnet/standard/serialization/system-text-json-configure-options#web-defaults-for-jsonserializeroptions) options during JSON serialization and deserialization.
+By default, Minimal API apps use [`Web defaults`](/dotnet/standard/serialization/system-text-json-configure-options#web-defaults-for-jsonserializeroptions) options during JSON serialization and deserialization.
 
 ### Configure JSON serialization options globally
 
@@ -244,5 +408,7 @@ As an alternative, use an overload of <xref:Microsoft.AspNetCore.Http.HttpRespon
 * <xref:fundamentals/minimal-apis/security>
 
 :::moniker-end
+
+[!INCLUDE[](~/fundamentals/minimal-apis/includes/responses9.md)]
 
 [!INCLUDE[](~/fundamentals/minimal-apis/includes/responses7-8.md)]

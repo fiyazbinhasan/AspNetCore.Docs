@@ -6,12 +6,12 @@ This article describes how to handle errors in Minimal API apps.
 
 In a Minimal API app, there are two different built-in centralized mechanisms to handle unhandled exceptions:
 
-* [Developer Exception Page middleware](#developer-exception-page) (For use in the **Development environment only**.)
+* [Developer Exception Page middleware](#developer-exception-page) (For use in the **`Development` environment only**.)
 * [Exception handler middleware](#exception-handler)
 
 This section refers to the following Minimal API app to demonstrate ways to handle exceptions. It throws an exception when the endpoint `/exception` is requested:
 
-``` csharp
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -27,10 +27,10 @@ The [Developer Exception Page](xref:fundamentals/error-handling#developer-except
 
 ASP.NET Core apps enable the developer exception page by default when both:
 
-* Running in the [Development environment](xref:fundamentals/environments).
+* Running in the [`Development` environment](xref:fundamentals/environments).
 * App is using [WebApplication.CreateBuilder](/dotnet/api/microsoft.aspnetcore.builder.webapplication.createbuilder).
 
-For more information on configuring middleware, see [Middleware in Minimal API apps](/aspnet/core/fundamentals/minimal-apis/middleware).
+For more information on configuring middleware, see [Middleware in ASP.NET Core apps](xref:fundamentals/middleware/index#middleware-added-automatically-by-webapplication).
 
 Using the preceding Minimal API app, when the `Developer Exception Page` detects an unhandled exception, it generates a default plain-text response similar to the following example:
 
@@ -56,16 +56,16 @@ Accept-Encoding: gzip, deflate, br
 ```
 
 > [!WARNING]
-> Don't enable the Developer Exception Page **unless the app is running in the Development environment**. Don't share detailed exception information publicly when the app runs in production. For more information on configuring environments, see <xref:fundamentals/environments>.
+> Don't enable the Developer Exception Page **unless the app is running in the `Development` environment**. Don't share detailed exception information publicly when the app runs in production. For more information on configuring environments, see <xref:fundamentals/environments>.
 
 ### Exception handler
 
-In non-development environments, use the [Exception Handler Middleware](xref:fundamentals/error-handling#exception-handler-page) to produce an error payload. To configure the `Exception Handler Middleware`, call <xref:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler%2A>. 
+In non-development environments, use the [exception handler middleware](xref:fundamentals/error-handling#exception-handler-page) to produce an error payload. To configure the `exception handler middleware`, call <xref:Microsoft.AspNetCore.Builder.ExceptionHandlerExtensions.UseExceptionHandler%2A>. 
 
 For example, the following code changes the app to respond with an [RFC 7807](https://tools.ietf.org/html/rfc7807)-compliant payload to the client. For more information, see [Problem Details](#problem-details) section.
 
 
-``` csharp
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -84,7 +84,7 @@ app.Run();
 
 Consider the following Minimal API app.
 
-``` csharp
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -103,7 +103,7 @@ The [`Status Code Pages middleware`](xref:fundamentals/error-handling#sestatusco
 
 For example, the following example changes the app to respond with an [RFC 7807](https://tools.ietf.org/html/rfc7807)-compliant payload to the client for all client and server responses, including routing errors (for example, `404 NOT FOUND`). For more information, see the [Problem Details](#problem-details) section.
 
-``` csharp
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
@@ -127,7 +127,7 @@ Minimal API apps can be configured to generate problem details response for all 
 
 The following code configures the app to generate problem details:
 
-``` csharp
+```csharp
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddProblemDetails();
 

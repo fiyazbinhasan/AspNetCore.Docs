@@ -4,7 +4,6 @@ author: tdykstra
 description: Discover how route and app model provider conventions help you control page routing, discovery, and processing.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: tdykstra
-ms.custom: mvc
 ms.date: 02/07/2020
 uid: razor-pages/razor-pages-conventions
 ---
@@ -18,7 +17,7 @@ To specify a page route, add route segments, or add parameters to a route, use t
 
 There are reserved words that can't be used as route segments or parameter names. For more information, see [Routing: Reserved routing names](xref:mvc/controllers/routing#reserved-routing-names).
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/razor-pages-conventions/samples/) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/razor-pages-conventions/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 | Scenario | The sample demonstrates  |
 | -------- | --------------------------- |
@@ -288,7 +287,7 @@ The Page filter (<xref:Microsoft.AspNetCore.Mvc.Filters.IPageFilter>) is a filte
 ## Additional resources
 
 * [Razor Pages Routing](https://www.learnrazorpages.com/razor-pages/routing)
-* <xref:security/authorization/razor-pages-authorization>
+* <xref:razor-pages/security/authorization/conventions>
 * <xref:mvc/controllers/areas#areas-with-razor-pages>
 
 :::moniker-end
@@ -303,7 +302,7 @@ To specify a page route, add route segments, or add parameters to a route, use t
 
 There are reserved words that can't be used as route segments or parameter names. For more information, see [Routing: Reserved routing names](xref:mvc/controllers/routing#reserved-routing-names).
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/razor-pages-conventions/samples/) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/razor-pages-conventions/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 | Scenario | The sample demonstrates ... |
 | -------- | --------------------------- |
@@ -569,7 +568,7 @@ The Page filter (<xref:Microsoft.AspNetCore.Mvc.Filters.IPageFilter>) is a filte
 
 ## Additional resources
 
-* <xref:security/authorization/razor-pages-authorization>
+* <xref:razor-pages/security/authorization/conventions>
 * <xref:mvc/controllers/areas#areas-with-razor-pages>
 
 :::moniker-end
@@ -584,7 +583,7 @@ To specify a page route, add route segments, or add parameters to a route, use t
 
 There are reserved words that can't be used as route segments or parameter names. For more information, see [Routing: Reserved routing names](xref:fundamentals/routing#reserved-routing-names).
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/razor-pages-conventions/samples/) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/razor-pages-conventions/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 | Scenario | The sample demonstrates ... |
 | -------- | --------------------------- |
@@ -825,7 +824,7 @@ The Page filter (<xref:Microsoft.AspNetCore.Mvc.Filters.IPageFilter>) is a filte
 
 ## Additional resources
 
-* <xref:security/authorization/razor-pages-authorization>
+* <xref:razor-pages/security/authorization/conventions>
 * <xref:mvc/controllers/areas#areas-with-razor-pages>
 
 :::moniker-end

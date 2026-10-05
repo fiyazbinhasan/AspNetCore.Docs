@@ -1,9 +1,8 @@
 ---
 title: External OAuth authentication providers
-author: rick-anderson
+author: tdykstra
 description: Discover External OAuth authentication providers that work with ASP.NET Core apps.
-ms.author: riande
-ms.custom: mvc
+ms.author: tdykstra
 ms.date: 11/11/2018
 uid: security/authentication/otherlogins
 ---
@@ -32,8 +31,6 @@ The following list includes common external OAuth authentication providers that 
 
 * [Pinterest](https://www.pinterest.com/login/?next=http%3A%2F%2Fdevsite%2Fapps%2F) ([Instructions](https://developers.pinterest.com/docs/api/overview/?))
 
-* [Pocket](https://getpocket.com/developer/apps/new) ([Instructions](https://getpocket.com/developer/docs/authentication))
-
 * [Flickr](https://www.flickr.com/services/apps/create) ([Instructions](https://www.flickr.com/services/api/auth.oauth.html))
 
 * [Dribbble](https://dribbble.com/signup) ([Instructions](https://developer.dribbble.com))
@@ -44,6 +41,6 @@ The following list includes common external OAuth authentication providers that 
 
 * [VK](https://vk.com/apps?act=manage) ([Instructions](https://vk.com/pages?oid=-17680044&p=Authorizing_Sites))
 
-[!INCLUDE[Multiple authentication providers](includes/chain-auth-providers.md)]
+To use multiple authentication providers, see <xref:security/authentication/social/index#multiple-authentication-providers>.
 
 [!INCLUDE[Forward request information when behind a proxy or load balancer section](includes/forwarded-headers-middleware.md)]

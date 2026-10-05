@@ -3,34 +3,34 @@ title: Render Razor components outside of ASP.NET Core
 author: guardrex
 description: Render Razor components outside of the context of an HTTP request.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/render-outside-of-aspnetcore
 ---
 # Render Razor components outside of ASP.NET Core
 
-<!-- UPDATE 9.0 Activate after release and INCLUDE is updated
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
-
-Razor components can be rendered outside of the context of an HTTP request. You can render Razor components as HTML directly to a string or stream independently of the ASP.NET Core hosting environment. This is convenient for scenarios where you want to generate HTML fragments, such as for generating email content, generating static site content, or for building a content templating engine.
+[Razor components](xref:blazor/components/index), which are self-contained portions of user interface (UI) with processing logic used in [ASP.NET Core Blazor](xref:blazor/index), can be rendered outside of the context of an HTTP request. You can render Razor components as HTML directly to a string or stream independently of the ASP.NET Core hosting environment. This is convenient for scenarios where you want to generate HTML fragments, such as for generating email content, generating static site content, or for building a content templating engine.
 
 In the following example, a Razor component is rendered to an HTML string from a console app:
 
-In a command shell, create a new console app project:
+In a command shell, create a new console app project and change the directory to the `ConsoleApp1` folder:
 
 ```dotnetcli
 dotnet new console -o ConsoleApp1
 cd ConsoleApp1
 ```
 
-In a command shell in the `ConsoleApp1` folder, add package references for <xref:Microsoft.AspNetCore.Components.Web?displayProperty=fullName> and <xref:Microsoft.Extensions.Logging?displayProperty=fullName> to the console app:
+Add a package reference for <xref:Microsoft.AspNetCore.Components.Web?displayProperty=fullName>:
 
 ```dotnetcli
 dotnet add package Microsoft.AspNetCore.Components.Web
+```
+
+Add a package reference for <xref:Microsoft.Extensions.Logging?displayProperty=fullName>:
+
+```dotnetcli
 dotnet add package Microsoft.Extensions.Logging
 ```
 
@@ -52,16 +52,14 @@ Add the following `RenderMessage` component to the project.
 
 @code {
     [Parameter]
-    public string Message { get; set; }
+    public string? Message { get; set; }
 }
 ```
 
-Update the `Program` file:
+Replace the code in the `Program` file with the following code:
 
 * Set up dependency injection (<xref:Microsoft.Extensions.DependencyInjection.IServiceCollection>/<xref:Microsoft.Extensions.DependencyInjection.ServiceCollectionContainerBuilderExtensions.BuildServiceProvider%2A>) and logging (<xref:Microsoft.Extensions.DependencyInjection.LoggingServiceCollectionExtensions.AddLogging%2A>/<xref:Microsoft.Extensions.Logging.ILoggerFactory>).
 * Create an <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer> and render the `RenderMessage` component by calling <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer.RenderComponentAsync%2A>.
-
-Any calls to <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer.RenderComponentAsync%2A> must be made in the context of calling `InvokeAsync` on a component dispatcher. A component dispatcher is available from the <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer.Dispatcher?displayProperty=nameWithType> property.
 
 ```csharp
 using Microsoft.AspNetCore.Components;
@@ -96,6 +94,8 @@ Console.WriteLine(html);
 
 > [!NOTE]
 > Pass <xref:Microsoft.AspNetCore.Components.ParameterView.Empty?displayProperty=nameWithType> to <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer.RenderComponentAsync%2A> when rendering the component without passing parameters.
+
+Any calls to <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer.RenderComponentAsync%2A> must be made in the context of calling `InvokeAsync` on a component dispatcher. A component dispatcher is available from the <xref:Microsoft.AspNetCore.Components.Web.HtmlRenderer.Dispatcher?displayProperty=nameWithType> property.
 
 Alternatively, you can write the HTML to a <xref:System.IO.TextWriter> by calling `output.WriteHtmlTo(textWriter)`.
 

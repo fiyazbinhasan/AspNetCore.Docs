@@ -1,10 +1,9 @@
 ---
 title: Publish an ASP.NET Core SignalR app to Azure App Service
-author: bradygaster
+author: wadepickett
 description: Learn how to publish an ASP.NET Core SignalR app to Azure App Service.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: wpickett
-ms.custom: mvc
 ms.date: 11/02/2020
 uid: signalr/publish-to-azure-web-app
 ---
@@ -53,7 +52,7 @@ Visual Studio completes the following tasks:
 
 The format of the app's URL is `{APP SERVICE NAME}.azurewebsites.net`. For example, an app named `SignalRChatApp` has a URL of `https://signalrchatapp.azurewebsites.net`.
 
-If an HTTP *502.2 - Bad Gateway* error occurs when deploying an app that targets a preview .NET Core release, see [Deploy ASP.NET Core preview release to Azure App Service](xref:host-and-deploy/azure-apps/index#deploy-aspnet-core-preview-release-to-azure-app-service) to resolve it.
+If an HTTP *502.2 - Bad Gateway* error occurs when deploying an app that targets a preview .NET release, see [Deploy ASP.NET Core preview release to Azure App Service](xref:host-and-deploy/azure-apps/index#deploy-aspnet-core-preview-release-to-azure-app-service) to resolve it.
 
 ## Configure the app in Azure App Service
 

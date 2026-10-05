@@ -1,10 +1,9 @@
 ---
 title: Razor Pages unit tests in ASP.NET Core
-author: rick-anderson
+author: wadepickett
 description: Learn how to create unit tests for Razor Pages apps.
 monikerRange: '>= aspnetcore-2.1'
-ms.author: riande
-ms.custom: mvc
+ms.author: wpickett
 ms.date: 7/30/2020
 uid: test/razor-pages-tests
 ---
@@ -23,9 +22,9 @@ This topic assumes that you have a basic understanding of Razor Pages apps and u
 
 * <xref:razor-pages/index>
 * <xref:tutorials/razor-pages/razor-pages-start>
-* [Unit testing C# in .NET Core using dotnet test and xUnit](/dotnet/articles/core/testing/unit-testing-with-dotnet-test)
+* [Testing with `dotnet test`](/dotnet/core/testing/unit-testing-with-dotnet-test)
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/test/razor-pages-tests/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/test/razor-pages-tests/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 The sample project is composed of two apps:
 
@@ -148,7 +147,7 @@ Another set of unit tests is responsible for tests of page model methods. In the
 | `OnPostDeleteMessageAsync` | Executes `DeleteMessageAsync` to delete a message with the `Id` specified. |
 | `OnPostAnalyzeMessagesAsync` | If one or more messages are in the database, calculates the average number of words per message. |
 
-The page model methods are tested using seven tests in the `IndexPageTests` class (`tests/RazorPagesTestSample.Tests/UnitTests/IndexPageTests.cs`). The tests use the familiar Arrange-Assert-Act pattern. These tests focus on:
+The page model methods are tested using seven tests in the `IndexPageTests` class (`tests/RazorPagesTestSample.Tests/UnitTests/IndexPageTests.cs`). The tests use the familiar Arrange-Act-Assert pattern. These tests focus on:
 
 * Determining if the methods follow the correct behavior when the [ModelState](xref:Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary) is invalid.
 * Confirming the methods produce the correct <xref:Microsoft.AspNetCore.Mvc.IActionResult>.
@@ -182,12 +181,12 @@ Other tests in this group create page model objects that include the <xref:Micro
 
 ## Additional resources
 
-* [Unit testing C# in .NET Core using dotnet test and xUnit](/dotnet/articles/core/testing/unit-testing-with-dotnet-test)
+* [Testing with `dotnet test`](/dotnet/core/testing/unit-testing-with-dotnet-test)
 * <xref:mvc/controllers/testing>
 * [Unit Test Your Code](/visualstudio/test/unit-test-your-code) (Visual Studio)
 * <xref:test/integration-tests>
 * [xUnit.net](https://github.com/xunit/xunit)
-* [Getting started with xUnit.net: Using .NET Core with the .NET SDK command line](https://xunit.net/docs/getting-started/netcore/cmdline)
+* [Getting started with xUnit.net](https://xunit.net/docs/getting-started/netcore/cmdline)
 * [Moq](https://github.com/moq/moq4)
 * [Moq Quickstart](https://github.com/Moq/moq4/wiki/Quickstart)
 
@@ -206,9 +205,9 @@ This topic assumes that you have a basic understanding of Razor Pages apps and u
 
 * <xref:razor-pages/index>
 * <xref:tutorials/razor-pages/razor-pages-start>
-* [Unit testing C# in .NET Core using dotnet test and xUnit](/dotnet/articles/core/testing/unit-testing-with-dotnet-test)
+* [Testing with `dotnet test`](/dotnet/core/testing/unit-testing-with-dotnet-test)
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/test/razor-pages-tests/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/test/razor-pages-tests/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 The sample project is composed of two apps:
 
@@ -331,7 +330,7 @@ Another set of unit tests is responsible for tests of page model methods. In the
 | `OnPostDeleteMessageAsync` | Executes `DeleteMessageAsync` to delete a message with the `Id` specified. |
 | `OnPostAnalyzeMessagesAsync` | If one or more messages are in the database, calculates the average number of words per message. |
 
-The page model methods are tested using seven tests in the `IndexPageTests` class (`tests/RazorPagesTestSample.Tests/UnitTests/IndexPageTests.cs`). The tests use the familiar Arrange-Assert-Act pattern. These tests focus on:
+The page model methods are tested using seven tests in the `IndexPageTests` class (`tests/RazorPagesTestSample.Tests/UnitTests/IndexPageTests.cs`). The tests use the familiar Arrange-Act-Assert pattern. These tests focus on:
 
 * Determining if the methods follow the correct behavior when the [ModelState](xref:Microsoft.AspNetCore.Mvc.ModelBinding.ModelStateDictionary) is invalid.
 * Confirming the methods produce the correct <xref:Microsoft.AspNetCore.Mvc.IActionResult>.
@@ -365,12 +364,12 @@ Other tests in this group create page model objects that include the <xref:Micro
 
 ## Additional resources
 
-* [Unit testing C# in .NET Core using dotnet test and xUnit](/dotnet/articles/core/testing/unit-testing-with-dotnet-test)
+* [Testing with `dotnet test`](/dotnet/core/testing/unit-testing-with-dotnet-test)
 * <xref:mvc/controllers/testing>
 * [Unit Test Your Code](/visualstudio/test/unit-test-your-code) (Visual Studio)
 * <xref:test/integration-tests>
 * [xUnit.net](https://github.com/xunit/xunit)
-* [Getting started with xUnit.net: Using .NET Core with the .NET SDK command line](https://xunit.net/docs/getting-started/netcore/cmdline)
+* [Getting started with xUnit.net](https://xunit.net/docs/getting-started/netcore/cmdline)
 * [Moq](https://github.com/moq/moq4)
 * [Moq Quickstart](https://github.com/Moq/moq4/wiki/Quickstart)
 * [JustMockLite](https://github.com/telerik/JustMockLite): A mocking framework for .NET developers. (*Not maintained or supported by Microsoft.*)

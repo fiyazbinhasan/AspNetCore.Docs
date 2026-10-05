@@ -1,15 +1,15 @@
 ---
 ms.topic: include
 author: mgravell
-ms.author: marcgravell
+ms.author: wpickett
 ms.date: 05/21/2024
 ---
 ### New `HybridCache` library
 
 > [!IMPORTANT]
-> `HybridCache` is currently still in preview but will be fully released *after* .NET 9.0 in a future minor release of .NET Extensions.
+> `HybridCache` is currently still in preview but will be fully released *after* .NET 9 in a future minor release of .NET Extensions.
 
-The [`HybridCache`](https://source.dot.net/#Microsoft.Extensions.Caching.Hybrid/Runtime/HybridCache.cs,8c0fe94693d1ac8d) API bridges some gaps in the existing <xref:Microsoft.Extensions.Caching.Distributed.IDistributedCache> and <xref:Microsoft.Extensions.Caching.Memory.IMemoryCache> APIs. It also adds new capabilities, such as:
+The <xref:Microsoft.Extensions.Caching.Hybrid.HybridCache> API bridges some gaps in the existing <xref:Microsoft.Extensions.Caching.Distributed.IDistributedCache> and <xref:Microsoft.Extensions.Caching.Memory.IMemoryCache> APIs. It also adds new capabilities, such as:
 
 * **"Stampede" protection** to prevent parallel fetches of the same work.
 * Configurable serialization.
@@ -55,7 +55,7 @@ That's a lot of work to get right each time, including things like serialization
 
 To simplify and improve this code with `HybridCache`, we first need to add the new library `Microsoft.Extensions.Caching.Hybrid`:
 
-``` xml
+```xml
 <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" Version="9.0.0" />
 ```
 
@@ -114,7 +114,7 @@ Because a lot of `HybridCache` usage will be adapted from existing `IDistributed
 * If the types being cached are immutable.
 * If the code doesn't modify them.
 
-In such cases, inform `HybridCache` that it's safe to reuse instances by:
+In such cases, inform `HybridCache` that it's safe to reuse instances by making both of the following changes:
 
 * Marking the type as `sealed`. The `sealed` keyword in C# means that the class can't be inherited.
 * Applying the `[ImmutableObject(true)]` attribute to it. The `[ImmutableObject(true)]` attribute indicates that the object's state can't be changed after it's created.
@@ -126,7 +126,7 @@ By reusing instances, `HybridCache` can reduce the overhead of CPU and object al
 Like `IDistributedCache`, `HybridCache` supports removal by key with a `RemoveKeyAsync` method.
 
 `HybridCache` also provides optional APIs for `IDistributedCache` implementations, to avoid `byte[]` allocations. This feature is implemented
-by the preview versions of the `Microsoft.Extensions.Caching.StackExchangeRedis` and `Microsoft.Extensions.Caching.SqlServer` packages.
+by the preview versions of the `Microsoft.Extensions.Caching.StackExchangeRedis`,  `Microsoft.Extensions.Caching.SqlServer`, and `Microsoft.Extensions.Caching.Postgres` packages.
 
 Serialization is configured as part of registering the service, with support for type-specific and generalized serializers via the
 `WithSerializer` and `.WithSerializerFactory` methods, chained from the `AddHybridCache` call. By default, the library

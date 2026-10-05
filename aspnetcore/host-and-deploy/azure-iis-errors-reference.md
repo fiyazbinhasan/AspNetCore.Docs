@@ -1,10 +1,10 @@
 ---
 title: Common error troubleshooting for Azure App Service and IIS with ASP.NET Core
-author: rick-anderson
+author: tdykstra
 description: Provides troubleshooting advice for the most common errors when hosting ASP.NET Core apps on Azure Apps Service and IIS.
 monikerRange: '>= aspnetcore-2.1'
-ms.author: riande
-ms.date: 7/23/2024
+ms.author: tdykstra
+ms.date: 04/21/2026
 uid: host-and-deploy/azure-iis-errors-reference
 ---
 
@@ -14,25 +14,25 @@ uid: host-and-deploy/azure-iis-errors-reference
 
 :::moniker range=">= aspnetcore-6.0"
 
-This topic describes the most common errors and provides troubleshooting advice when hosting ASP.NET Core apps on Azure Apps Service and IIS.
+This article describes the most common errors and provides troubleshooting advice when hosting ASP.NET Core apps on Azure Apps Service and IIS.
 
 See <xref:test/troubleshoot-azure-iis> information on common app startup errors and instructions on how to diagnose errors.
 
 Collect the following information:
 
 * Browser behavior such as status code and error message.
-* Application Event Log entries
+* Application Event Log entries.
   * Azure App Service: See <xref:test/troubleshoot-azure-iis>.
   * IIS
     1. Select **Start** on the **Windows** menu, type *Event Viewer*, and press **Enter**.
     1. After the **Event Viewer** opens, expand **Windows Logs** > **Application** in the sidebar.
-* ASP.NET Core Module stdout and debug log entries
+* ASP.NET Core Module stdout and debug log entries.
   * Azure App Service: See <xref:test/troubleshoot-azure-iis>.
-  * IIS: Follow the instructions in the [Log creation and redirection](xref:host-and-deploy/aspnet-core-module#log-creation-and-redirection) and [Enhanced diagnostic logs](xref:host-and-deploy/iis/logging-and-diagnostics#enhanced-diagnostic-logs) sections of the ASP.NET Core Module topic.
+  * IIS: Follow the instructions in the [Log creation and redirection](xref:host-and-deploy/aspnet-core-module#log-creation-and-redirection) and [Enhanced diagnostic logs](xref:host-and-deploy/iis/logging-and-diagnostics#enhanced-diagnostic-logs) sections of the ASP.NET Core Module article.
 
 Compare error information to the following common errors. If a match is found, follow the troubleshooting advice.
 
-The list of errors in this topic isn't exhaustive. If you encounter an error not listed here, open a new issue using the **Content feedback** button at the bottom of this topic with detailed instructions on how to reproduce the error.
+The list of errors in this article isn't exhaustive. If you encounter an error not listed here, open a new issue using the **Content feedback** button at the bottom of this article with detailed instructions on how to reproduce the error.
 
 [!INCLUDE[Azure App Service Preview Notice](~/includes/azure-apps-preview-notice.md)]
 
@@ -42,7 +42,7 @@ The list of errors in this topic isn't exhaustive. If you encounter an error not
 
 Troubleshooting:
 
-Non-OS files in the **C:\Windows\SysWOW64\inetsrv** directory aren't preserved during an OS upgrade. If the ASP.NET Core Module is installed prior to an OS upgrade and then any app pool is run in 32-bit mode after an OS upgrade, this issue is encountered. After an OS upgrade, repair the ASP.NET Core Module. See [Install the .NET Core Hosting bundle](xref:host-and-deploy/iis/index#install-the-net-core-hosting-bundle). Select **Repair** when the installer is run.
+Non-OS files in the **C:\Windows\SysWOW64\inetsrv** directory aren't preserved during an OS upgrade. If the ASP.NET Core Module is installed prior to an OS upgrade and then any app pool is run in 32-bit mode after an OS upgrade, this issue is encountered. After an OS upgrade, repair the ASP.NET Core Module. See [Install the .NET Hosting bundle](xref:host-and-deploy/iis/index#install-the-net-hosting-bundle). Select **Repair** when the installer is run.
 
 ## Missing site extension, 32-bit (x86) and 64-bit (x64) site extensions installed, or wrong process bitness set
 
@@ -155,11 +155,11 @@ Troubleshooting:
 
 * Confirm that the proper role is enabled. See [IIS Configuration](xref:host-and-deploy/iis/index#iis-configuration).
 
-* Open **Programs & Features** or **Apps & features** and confirm that **Windows Server Hosting** is installed. If **Windows Server Hosting** isn't present in the list of installed programs, download and install the .NET Core Hosting Bundle.
+* Open **Programs & Features** or **Apps & features** and confirm that **Windows Server Hosting** is installed. If **Windows Server Hosting** isn't present in the list of installed programs, download and install the .NET Hosting Bundle.
 
-  [Current .NET Core Hosting Bundle installer (direct download)](https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer)
+  [Current .NET Hosting Bundle installer (direct download)](https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer)
 
-  For more information, see [Install the .NET Core Hosting Bundle](xref:host-and-deploy/iis/index#install-the-net-core-hosting-bundle).
+  For more information, see [Install the .NET Hosting Bundle](xref:host-and-deploy/iis/index#install-the-net-hosting-bundle).
 
 * Make sure that the **Application Pool** > **Process Model** > **Identity** is set to **ApplicationPoolIdentity** or the custom identity has the correct permissions to access the app's deployment folder.
 
@@ -191,13 +191,13 @@ Troubleshooting:
 
 * For an FDD, *dotnet.exe* might not be accessible for the user identity of the app pool. Confirm that the app pool user identity has access to the *C:\Program Files\dotnet* directory. Confirm that there are no deny rules configured for the app pool user identity on the *C:\Program Files\dotnet* and app directories.
 
-* An FDD may have been deployed and .NET Core installed without restarting IIS. Either restart the server or restart IIS by executing **net stop was /y** followed by **net start w3svc** from a command prompt.
+* An FDD may have been deployed and .NET installed without restarting IIS. Either restart the server or restart IIS by executing **net stop was /y** followed by **net start w3svc** from a command prompt.
 
-* An FDD may have been deployed without installing the .NET Core runtime on the hosting system. If the .NET Core runtime hasn't been installed, run the **.NET Core Hosting Bundle installer** on the system.
+* An FDD may have been deployed without installing the .NET runtime on the hosting system. If the .NET runtime hasn't been installed, run the **.NET Hosting Bundle installer** on the system.
 
-  [Current .NET Core Hosting Bundle installer (direct download)](https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer)
+  [Current .NET Hosting Bundle installer (direct download)](https://dotnet.microsoft.com/permalink/dotnetcore-current-windows-runtime-bundle-installer)
 
-  For more information, see [Install the .NET Core Hosting Bundle](xref:host-and-deploy/iis/index#install-the-net-core-hosting-bundle).
+  For more information, see [Install the .NET Hosting Bundle](xref:host-and-deploy/iis/index#install-the-net-hosting-bundle).
 
   If a specific runtime is required, download the runtime from the [.NET Downloads](https://dotnet.microsoft.com/download/dotnet) page and install it on the system. Complete the installation by restarting the system or restarting IIS by executing **net stop was /y** followed by **net start w3svc** from a command prompt.
 
@@ -217,7 +217,7 @@ Troubleshooting:
 
 * Examine the *arguments* attribute on the `<aspNetCore>` element in *web.config* to confirm that it's either (a) `.\{ASSEMBLY}.dll` for a framework-dependent deployment (FDD); or (b) not present, an empty string (`arguments=""`), or a list of the app's arguments (`arguments="{ARGUMENT_1}, {ARGUMENT_2}, ... {ARGUMENT_X}"`) for a self-contained deployment (SCD).
 
-## Missing .NET Core shared framework
+## Missing .NET shared framework
 
 * **Browser:** HTTP Error 500.0 - ANCM In-Process Handler Load Failure
 
@@ -293,7 +293,7 @@ Troubleshooting:
 
 The process failed to start, most likely due to an app configuration or programming issue.
 
-For more information, see the following topics:
+For more information, see the following articles:
 
 * <xref:test/troubleshoot-azure-iis>
 * <xref:test/troubleshoot>

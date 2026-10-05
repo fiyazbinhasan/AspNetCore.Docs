@@ -86,14 +86,28 @@ For more information on configuration, see <xref:grpc/configuration>.
 
 ## Logging
 
-C-core-based apps rely on the `GrpcEnvironment` to [configure the logger](https://grpc.io/grpc/csharp/api/Grpc.Core.GrpcEnvironment.html?q=size#Grpc_Core_GrpcEnvironment_SetLogger_Grpc_Core_Logging_ILogger_) for debugging purposes. The ASP.NET Core stack provides this functionality through the [Logging API](xref:fundamentals/logging/index). For example, a logger can be added to the gRPC service via constructor injection:
+C-core-based apps rely on the `GrpcEnvironment` to [configure the logger](https://grpc.io/grpc/csharp/api/Grpc.Core.GrpcEnvironment.html?q=size#Grpc_Core_GrpcEnvironment_SetLogger_Grpc_Core_Logging_ILogger_) for debugging purposes. The ASP.NET Core stack provides this functionality through the [Logging API](xref:fundamentals/logging/index). For example, a logger can be added to the gRPC service.
+
+Constructor injection:
 
 ```csharp
 public class GreeterService : Greeter.GreeterBase
 {
+    private readonly ILogger<GreeterService> _logger;
+
     public GreeterService(ILogger<GreeterService> logger)
     {
+        _logger = logger;
     }
+}
+```
+
+Primary constructor injection (.NET 8 or later):
+
+```csharp
+public class GreeterService(ILogger<GreeterService> logger) : Greeter.GreeterBase
+{
+    ...
 }
 ```
 
@@ -113,7 +127,7 @@ C-core-based apps configure HTTPS through the [Server.Ports property](https://gr
 
 ASP.NET Core [middleware](xref:fundamentals/middleware/index) offers similar functionalities compared to interceptors in C-core-based gRPC apps. Both are supported by ASP.NET Core gRPC apps, so there's no need to rewrite interceptors.
 
-For more information on how these features compare to each other, see [gRPC Interceptors versus Middleware](xref:grpc/interceptors#grpc-interceptors-versus-middleware).
+For more information on how these features compare to each other, see [gRPC Interceptors versus middleware](xref:grpc/interceptors#grpc-interceptors-versus-middleware).
 
 ## Host gRPC in non-ASP.NET Core projects
 

@@ -45,7 +45,7 @@ groups:
     - id: graph-sdk-4
       title: Graph SDK v4
     - id: graph-sdk-5
-      title: Graph SDK v5
+      title: Graph SDK v5 or later
     - id: named-client-graph-api
       title: Named HttpClient with Graph API
 - id: blazor-multiple-hosted-wasm-apps
@@ -84,10 +84,12 @@ groups:
   title: Specification
   prompt: Choose the app specification
   pivots:
-    - id: without-bff-pattern
-      title: OIDC without BFF pattern
-    - id: with-bff-pattern
-      title: OIDC with BFF pattern
+    - id: with-yarp-and-aspire
+      title: With YARP and Aspire (Interactive Auto)
+    - id: without-yarp-and-aspire
+      title: Without YARP and Aspire (Interactive Auto)
+    - id: without-yarp-and-aspire-server
+      title: Without YARP and Aspire (Interactive Server)
 - id: tooling
   title: Tooling
   prompt: Select your tooling
@@ -98,3 +100,37 @@ groups:
       title: Visual Studio Code
     - id: cli
       title: .NET CLI
+- id: blazor-web-app-entra-specification
+  title: Specification
+  prompt: Choose the app specification
+  pivots:
+    - id: with-yarp-and-aspire
+      title: With YARP and Aspire
+    - id: without-yarp-and-aspire
+      title: Without YARP and Aspire
+- id: unit-testing-framework
+  title: Unit testing framework
+  prompt: Choose a unit testing framework
+  pivots:
+    - id: xunit
+      title: xUnit
+    - id: mstest
+      title: MSTest
+    - id: nunit
+      title: NUnit
+- id: migration-remote-app-setup
+  title: Remote app setup
+  prompt: Choose how to configure remote app
+  pivots:
+    - id: manual
+      title: Manually
+    - id: aspire
+      title: Aspire
+- id: implementation
+  title: Feature implementation
+  prompt: Choose how the feature will be implemented
+  pivots:
+    - id: new-development
+      title: New app created from the project template
+    - id: existing-app
+      title: Implemented in an existing app

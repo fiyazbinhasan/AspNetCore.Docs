@@ -3,9 +3,8 @@ title: Display images and documents in ASP.NET Core Blazor
 author: guardrex
 description: Learn how to display images and documents in ASP.NET Core Blazor apps.
 monikerRange: '>= aspnetcore-6.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/13/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/images-and-documents
 ---
 # Display images and documents in ASP.NET Core Blazor
@@ -155,9 +154,9 @@ The following `ShowImage2` component:
 
 :::moniker-end
 
-The following `ShowFile` component loads either a text file (`files/quote.txt`) or a PDF file (`files/quote.pdf`) into an [`<iframe>` element (MDN documentation)](https://developer.mozilla.org/docs/Web/HTML/Element/iframe).
+The following `ShowFile` component loads either a text file (`files/quote.txt`) or a PDF file (`files/quote.pdf`) into an [`<iframe>` element](https://developer.mozilla.org/docs/Web/HTML/Element/iframe).
 
-> [!CAUTION]
+> [!WARNING]
 > Use of the `<iframe>` element in the following example is safe and doesn't require [sandboxing](https://developer.mozilla.org/docs/Web/HTML/Element/iframe#sandbox) because content is loaded from the app, which is a trusted source.
 >
 > When loading content from an untrusted source or user input, an improperly implemented `<iframe>` element risks creating security vulnerabilities.
@@ -187,6 +186,8 @@ The following `ShowFile` component loads either a text file (`files/quote.txt`) 
 :::code language="razor" source="~/../blazor-samples/6.0/BlazorSample_WebAssembly/Pages/images/ShowFile.razor":::
 
 :::moniker-end
+
+In the preceding example, the `using` statement for the `response` variable doesn't dispose of the <xref:System.Net.Http.HttpResponseMessage> instance until the scope of `ShowFileAsync` ends. The open stream is maintained long enough to transfer the file data to the `setSource` function via JavaScript interop. For general guidance on the importance of disposing of <xref:System.Net.Http.HttpResponseMessage> instances, see <xref:blazor/call-web-api#disposal-of-httprequestmessage-httpresponsemessage-and-httpclient>.
 
 ## Additional resources
 

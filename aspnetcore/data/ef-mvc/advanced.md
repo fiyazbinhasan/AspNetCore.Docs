@@ -3,7 +3,6 @@ title: "Tutorial: Learn about advanced scenarios - ASP.NET MVC with EF Core"
 description: "This tutorial introduces useful topics for going beyond the basics of developing ASP.NET Core web apps that use Entity Framework Core."
 author: tdykstra
 ms.author: tdykstra
-ms.custom: mvc
 ms.date: 03/27/2019
 ms.topic: tutorial
 uid: data/ef-mvc/advanced
@@ -34,7 +33,7 @@ In this tutorial, you:
 
 One of the advantages of using the Entity Framework is that it avoids tying your code too closely to a particular method of storing data. It does this by generating SQL queries and commands for you, which also frees you from having to write them yourself. But there are exceptional scenarios when you need to run specific SQL queries that you have manually created. For these scenarios, the Entity Framework Code First API includes methods that enable you to pass SQL commands directly to the database. You have the following options in EF Core 1.0:
 
-* Use the `DbSet.FromSql` method for queries that return entity types. The returned objects must be of the type expected by the `DbSet` object, and they're automatically tracked by the database context unless you [turn tracking off](crud.md#no-tracking-queries).
+* Use the `DbSet.FromSql` method for queries that return entity types. The returned objects must be of the type expected by the `DbSet` object, and they're automatically tracked by the database context unless you [turn tracking off](crud.md#disable-tracking-of-entity-objects-no-tracking-queries).
 
 * Use the `Database.ExecuteSqlCommand` for non-query commands.
 
@@ -255,6 +254,8 @@ For more information about EF Core, see the [Entity Framework Core documentation
 For information on how to deploy a web app, see <xref:host-and-deploy/index>.
 
 For information about other topics related to ASP.NET Core MVC, such as authentication and authorization, see <xref:index>.
+
+[!INCLUDE[](~/includes/reliableWAP.md)]
 
 ## Next steps
 

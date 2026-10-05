@@ -3,9 +3,8 @@ title: Build a Blazor todo list app
 author: guardrex
 description: Build a Blazor app step-by-step.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tutorials/build-a-blazor-app
 ---
 # Build a Blazor todo list app
@@ -531,7 +530,7 @@ Save the `Todo.razor` file. The app is automatically rebuilt in the command shel
 
 Add items, edit items, and mark todo items done to test the component.
 
-When finished, shut down the app in the command shell. Many command shells accept the keyboard command <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS) to stop an app.
+When finished, shut down the app in the command shell. Many command shells accept the keyboard command <kbd>Ctrl</kbd>+<kbd>C</kbd> to stop an app.
 
 ## Publish to Azure
 

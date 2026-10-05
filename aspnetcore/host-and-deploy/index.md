@@ -4,8 +4,7 @@ author: tdykstra
 description: Learn how to set up hosting environments and deploy ASP.NET Core apps.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 02/07/2020
+ms.date: 04/22/2026
 uid: host-and-deploy/index
 ---
 # Host and deploy ASP.NET Core
@@ -83,7 +82,7 @@ Additional configuration might be required for apps hosted behind proxy servers 
 
 Deployment often requires additional tasks besides copying the output from [dotnet publish](/dotnet/core/tools/dotnet-publish) to a server. For example, extra files might be required or excluded from the *publish* folder. Visual Studio uses [MSBuild](/visualstudio/msbuild/msbuild) for web deployment, and MSBuild can be customized to do many other tasks during deployment. For more information, see <xref:host-and-deploy/visual-studio-publish-profiles> and the [Using MSBuild and Team Foundation Build](https://www.microsoftpressstore.com/store/inside-the-microsoft-build-engine-using-msbuild-and-9780735645240) book.
 
-By using [the Publish Web feature](xref:tutorials/publish-to-azure-webapp-using-vs) apps can be deployed directly from Visual Studio to the Azure App Service. Azure DevOps Services supports [continuous deployment to Azure App Service](/azure/devops/pipelines/targets/webapp). For more information, see [DevOps for ASP.NET Core Developers](/dotnet/architecture/devops-for-aspnet-developers).
+By using [the Publish Web feature](xref:tutorials/publish-to-azure-webapp-using-vs), apps can be deployed directly from Visual Studio to the Azure App Service. Azure DevOps Services supports [continuous deployment to Azure App Service](/azure/devops/pipelines/targets/webapp). For more information, see [DevOps for ASP.NET Core Developers](/dotnet/architecture/devops-for-aspnet-developers).
 
 ## Publish to Azure
 
@@ -107,10 +106,11 @@ For more information, see <xref:host-and-deploy/docker/index>.
 
 ## Perform health checks
 
-Use Health Check Middleware to perform health checks on an app and its dependencies. For more information, see <xref:host-and-deploy/health-checks>.
+Use health checks middleware to perform health checks on an app and its dependencies. For more information, see <xref:host-and-deploy/health-checks>.
 
 ## Additional resources
 
+* [.NET application publishing overview](/dotnet/core/deploying)
 * <xref:test/troubleshoot>
 * [ASP.NET Hosting](https://dotnet.microsoft.com/apps/aspnet/hosting)
 
@@ -184,6 +184,7 @@ For more information, see <xref:host-and-deploy/docker/index>.
 
 ## Additional resources
 
+* [.NET application publishing overview](/dotnet/core/deploying)
 * <xref:test/troubleshoot>
 * [ASP.NET Hosting](https://dotnet.microsoft.com/apps/aspnet/hosting)
 

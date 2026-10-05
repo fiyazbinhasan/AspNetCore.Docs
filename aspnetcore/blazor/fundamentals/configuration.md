@@ -3,9 +3,8 @@ title: ASP.NET Core Blazor configuration
 author: guardrex
 description: Learn about Blazor app configuration, including app settings, authentication, and logging configuration.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/fundamentals/configuration
 ---
 # ASP.NET Core Blazor configuration
@@ -264,7 +263,7 @@ builder.Services.AddOidcAuthentication(options =>
 
 *This section applies to apps that configure logging via an app settings file in the `wwwroot` folder.*
 
-Add the [`Microsoft.Extensions.Logging.Configuration`](https://www.nuget.org/packages/Microsoft.Extensions.Logging.Configuration) package to the app.
+Add the [`Microsoft.Extensions.Logging.Configuration` package](https://www.nuget.org/packages/Microsoft.Extensions.Logging.Configuration) to the app.
 
 [!INCLUDE[](~/includes/package-reference.md)]
 
@@ -300,24 +299,95 @@ var hostname = builder.Configuration["HostName"];
 
 ## Cached configuration
 
-Configuration files are cached for offline use. With [Progressive Web Applications (PWAs)](xref:blazor/progressive-web-app), you can only update configuration files when creating a new deployment. Editing configuration files between deployments has no effect because:
+Configuration files are cached for offline use. With [Progressive Web Applications (PWAs)](xref:blazor/progressive-web-app/index), you can only update configuration files when creating a new deployment. Editing configuration files between deployments has no effect because:
 
 * Users have cached versions of the files that they continue to use.
 * The PWA's `service-worker.js` and `service-worker-assets.js` files must be rebuilt on compilation, which signal to the app on the user's next online visit that the app has been redeployed.
 
-For more information on how background updates are handled by PWAs, see <xref:blazor/progressive-web-app#background-updates>.
+For more information on how background updates are handled by PWAs, see <xref:blazor/progressive-web-app/index#background-updates>.
 
 ## Options configuration
 
-[Options configuration](xref:fundamentals/configuration/options) requires adding a package reference for the [`Microsoft.Extensions.Options.ConfigurationExtensions`](https://www.nuget.org/packages/Microsoft.Extensions.Options.ConfigurationExtensions) NuGet package.
-
-[!INCLUDE[](~/includes/package-reference.md)]
+[Options configuration](xref:fundamentals/configuration/options) uses API in the [`Microsoft.Extensions.Options.ConfigurationExtensions`](https://www.nuget.org/packages/Microsoft.Extensions.Options.ConfigurationExtensions) NuGet package.
 
 Example:
 
+`OptionsExample.cs`:
+
 ```csharp
-builder.Services.Configure<MyOptions>(
-    builder.Configuration.GetSection("MyOptions"));
+public class OptionsExample
+{
+    public string? Option1 { get; set; }
+    public string? Option2 { get; set; }
+}
+```
+
+In `appsettings.json`:
+
+```json
+"OptionsExample": {
+  "Option1": "Option1 Value",
+  "Option2": "Option2 Value"
+}
+```
+
+```csharp
+builder.Services.Configure<OptionsExample>(
+    builder.Configuration.GetSection("OptionsExample"));
+```
+
+The following Razor component retrieves the settings with the [`@inject`](xref:mvc/views/razor#inject) directive or [`[Inject]` attribute](xref:Microsoft.AspNetCore.Components.InjectAttribute).
+
+`Options.razor`:
+
+```razor
+@page "/options"
+@using Microsoft.Extensions.Options
+@inject IOptions<OptionsExample>? OptionsExample1
+
+<h1>Options</h1>
+
+<h2>
+    &commat;inject approach
+</h2>
+
+<ul>
+    <li>@OptionsExample1?.Value.Option1</li>
+    <li>@OptionsExample1?.Value.Option2</li>
+</ul>
+
+<h2>
+    [Inject] approach
+</h2>
+
+<ul>
+    <li>@OptionsExample2?.Value.Option1</li>
+    <li>@OptionsExample2?.Value.Option2</li>
+</ul>
+
+@code {
+    [Inject]
+    public IOptions<OptionsExample>? OptionsExample2 { get; set; }
+}
 ```
 
 Not all of the ASP.NET Core Options features are supported in Razor components. For example, <xref:Microsoft.Extensions.Options.IOptionsSnapshot%601> and <xref:Microsoft.Extensions.Options.IOptionsMonitor%601> configuration is supported, but recomputing option values for these interfaces isn't supported outside of reloading the app by either requesting the app in a new browser tab or selecting the browser's reload button. Merely calling [`StateHasChanged`](xref:blazor/components/lifecycle#state-changes-statehaschanged) doesn't update snapshot or monitored option values when the underlying configuration changes.
+
+:::moniker range=">= aspnetcore-11.0"
+
+### Environment variables in Blazor WebAssembly configuration
+
+Blazor WebAssembly applications access environment variables through <xref:Microsoft.Extensions.Configuration.IConfiguration>. This enables runtime configuration without rebuilding the app, making it easier to deploy the same build to different environments.
+
+In the following example, the `API_ENDPOINT` and `ENABLE_FEATURE_X` environment variables are automatically included in configuration:
+
+```csharp
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
+
+var apiEndpoint = builder.Configuration["API_ENDPOINT"];
+var featureFlag = builder.Configuration["ENABLE_FEATURE_X"];
+```
+
+Environment variables are loaded into the configuration system alongside other configuration sources, such as app settings (`appsettings.json`), providing a unified way to access configuration values regardless of their source.
+
+:::moniker-end

@@ -4,7 +4,8 @@ author: wadepickett
 description: Part 4 of tutorial series on ASP.NET Core MVC.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: wpickett
-ms.date: 07/24/2024
+ms.custom: sfi-ropc-nochange
+ms.date: 01/22/2026
 uid: tutorials/first-mvc-app/adding-model
 ---
 
@@ -12,9 +13,7 @@ uid: tutorials/first-mvc-app/adding-model
 
 [!INCLUDE[](~/includes/not-latest-version.md)]
 
-By [Rick Anderson](https://twitter.com/RickAndMSFT) and [Jon P Smith](https://twitter.com/thereformedprog).
-
-:::moniker range=">= aspnetcore-9.0"
+:::moniker range=">= aspnetcore-10.0"
 
 In this tutorial, classes are added for managing movies in a database. These classes are the "**M**odel" part of the **M**VC app.
 
@@ -38,7 +37,7 @@ Add a file named `Movie.cs` to the *Models* folder.
 
 Update the `Models/Movie.cs` file with the following code:
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/mvcmovie90/Models/Movie.cs?name=snippet_First)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/mvcmovie10/Models/Movie.cs?name=snippet_First)]
 
 The `Movie` class contains an `Id` field, which is required by the database for the primary key.
 
@@ -61,9 +60,11 @@ Build the project as a check for compiler errors.
 
 # [Visual Studio Code](#tab/visual-studio-code)
 
+Open a command window in the project directory. The project directory is the directory that contains the `Program.cs` and `.csproj` files.
+
 [!INCLUDE[](~/includes/add-EF-NuGet-SQLite-CLI-9.md)]
 
-In Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+In Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 In the *Panel* below the editor region, select the *PROBLEMS* tab, or from the *View* menu, select *Problems* if it is not currently in view. Verify there are no compilation errors.
 
@@ -77,7 +78,7 @@ Use the scaffolding tool to produce `Create`, `Read`, `Update`, and `Delete` (CR
 
 In **Solution Explorer**, right-click the *Controllers* folder and select **Add > New Scaffolded Item**.
 
-![view of above step](~/tutorials/first-mvc-app/adding-model/_static/9/add_new_scaffoldvs22v17.11.0.png)
+:::image type="content" source="~/tutorials/first-mvc-app/adding-model/media/new-scaffolded-item.png" alt-text="View of the menu item to add a new scaffolded item.":::
 
 In the **Add New Scaffolded Item** dialog:
 
@@ -85,7 +86,7 @@ In the **Add New Scaffolded Item** dialog:
 * Select  **MVC Controller with views, using Entity Framework**.
 * Select **Add**.
 
-![Add Scaffold dialog](~/tutorials/first-mvc-app/adding-model/_static/9/add_scaffold-VS22-17.11.0.png)
+:::image type="content" source="~/tutorials/first-mvc-app/adding-model/media/add-new-scaffolded-item.png" alt-text="Add Scaffold dialog.":::
 
 Complete the **Add MVC Controller with views, using Entity Framework** dialog:
 
@@ -97,7 +98,7 @@ Complete the **Add MVC Controller with views, using Entity Framework** dialog:
 * **Views** and **Controller name**: Keep the default.
 * Select **Add**.
 
-![Add Data context keep defaults](~/tutorials/first-mvc-app/adding-model/_static/9/dc_last_step_vs22v17.11.0.png)
+:::image type="content" source="~/tutorials/first-mvc-app/adding-model/media/add-mvc-controller-with-views.png" alt-text="Add Data context keep defaults.":::
 
 If you get an error message, select **Add** a second time to try it again.
 
@@ -170,7 +171,7 @@ Build the app to verify that there are no errors.
 
 The following highlighted code in `Program.cs` shows how to use SQLite in development and SQL Server in production.
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Program.cs?name=snippet_SQLiteDevProd&highlight=3-99)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Program.cs?name=snippet_SQLiteDevProd&highlight=3-99)]
 
 ---
 
@@ -242,6 +243,8 @@ For more information on maintaining multiple providers such as Microsoft SQL Ser
 
 Run the app and select the **Movie App** link.
 
+:::image type="content" source="~/tutorials/first-mvc-app/adding-model/media/movie-app-link.png" alt-text="App showing the Movie App view.":::
+
 If you get an exception similar to the following, you may have missed the `Update-Database` command in the [migrations step](#migration):
 
 ```console
@@ -261,7 +264,7 @@ SqliteException: SQLite Error 1: 'no such table: Movie'.
 ---
 
 > [!NOTE]
-> You may not be able to enter decimal commas in the `Price` field. To support [jQuery validation](https://jqueryvalidation.org/) for non-English locales that use a comma (",") for a decimal point and for non US-English date formats, the app must be globalized. For globalization instructions, see [this GitHub issue](https://github.com/dotnet/AspNetCore.Docs/issues/4076#issuecomment-326590420).
+> You may not be able to enter decimal commas in the `Price` field. To support [jQuery validation](https://jqueryvalidation.org/) for non-English locales that use a comma (",") for a decimal point and for non US-English date formats, the app must be globalized. For globalization instructions, see [this GitHub issue](https://github.com/dotnet/AspNetCore.Docs/issues/4076#issuecomment-326510420).
 
 <a name="dc"></a>
 
@@ -271,7 +274,7 @@ With EF Core, data access is performed using a model. A model is made up of enti
 
 Scaffolding creates the `Data/MvcMovieContext.cs` database context class:
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Data/MvcMovieContext.cs?name=snippet_First)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Data/MvcMovieContext.cs?name=snippet_First)]
 
 The preceding code creates a [DbSet\<Movie>](xref:Microsoft.EntityFrameworkCore.DbSet%601) property that represents the movies in the database.
 
@@ -285,11 +288,11 @@ Scaffolding generated the following highlighted code in `Program.cs`:
 
 # [Visual Studio](#tab/visual-studio)
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Program.cs?name=snippet_FirstSQLServer&highlight=2-3)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Program.cs?name=snippet_FirstSQLServer&highlight=2-3)]
 
 # [Visual Studio Code](#tab/visual-studio-code)
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Program.cs?name=snippet_FirstSQLite&highlight=3-4)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Program.cs?name=snippet_FirstSQLite&highlight=3-4)]
 
 ---
 
@@ -303,11 +306,11 @@ Scaffolding added a connection string to the `appsettings.json` file:
 
 # [Visual Studio](#tab/visual-studio)
 
-[!code-json[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/appsettings.json?highlight=9-10)]
+[!code-json[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/appsettings.json?highlight=9-10)]
 
 # [Visual Studio Code](#tab/visual-studio-code)
 
-[!code-json[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/appsettings_SQLite.json?highlight=9-10)]
+[!code-json[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/appsettings_SQLite.json?highlight=9-10)]
 
 ---
 
@@ -317,7 +320,7 @@ For local development, the [ASP.NET Core configuration system](xref:fundamentals
 
 Examine the `Migrations/{timestamp}_InitialCreate.cs` migration file:
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Migrations/20240725022257_InitialCreate.cs)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Migrations/20240725022257_InitialCreate.cs)]
 
 In the preceding code:
 
@@ -330,7 +333,7 @@ Open the `Controllers/MoviesController.cs` file and examine the constructor:
 
 <!-- l.. Make copy of Movies controller (or use the old one as I did in the 3.0 upgrade) because we comment out the initial index method and update it later  -->
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Controllers/MoviesController.cs?name=snippet_Constructor)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Controllers/MoviesController.cs?name=snippet_Constructor)]
 
 The constructor uses [Dependency Injection](xref:fundamentals/dependency-injection) to inject the database context (`MvcMovieContext`) into the controller. The database context is used in each of the [CRUD](https://wikipedia.org/wiki/Create,_read,_update_and_delete) methods in the controller.
 
@@ -348,9 +351,9 @@ MVC provides the ability to pass strongly typed model objects to a view. This st
 
 Examine the generated `Details` method in the `Controllers/MoviesController.cs` file:
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Controllers/MoviesController.cs?name=snippet_Details)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Controllers/MoviesController.cs?name=snippet_Details)]
 
-The `id` parameter is generally passed as route data. For example, `https://localhost:5001/movies/details/1` sets:
+The `id` parameter is generally passed as route data. For example, `https://localhost:{PORT}/movies/details/1` sets:
 
 * The controller to the `movies` controller, the first URL segment.
 * The action to `details`, the second URL segment.
@@ -358,7 +361,7 @@ The `id` parameter is generally passed as route data. For example, `https://loca
 
 The `id` can be passed in with a query string, as in the following example:
 
-`https://localhost:5001/movies/details?id=1`
+`https://localhost:{PORT}/movies/details?id=1`
 
 The `id` parameter is defined as a [nullable type](/dotnet/csharp/programming-guide/nullable-types/index) (`int?`) in cases when the `id` value isn't provided.
 
@@ -377,7 +380,7 @@ return View(movie);
 
 Examine the contents of the `Views/Movies/Details.cshtml` file:
 
-[!code-cshtml[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Views/Movies/DetailsOriginal.cshtml)]
+[!code-cshtml[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Views/Movies/DetailsOriginal.cshtml)]
 
 The `@model` statement at the top of the view file specifies the type of object that the view expects. When the movie controller was created, the following `@model` statement was included:
 
@@ -389,19 +392,19 @@ This `@model` directive allows access to the movie that the controller passed to
 
 Examine the `Index.cshtml` view and the `Index` method in the Movies controller. Notice how the code creates a `List` object when it calls the `View` method. The code passes this `Movies` list from the `Index` action method to the view:
 
-[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/mvcmovie90/Controllers/MoviesController.cs?name=snippet_FirstIndexNoSearch)]
+[!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/mvcmovie10/Controllers/MoviesController.cs?name=snippet_FirstIndexNoSearch)]
 
-The code returns [problem details](xref:web-api/handle-errors#problem-details-service) if the `Movie` property of the data context is null.
+The code returns [problem details](xref:fundamentals/error-handling-api#problem-details-service) if the `Movie` property of the data context is null.
 
 When the movies controller was created, scaffolding included the following `@model` statement at the top of the `Index.cshtml` file:
 
 <!-- Copy Index.cshtml to IndexOriginal.cshtml -->
 
-[!code-cshtml[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Views/Movies/IndexOriginal.cshtml?range=1)]
+[!code-cshtml[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Views/Movies/IndexOriginal.cshtml?range=1)]
 
 The `@model` directive allows access to the list of movies that the controller passed to the view by using a `Model` object that's strongly typed. For example, in the `Index.cshtml` view, the code loops through the movies with a `foreach` statement over the strongly typed `Model` object:
 
-[!code-cshtml[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie90/Views/Movies/IndexOriginal.cshtml?highlight=1,31,34,37,40,43,46-48)]
+[!code-cshtml[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie10/Views/Movies/IndexOriginal.cshtml?highlight=1,31,34,37,40,43,46-48)]
 
 Because the `Model` object is strongly typed as an `IEnumerable<Movie>` object, each item in the loop is typed as `Movie`. Among other benefits, the compiler validates the types used in the code.
 
@@ -416,6 +419,8 @@ Because the `Model` object is strongly typed as an `IEnumerable<Movie>` object, 
 > [Next: Working with SQL](~/tutorials/first-mvc-app/working-with-sql.md)
 
 :::moniker-end
+
+[!INCLUDE[](~/tutorials/first-mvc-app/adding-model/includes/adding-model9.md)]
 
 [!INCLUDE[](~/tutorials/first-mvc-app/adding-model/includes/adding-model8.md)]
 

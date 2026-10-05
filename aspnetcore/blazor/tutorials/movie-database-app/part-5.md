@@ -3,19 +3,14 @@ title: Build a Blazor movie database app (Part 5 - Add validation)
 author: guardrex
 description: This part of the Blazor movie database app tutorial explains how metadata (data annotations) of the movie model is used to validate user input in the forms that create and edit movies.
 monikerRange: '>= aspnetcore-8.0'
-ms.author: riande
-ms.custom: mvc
-ms.date: 08/26/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/tutorials/movie-database-app/part-5
 zone_pivot_groups: tooling
 ---
 # Build a Blazor movie database app (Part 5 - Add validation)
 
-<!-- UPDATE 9.0 Activate after release
-
-[!INCLUDE[](~/includes/not-latest-version.md)]
-
--->
+[!INCLUDE[](~/includes/not-latest-version-without-not-supported-content.md)]
 
 This article is the fifth part of the Blazor movie database app tutorial that teaches you the basics of building an ASP.NET Core Blazor Web App with features to manage a movie database.
 
@@ -23,7 +18,7 @@ This part of the tutorial series explains how metadata of the `Movie` model is u
 
 ## Validation using data annotations
 
-Validation rules are specified on a model class using *data annotations*. The following list shows some of the <xref:System.ComponentModel.DataAnnotations> attributes for user input validation of public properties in a form's model:
+Validation rules are specified on a model class using *data annotations*. The following list shows some of the <xref:System.ComponentModel.DataAnnotations> attributes for user input validation of `public` properties in a form's model:
 
 * [`[Required]`](xref:System.ComponentModel.DataAnnotations.RequiredAttribute): Require that the user provide a value.
 * [`[StringLength]`](xref:System.ComponentModel.DataAnnotations.StringLengthAttribute): Specifies the minimum and maximum length of characters. Note that a `MinimumLength` passed to the attribute doesn't make the string required (apply the [`[Required]` attribute](xref:System.ComponentModel.DataAnnotations.RequiredAttribute)).
@@ -44,7 +39,7 @@ Add the following data annotations to the `Movie` class properties. To update al
   public string? Title { get; set; }
 
 + [Required]
-* [StringLength(30)]
++ [StringLength(30)]
 + [RegularExpression(@"^[A-Z]+[a-zA-Z()\s-]*$")]
   public string? Genre { get; set; }
 
@@ -54,7 +49,7 @@ Add the following data annotations to the `Movie` class properties. To update al
   public decimal Price { get; set; }
 ```
 
-<!-- HOLD for a later version of the tutorial
+<!-- UPDATE 11.0 - HOLD for a later version of the tutorial
      when QuickGrid has display name support per
      https://github.com/dotnet/aspnetcore/issues/49147.
 
@@ -139,7 +134,7 @@ To align the model and the database schema, create and apply an EF Core *databas
 >
 > When using VS Code, close the browser's window and stop the app in VS Code with **Run** > **Stop Debugging** or by pressing <kbd>Shift</kbd>+<kbd>F5</kbd> on the keyboard.
 >
-> When using the .NET CLI, close the browser's window and stop the app in the command shell with <kbd>Ctrl</kbd>+<kbd>C</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>C</kbd> (macOS).
+> When using the .NET CLI, close the browser's window and stop the app in the command shell with <kbd>Ctrl</kbd>+<kbd>C</kbd>.
 
 :::zone pivot="vs"
 

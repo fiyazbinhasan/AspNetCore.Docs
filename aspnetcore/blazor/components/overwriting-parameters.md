@@ -3,9 +3,8 @@ title: Avoid overwriting parameters in ASP.NET Core Blazor
 author: guardrex
 description: Learn how to avoid overwriting parameters in Blazor apps during rerendering.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 03/08/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/overwriting-parameters
 ---
 # Avoid overwriting parameters in ASP.NET Core Blazor

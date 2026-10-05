@@ -59,6 +59,9 @@ The following table describes options for configuring SignalR hubs:
 | `MaximumReceiveMessageSize` | 32 KB | Maximum size of a single incoming hub message. Increasing the value may increase the risk of [Denial of service (DoS) attacks](https://developer.mozilla.org/docs/Glossary/DOS_attack). |
 | `MaximumParallelInvocationsPerClient` | 1 | The maximum number of hub methods that each client can call in parallel before queueing. |
 
+> [!NOTE]
+> `MaximumParallelInvocationsPerClient` does not apply to streaming hub invocations. Streaming invocations are expected to be long-running and can run concurrently. Use [hub filters](xref:signalr/hub-filters) to enforce per-connection streaming concurrency limits.
+
 Options can be configured for all hubs by providing an options delegate to the `AddSignalR` call in `Program.cs`.
 
 ```csharp
@@ -84,7 +87,7 @@ Use `HttpConnectionDispatcherOptions` to configure advanced settings related to 
 
 [!code-csharp[](~/signalr/configuration/samples/6.x/Program.cs?highlight=24-30)]
 
-The following table describes options for configuring ASP.NET Core SignalR's advanced HTTP options:
+The following table describes options for configuring ASP.NET Core SignalR's advanced HTTP options.
 
 | Option | Default Value | Description |
 | ------ | ------------- | ----------- |
@@ -95,6 +98,7 @@ The following table describes options for configuring ASP.NET Core SignalR's adv
 | `LongPolling` | See below. | Additional options specific to the Long Polling transport. |
 | `WebSockets` | See below. | Additional options specific to the WebSockets transport. |
 | `MinimumProtocolVersion` | 0 | Specify the minimum version of the negotiate protocol. This is used to limit clients to newer versions. |
+| `TransportSendTimeout` | 10 seconds | The maximum amount of time the transport waits for a single send to a client to complete. If a send exceeds this timeout, the connection is closed. |
 | `CloseOnAuthenticationExpiration` | false | Set this option to enable authentication expiration tracking which will close connections when a token expires. |
 
 The Long Polling transport has additional options that can be configured using the `LongPolling` property:

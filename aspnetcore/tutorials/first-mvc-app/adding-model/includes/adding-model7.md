@@ -51,7 +51,7 @@ Build the project as a check for compiler errors.
 
 [!INCLUDE[](~/includes/add-EF-NuGet-SQLite-CLI-7.md)]
 
-In Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> (Windows) or <kbd>⌘</kbd>+<kbd>F5</kbd> (macOS) to run the app without debugging.
+In Visual Studio Code, press <kbd>Ctrl</kbd>+<kbd>F5</kbd> to run the app without debugging.
 
 In the *Panel* below the editor region, select the *PROBLEMS* tab, or from the *View* menu, select *Problems* if it is not currently in view. Verify there are no compilation errors.
 
@@ -460,7 +460,7 @@ Examine the `Index.cshtml` view and the `Index` method in the Movies controller.
 
 [!code-csharp[](~/tutorials/first-mvc-app/start-mvc/sample/MvcMovie70/Controllers/MoviesController.cs?name=snippet_FirstIndexNoSearch)]
 
-The code returns [problem details](xref:web-api/handle-errors#problem-details-service) if the `Movie` property of the data context is null.
+The code returns [problem details](xref:fundamentals/error-handling-api#problem-details-service) if the `Movie` property of the data context is null.
 
 When the movies controller was created, scaffolding included the following `@model` statement at the top of the `Index.cshtml` file:
 

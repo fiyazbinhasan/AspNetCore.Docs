@@ -1,10 +1,9 @@
 ---
 title: File Providers in ASP.NET Core
-author: rick-anderson
+author: tdykstra
 description: Learn how ASP.NET Core abstracts file system access through the use of File Providers.
 monikerRange: '>= aspnetcore-2.1'
-ms.author: riande
-ms.custom: mvc
+ms.author: tdykstra
 ms.date: 04/06/2020
 uid: fundamentals/file-providers
 ---
@@ -19,11 +18,11 @@ By [Steve Smith](https://ardalis.com/)
 ASP.NET Core abstracts file system access through the use of File Providers. File Providers are used throughout the ASP.NET Core framework. For example:
 
 * <xref:Microsoft.AspNetCore.Hosting.IWebHostEnvironment> exposes the app's [content root](xref:fundamentals/index#content-root) and [web root](xref:fundamentals/index#web-root) as `IFileProvider` types.
-* [Static File Middleware](xref:fundamentals/static-files) uses File Providers to locate static files.
+* [Static file middleware](xref:fundamentals/static-files) uses File Providers to locate static files.
 * [Razor](xref:mvc/views/razor) uses File Providers to locate pages and views.
-* .NET Core tooling uses File Providers and glob patterns to specify which files should be published.
+* .NET tooling uses File Providers and glob patterns to specify which files should be published.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/file-providers/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/file-providers/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## File Provider interfaces
 
@@ -58,6 +57,9 @@ The following table lists implementations of `IFileProvider`.
 ### Physical File Provider
 
 The <xref:Microsoft.Extensions.FileProviders.PhysicalFileProvider> provides access to the physical file system. `PhysicalFileProvider` uses the <xref:System.IO.File?displayProperty=fullName> type (for the physical provider) and scopes all paths to a directory and its children. This scoping prevents access to the file system outside of the specified directory and its children. The most common scenario for creating and using a `PhysicalFileProvider` is to request an `IFileProvider` in a constructor through [dependency injection](xref:fundamentals/dependency-injection).
+
+> [!WARNING]
+> `PhysicalFileProvider` scopes access to its root directory and child paths, but this doesn't guarantee a security sandbox. Symbolic links under the root can still expose files outside the root directory.
 
 When instantiating this provider directly, an absolute directory path is required and serves as the base path for all requests made using the provider. Glob patterns aren't supported in the directory path.
 
@@ -170,11 +172,11 @@ The following table provides common examples of glob patterns.
 ASP.NET Core abstracts file system access through the use of File Providers. File Providers are used throughout the ASP.NET Core framework:
 
 * <xref:Microsoft.Extensions.Hosting.IHostingEnvironment> exposes the app's [content root](xref:fundamentals/index#content-root) and [web root](xref:fundamentals/index#web-root) as `IFileProvider` types.
-* [Static File Middleware](xref:fundamentals/static-files) uses File Providers to locate static files.
+* [Static file middleware](xref:fundamentals/static-files) uses File Providers to locate static files.
 * [Razor](xref:mvc/views/razor) uses File Providers to locate pages and views.
-* .NET Core tooling uses File Providers and glob patterns to specify which files should be published.
+* .NET tooling uses File Providers and glob patterns to specify which files should be published.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/file-providers/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/file-providers/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## File Provider interfaces
 

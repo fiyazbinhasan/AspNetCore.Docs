@@ -1,19 +1,30 @@
 ---
 title: Get started with NSwag and ASP.NET Core
-author: zuckerthoben
+ai-usage: ai-assisted
+author: wadepickett
 description: Learn how to use NSwag to generate documentation and help pages for an ASP.NET Core web API.
 ms.author: wpickett
-ms.custom: mvc
+ms.reviewer: wpickett
 monikerRange: ">= aspnetcore-3.1 <= aspnetcore-8.0"
-ms.date: 12/05/2019
+ms.date: 07/06/2026
 uid: tutorials/get-started-with-nswag
 ---
 # Get started with NSwag and ASP.NET Core
 
 :::moniker range=">= aspnetcore-6.0"
-By [Christoph Nienaber](https://twitter.com/zuckerthoben), [Rico Suter](https://rsuter.com), and [Dave Brock](https://twitter.com/daveabrock)
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/7.x/NSwagSample) ([how to download](xref:index#how-to-download-a-sample))
+> [!NOTE]
+> In .NET 9 and later, ASP.NET Core includes built-in OpenAPI support. NSwag isn't included by default, but you can add it manually as a community package to ASP.NET Core projects targeting .NET 9 or later.
+>
+> • To understand the built-in OpenAPI features, see <xref:fundamentals/openapi/overview?view=aspnetcore-9.0&preserve-view=true>.  
+> • To add and use the Swagger UI for interactive exploration or local ad-hoc testing, see <xref:fundamentals/openapi/using-openapi-documents#use-swagger-ui-for-local-ad-hoc-testing>.  
+> • For a step-by-step walkthrough of building a Minimal API that uses the built-in OpenAPI support in the latest version of ASP.NET Core, see <xref:tutorials/min-web-api>. It shows how to test endpoints with Endpoints Explorer and `.http` files in Visual Studio and with the Scalar UI in Visual Studio Code.
+>
+> The following instructions apply when using NSwag with .NET versions earlier than 9.
+
+By [Rico Suter](https://rsuter.com) and [Dave Brock](https://twitter.com/daveabrock)
+
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/7.x/NSwagSample) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 NSwag offers the following capabilities:
 
@@ -49,14 +60,14 @@ Use one of the following approaches to install the NSwag NuGet package:
   * Right-click the project in **Solution Explorer** > **Manage NuGet Packages**
   * Set the **Package source** to "nuget.org"
   * Enter "NSwag.AspNetCore" in the search box
-  * Select the "NSwag.AspNetCore" package from the **Browse** tab and click **Install**
+  * Select the "NSwag.AspNetCore" package from the **Browse** tab and select **Install**
 
 ### [Visual Studio for Mac](#tab/visual-studio-mac)
 
 * Right-click the *Packages* folder in **Solution Pad** > **Add Packages...**
 * Set the **Add Packages** window's **Source** drop-down to "nuget.org"
 * Enter "NSwag.AspNetCore" in the search box
-* Select the "NSwag.AspNetCore" package from the results pane and click **Add Package**
+* Select the "NSwag.AspNetCore" package from the results pane and select **Add Package**
 
 ### [Visual Studio Code](#tab/visual-studio-code)
 
@@ -104,14 +115,14 @@ You can take advantage of NSwag's code generation capabilities by choosing one o
 
 ### Generate code with NSwagStudio
 
-* Install NSwagStudio by following the instructions at the [NSwagStudio GitHub repository](https://github.com/RicoSuter/NSwag/wiki/NSwagStudio). On the NSwag release page, you can download an xcopy version which can be started without installation and admin privileges.
+* Install NSwagStudio by following the instructions at the [NSwagStudio GitHub repository](https://github.com/RicoSuter/NSwag/wiki/NSwagStudio). On the NSwag release page, you can download an xcopy version, which can be started without installation and admin privileges.
 * Launch NSwagStudio and enter the `swagger.json` file URL in the **Swagger Specification URL** text box. For example, `http://localhost:5232/swagger/v1/swagger.json`.
-* Click the **Create local Copy** button to generate a JSON representation of your Swagger specification.
+* Select the **Create local Copy** button to generate a JSON representation of your Swagger specification.
 
 :::image source="web-api-help-pages-using-swagger/_static/v6-nswag-NSwagStudio.png" alt-text="NSwag Studio imports the specification and exports a CSharp Client.":::
 
-* In the **Outputs** area, click the **CSharp Client** checkbox. Depending on your project, you can also choose **TypeScript Client** or **CSharp Web API Controller**. If you select **CSharp Web API Controller**, a service specification rebuilds the service, serving as a reverse generation.
-* Click **Generate Outputs** to produce a complete C# client implementation of the *TodoApi.NSwag* project. To see the generated client code, click the **CSharp Client** tab:
+* In the **Outputs** area, select the **CSharp Client** checkbox. Depending on your project, you can also choose **TypeScript Client** or **CSharp Web API Controller**. If you select **CSharp Web API Controller**, a service specification rebuilds the service, serving as a reverse generation.
+* Select **Generate Outputs** to produce a complete C# client implementation of the *TodoApi.NSwag* project. To see the generated client code, select the **CSharp Client** tab:
 
 :::code language="csharp" source="web-api-help-pages-using-swagger/_static/v6-nswag-generated-todoclient.cs" range="19-55":::
 
@@ -151,7 +162,7 @@ To enable XML comments, perform the following steps:
 
 #### [Visual Studio for Mac](#tab/visual-studio-mac)
 
-* From the *Solution Pad*, press **control** and click the project name. Navigate to **Tools** > **Edit File**.
+* From the *Solution Pad*, press **control** and select the project name. Navigate to **Tools** > **Edit File**.
 * Manually add the highlighted lines to the `.csproj` file:
 
 :::code language="xml" source="web-api-help-pages-using-swagger/samples/7.x/NSwagSample/NSwagSample.csproj" id="snippet_GenerateDocumentationFile" highlight="2":::
@@ -180,7 +191,7 @@ To suppress warnings project-wide, define a semicolon-delimited list of warning 
 
 :::code language="xml" source="web-api-help-pages-using-swagger/samples/7.x/NSwagSample/NSwagSample.csproj" id="snippet_GenerateDocumentationFileWithNoWarn" highlight="3":::
 
-To suppress warnings only for specific members, enclose the code in [#pragma warning](/dotnet/csharp/language-reference/preprocessor-directives/preprocessor-pragma-warning) preprocessor directives. This approach is useful for code that shouldn't be exposed via the API docs. In the following example, warning code CS1591 is ignored for the entire `TodoContext` class. Enforcement of the warning code is restored at the close of the class definition. Specify multiple warning codes with a comma-delimited list.
+To suppress warnings only for specific members, enclose the code in [#pragma warning](/dotnet/csharp/language-reference/preprocessor-directives#pragma-warning) preprocessor directives. This approach is useful for code that shouldn't be exposed via the API docs. In the following example, warning code CS1591 is ignored for the entire `TodoContext` class. Enforcement of the warning code is restored at the close of the class definition. Specify multiple warning codes with a comma-delimited list.
 
 :::code language="csharp" source="web-api-help-pages-using-swagger/samples/7.x/NSwagSample/Models/TodoContext.cs" id="snippet_PragmaWarningDisable" highlight="3,10":::
 
@@ -230,9 +241,9 @@ Run the application and navigate to `http://localhost:<port>/redoc` to view the 
 
 :::moniker range="< aspnetcore-6.0"
 
-By [Christoph Nienaber](https://twitter.com/zuckerthoben), [Rico Suter](https://rsuter.com), and [Dave Brock](https://twitter.com/daveabrock)
+By [Rico Suter](https://rsuter.com) and [Dave Brock](https://twitter.com/daveabrock)
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/2.1/TodoApi.NSwag) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/tutorials/web-api-help-pages-using-swagger/samples/2.1/TodoApi.NSwag) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 NSwag offers the following capabilities:
 
@@ -255,8 +266,8 @@ Use one of the following approaches to install the NSwag NuGet package:
 ### [Visual Studio](#tab/visual-studio)
 
 * From the **Package Manager Console** window:
-  * Go to **View** > **Other Windows** > **Package Manager Console**
-  * Navigate to the directory in which the `TodoApi.csproj` file exists
+  * Go to **View** > **Other Windows** > **Package Manager Console**.
+  * Navigate to the directory in which the `TodoApi.csproj` file exists.
   * Execute the following command:
 
     ```powershell
@@ -271,10 +282,10 @@ Use one of the following approaches to install the NSwag NuGet package:
 
 ### [Visual Studio for Mac](#tab/visual-studio-mac)
 
-* Right-click the *Packages* folder in **Solution Pad** > **Add Packages...**
-* Set the **Add Packages** window's **Source** drop-down to "nuget.org"
-* Enter "NSwag.AspNetCore" in the search box
-* Select the "NSwag.AspNetCore" package from the results pane and click **Add Package**
+* Right-click the *Packages* folder in **Solution Pad** > **Add Packages...**.
+* Set the **Add Packages** window's **Source** drop-down to "nuget.org".
+* Enter "NSwag.AspNetCore" in the search box.
+* Select the "NSwag.AspNetCore" package from the results pane and click **Add Package**.
 
 ### [Visual Studio Code](#tab/visual-studio-code)
 

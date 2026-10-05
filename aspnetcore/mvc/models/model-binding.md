@@ -1,13 +1,14 @@
 ---
 title: Model Binding in ASP.NET Core
+ai-usage: ai-assisted
 author: tdykstra
 description: Learn how model binding in ASP.NET Core works and how to customize its behavior.
 monikerRange: '>= aspnetcore-3.1'
 ms.author: tdykstra
-ms.date: 6/20/2023
+ms.date: 08/10/2026
 uid: mvc/models/model-binding
 ---
-
+<!-- Note the use of inline moniker tags at the end of the file. -->
 # Model Binding in ASP.NET Core
 
 [!INCLUDE[](~/includes/not-latest-version.md)]
@@ -21,7 +22,7 @@ This article explains what model binding is, how it works, and how to customize 
 Controllers and Razor pages work with data that comes from HTTP requests. For example, route data may provide a record key, and posted form fields may provide values for the properties of the model. Writing code to retrieve each of these values and convert them from strings to .NET types would be tedious and error-prone. Model binding automates this process. The model binding system:
 
 * Retrieves data from various sources such as route data, form fields, and query strings.
-* Provides the data to controllers and Razor pages in method parameters and public properties.
+* Provides the data to controllers and Razor pages in method parameters and `public` properties.
 * Converts string data to .NET types.
 * Updates properties of complex types.
 
@@ -56,17 +57,17 @@ Model binding tries to find values for the following kinds of targets:
 
 * Parameters of the controller action method that a request is routed to.
 * Parameters of the Razor Pages handler method that a request is routed to. 
-* Public properties of a controller or `PageModel` class, if specified by attributes.
+* Public (`public`) properties of a controller or `PageModel` class, if specified by attributes.
 
 ### [BindProperty] attribute
 
-Can be applied to a public property of a controller or `PageModel` class to cause model binding to target that property:
+Can be applied to a `public` property of a controller or `PageModel` class to cause model binding to target that property:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Pages/Edit.cshtml.cs" id="snippet_Class" highlight="3":::
 
 ### [BindProperties] attribute
 
-Can be applied to a controller or `PageModel` class to tell model binding to target all public properties of the class:
+Can be applied to a controller or `PageModel` class to tell model binding to target all `public` properties of the class:
 
 :::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Pages/Create.cshtml.cs" id="snippet_Class" highlight="1":::
 
@@ -105,6 +106,17 @@ If the default source is not correct, use one of the following attributes to spe
 * [`[FromForm]`](xref:Microsoft.AspNetCore.Mvc.FromFormAttribute) - Gets values from posted form fields.
 * [`[FromBody]`](xref:Microsoft.AspNetCore.Mvc.FromBodyAttribute) - Gets values from the request body.
 * [`[FromHeader]`](xref:Microsoft.AspNetCore.Mvc.FromHeaderAttribute) - Gets values from HTTP headers.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-11.0"
+
+> [!NOTE]
+> [C# union types](/dotnet/csharp/language-reference/builtin-types/union) are supported only with `[FromBody]`. The other binding sources—`[FromQuery]`, `[FromRoute]`, `[FromForm]`, and `[FromHeader]`—bind string values without JSON parsing, so they can't dispatch to a union case.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 These attributes:
 
@@ -162,7 +174,7 @@ By default, a model state error isn't created if no value is found for a model p
 
 If model state should be invalidated when nothing is found in form fields for a model property, use the [`[BindRequired]`](#bindrequired-attribute) attribute.
 
-Note that this `[BindRequired]` behavior applies to model binding from posted form data, not to JSON or XML data in a request body. Request body data is handled by [input formatters](#input-formatters).
+Note that this `[BindRequired]` behavior applies to model binding from posted form data, not from JSON or XML data in a request body. Request body data is handled by [input formatters](#input-formatters).
 
 ## Type conversion errors
 
@@ -264,12 +276,16 @@ The following controller action uses the `DateRangeTP` class to bind a date rang
 
 A complex type must have a public default constructor and public writable properties to bind. When model binding occurs, the class is instantiated using the public default constructor.
 
-For each property of the complex type, [model binding looks through the sources for the name pattern](https://github.com/dotnet/aspnetcore/blob/v6.0.3/src/Mvc/Mvc.Core/src/ModelBinding/ParameterBinder.cs#L157-L172) *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix. The decision to use the prefix isn't made per property. For example, with a query containing `?Instructor.Id=100&Name=foo`, bound to method `OnGet(Instructor instructor)`, the resulting object of type `Instructor` contains:
+Structs and other value types, including `record struct` types, aren't supported as complex type binding targets. Reflection doesn't report an implicit parameterless constructor for a struct, so model binding can't create the model instance. Value types also have copy-by-value semantics, which prevents the binder from setting properties on an instance after it's created. Binding a struct as a complex type throws an <xref:System.InvalidOperationException>. Use a class or a `record` class instead. A struct can still be bound as a [simple type](#simple-types) if it has a type converter or implements [`IParsable<TSelf>`](/dotnet/api/system.iparsable-1), which is how types such as <xref:System.Guid> and <xref:System.DateTime> are bound.
+
+For each property of the complex type, [model binding looks through the sources for the name pattern](https://github.com/dotnet/aspnetcore/blob/main/src/Mvc/Mvc.Core/src/ModelBinding/ParameterBinder.cs#L115-L130) *prefix.property_name*. If nothing is found, it looks for just *property_name* without the prefix. The decision to use the prefix isn't made per property. For example, with a query containing `?Instructor.Id=100&Name=foo`, bound to method `OnGet(Instructor instructor)`, the resulting object of type `Instructor` contains:
 
 * `Id` set to `100`.
 * `Name` set to `null`. Model binding expects `Instructor.Name` because `Instructor.Id` was used in the preceding query parameter.
 
-For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` public property, the prefix is the public property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
+[!INCLUDE[](~/includes/aspnetcore-repo-ref-source-links.md)]
+
+For binding to a parameter, the prefix is the parameter name. For binding to a `PageModel` `public` property, the prefix is the property name. Some attributes have a `Prefix` property that lets you override the default usage of parameter or property name.
 
 For example, suppose the complex type is the following `Instructor` class:
 
@@ -524,11 +540,14 @@ POCOs that do not have parameterless constructors can't be bound.
 The following code results in an exception saying that the type must have a parameterless constructor:
 
 ```csharp
-public class Person(string Name)
-
+public class Person {
+    public Person(string Name) { }
+}
 public record Person([Required] string Name, [Range(0, 100)] int Age)
 {
-    public Person(string Name) : this (Name, 0);
+    public Person(string Name) : this (Name, 0)
+    {
+    }
 }
 ```
 
@@ -628,7 +647,17 @@ Used to retrieve all the values from posted form data.
 
 ## Input formatters
 
-Data in the request body can be in JSON, XML, or some other format. To parse this data, model binding uses an *input formatter* that is configured to handle a particular content type. By default, ASP.NET Core includes JSON based input formatters for handling JSON data. You can add other formatters for other content types.
+Data in the request body can be in JSON, XML, or some other format. To parse this data, model binding uses an *input formatter* that is configured to handle a particular content type. By default, ASP.NET Core includes JSON based input formatters for handling JSON data using [`System.Text.Json`](/dotnet/standard/serialization/system-text-json-overview). You can add other formatters for other content types.
+
+The default JSON input formatter can be configured using the `AddJsonOptions` method:
+
+:::code language="csharp" source="~/mvc/models/model-binding/samples/6.x/ModelBindingSample/Snippets/Program.cs" id="snippet_AddJsonOptions":::
+
+Common configuration options include:
+
+* **Property naming policy** - Configure camelCase or other naming conventions
+* **Enum converters** - Handle enum serialization as strings
+* **Custom converters** - Add type-specific serialization logic
 
 ASP.NET Core selects input formatters based on the [Consumes](xref:Microsoft.AspNetCore.Mvc.ConsumesAttribute) attribute. If no attribute is present, it uses the [Content-Type header](https://www.w3.org/Protocols/rfc1341/4_Content-Type.html).
 
@@ -706,13 +735,22 @@ If an instance of the type isn't registered in the dependency injection containe
 
 For nullable parameters, ensure that the parameter isn't `null` before accessing it.
 
+:::moniker-end
+:::moniker range=">= aspnetcore-10.0"
+
+## Json+PipeReader deserialization in MVC
+
+[!INCLUDE [](~/includes/net10pipereader.md)]
+
+:::moniker-end
+:::moniker range=">= aspnetcore-8.0"
+
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/mvc/models/model-binding/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * <xref:mvc/models/validation>
 * <xref:mvc/advanced/custom-model-binding>
 
 :::moniker-end
 
 [!INCLUDE[](~/mvc/models/model-binding/includes/model-binding7.md)]
-

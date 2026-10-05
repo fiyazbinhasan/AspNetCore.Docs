@@ -4,7 +4,6 @@ author: tdykstra
 description: Explains how to create reusable Razor UI using partial views in a class library in ASP.NET Core.
 ms.author: tdykstra
 ms.date: 11/19/2023
-ms.custom: mvc
 uid: razor-pages/ui-class
 ---
 # Create reusable UI using the Razor class library project in ASP.NET Core
@@ -21,7 +20,7 @@ For information on how to integrate npm and webpack into the build process for a
 
 # [Visual Studio](#tab/visual-studio)
 
-* From Visual Studio select **Create new a new project**.
+* From Visual Studio's **Start Window**, select **Create a new project**. Alternatively, select the **File** > **New** > **Project/Solution**.
 * Select **Razor Class Library** > **Next**.
 * Name the library (for example, "RazorClassLib"), > **Create**. To avoid a file name collision with the generated view library, ensure the library name doesn't end in `.Views`.
 * Select **Support pages and views** if you need the library to contain pages and/or views. By default, only Razor components are supported. Select **Create**.
@@ -122,26 +121,17 @@ In the following example, the `lib.css` stylesheet in the `wwwroot` folder isn't
 
 To include TypeScript files in an RCL:
 
-1. Reference the [`Microsoft.TypeScript.MSBuild`](https://www.nuget.org/packages/Microsoft.TypeScript.MSBuild) NuGet package in the project.
+* Reference the [`Microsoft.TypeScript.MSBuild`](https://www.nuget.org/packages/Microsoft.TypeScript.MSBuild) NuGet package in the project.
 
    [!INCLUDE[](~/includes/package-reference.md)]
 
-1. Place the TypeScript files (`.ts`) outside of the `wwwroot` folder. For example, place the files in a `Client` folder.
+* Place the TypeScript files (`.ts`) outside of the `wwwroot` folder. For example, place the files in a `Client` folder.
+* Add the following markup to the project file:
+  * Configure the TypeScript build output for the `wwwroot` folder with the `TypescriptOutDir` property.
+  * Include the TypeScript target as a dependency of the `PrepareForBuildDependsOn` target.
+  * Remove the output in the `wwwroot folder`.
 
-1. Configure the TypeScript build output for the `wwwroot` folder. Set the `TypescriptOutDir` property inside of a `PropertyGroup` in the project file:
-
-   ```xml
-   <TypescriptOutDir>wwwroot</TypescriptOutDir>
-   ```
-
-1. Include the TypeScript target as a dependency of the `PrepareForBuildDependsOn` target by adding the following target inside of a `PropertyGroup` in the project file:
-   
-   ```xml
-   <PrepareForBuildDependsOn>
-     CompileTypeScript;
-     GetTypeScriptOutputForPublishing;$(PrepareForBuildDependsOn)
-   </PrepareForBuildDependsOn>
-   ```
+[!code-xml[](~/razor-pages/ui-class/remove.xml?highlight=5-9,13)]
 
 ### Consume content from a referenced RCL
 
@@ -151,7 +141,7 @@ The consuming app references static assets provided by the library with `<script
 
 [!code-csharp[](~/razor-pages/ui-class/7samples/MvcProgram.cs?highlight=15)]
 
-When running the consuming app from build output (`dotnet run`), static web assets are enabled by default in the Development environment. To support assets in other environments when running from build output, call <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderExtensions.UseStaticWebAssets%2A> on the host builder in `Program.cs`:
+When running the consuming app from build output (`dotnet run`), static web assets are enabled by default in the `Development` environment. To support assets in other environments when running from build output, call <xref:Microsoft.AspNetCore.Hosting.WebHostBuilderExtensions.UseStaticWebAssets%2A> on the host builder in `Program.cs`:
 
 [!code-csharp[](~/razor-pages/ui-class/7samples/cli/WebApp1/Program.cs?name=snippet1&highlight=3-4)]
 
@@ -172,7 +162,7 @@ When the app is published, the companion assets from all referenced projects and
 
 ## Additional resources
 
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/ui-class/samples) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/razor-pages/ui-class/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 * <xref:blazor/components/class-libraries>
 * <xref:blazor/components/css-isolation#razor-class-library-rcl-support>

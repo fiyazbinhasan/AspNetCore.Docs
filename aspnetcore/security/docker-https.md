@@ -1,10 +1,11 @@
 ---
 title: Hosting ASP.NET Core Images with Docker over HTTPS
-author: rick-anderson
+ai-usage: ai-assisted
+author: wadepickett
 description: Learn how to host ASP.NET Core Images with Docker over HTTPS
 ms.author: wpickett
-ms.custom: mvc
-ms.date: 09/07/2024
+ms.custom: sfi-ropc-nochange
+ms.date: 07/29/2026
 uid: security/docker-https
 ---
 # Hosting ASP.NET Core images with Docker over HTTPS
@@ -61,14 +62,17 @@ Run the container image with ASP.NET Core configured for HTTPS in a command shel
 
 ```console
 docker pull mcr.microsoft.com/dotnet/samples:aspnetapp
-docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=8001 -e ASPNETCORE_Kestrel__Certificates__Default__Password="<CREDENTIAL_PLACEHOLDER>" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ mcr.microsoft.com/dotnet/samples:aspnetapp
+docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=443 -e ASPNETCORE_Kestrel__Certificates__Default__Password="<CREDENTIAL_PLACEHOLDER>" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:/https/ mcr.microsoft.com/dotnet/samples:aspnetapp
 ```
 
 In the preceding code, replace `<CREDENTIAL_PLACEHOLDER>` with the password. The password must match the password used for the certificate.
 
 When using [PowerShell](/powershell/scripting/overview), replace `%USERPROFILE%` with `$env:USERPROFILE`.
 
-Note: The certificate in this case must be a `.pfx` file.  Utilizing a `.crt` or `.key` file with or without the password isn't supported with the sample container.  For example, when specifying a `.crt` file, the container may return error messages such as 'The server mode SSL must use a certificate with the associated private key.'. When using [WSL](/windows/wsl/about), validate the mount path to ensure that the certificate loads correctly.
+The certificate in this case must be a `.pfx` file.  Utilizing a `.crt` or `.key` file with or without the password isn't supported with the sample container.  For example, when specifying a `.crt` file, the container may return error messages such as 'The server mode SSL must use a certificate with the associated private key.'. When using [WSL](/windows/wsl/about), validate the mount path to ensure that the certificate loads correctly.
+
+> [!NOTE]
+> Don't confuse the `HTTPS_PORTS` configuration key and `ASPNETCORE_HTTPS_PORTS` environment variable, which set the ports for Kestrel/HTTP.sys endpoint configuration, with the `HTTPS_PORT` configuration key and `ASPNETCORE_HTTPS_PORT` environment variable, which set the port for [HTTPS redirection middleware](xref:security/enforcing-ssl#https-redirection-middleware-usehttpsredirection).
 
 ### macOS or Linux
 
@@ -79,7 +83,7 @@ dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p <CREDENTIAL_PL
 dotnet dev-certs https --trust
 ```
 
-On Linux, `dotnet dev-certs https --trust` requires .NET 9 SDK or later. For Linux on .NET 8.0.401 SDK and earlier, see your Linux distribution's documentation for trusting a certificate.
+On Linux, `dotnet dev-certs https --trust` requires .NET 9 or later SDK. For Linux on .NET 8.0.401 or earlier SDK, see your Linux distribution's documentation for trusting a certificate.
 
 In the preceding commands, replace `<CREDENTIAL_PLACEHOLDER>` with a password.
 
@@ -87,10 +91,13 @@ Run the container image with ASP.NET Core configured for HTTPS:
 
 ```console
 docker pull mcr.microsoft.com/dotnet/samples:aspnetapp
-docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=8001 -e ASPNETCORE_Kestrel__Certificates__Default__Password="<CREDENTIAL_PLACEHOLDER>" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ mcr.microsoft.com/dotnet/samples:aspnetapp
+docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=443 -e ASPNETCORE_Kestrel__Certificates__Default__Password="<CREDENTIAL_PLACEHOLDER>" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ mcr.microsoft.com/dotnet/samples:aspnetapp
 ```
 
 In the preceding code, replace `<CREDENTIAL_PLACEHOLDER>` with the password. The password must match the password used for the certificate.
+
+> [!NOTE]
+> Don't confuse the `HTTPS_PORTS` configuration key and `ASPNETCORE_HTTPS_PORTS` environment variable, which set the ports for Kestrel/HTTP.sys endpoint configuration, with the `HTTPS_PORT` configuration key and `ASPNETCORE_HTTPS_PORT` environment variable, which set the port for [HTTPS redirection middleware](xref:security/enforcing-ssl#https-redirection-middleware-usehttpsredirection).
 
 ### Windows using Windows containers
 
@@ -107,7 +114,7 @@ Run the container image with ASP.NET Core configured for HTTPS:
 
 ```console
 docker pull mcr.microsoft.com/dotnet/samples:aspnetapp
-docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=8001 -e ASPNETCORE_Kestrel__Certificates__Default__Password="<CREDENTIAL_PLACEHOLDER>" -e ASPNETCORE_Kestrel__Certificates__Default__Path=c:\https\aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:C:\https\ --user ContainerAdministrator mcr.microsoft.com/dotnet/samples:aspnetapp
+docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=443 -e ASPNETCORE_Kestrel__Certificates__Default__Password="<CREDENTIAL_PLACEHOLDER>" -e ASPNETCORE_Kestrel__Certificates__Default__Path=c:\https\aspnetapp.pfx -v %USERPROFILE%\.aspnet\https:C:\https\ --user ContainerAdministrator mcr.microsoft.com/dotnet/samples:aspnetapp
 ```
 
 ***NOTE:*** `<CREDENTIAL_PLACEHOLDER>` is a placeholder for the Kestrel certificates default password.

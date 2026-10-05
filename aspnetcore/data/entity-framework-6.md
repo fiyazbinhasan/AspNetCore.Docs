@@ -1,9 +1,8 @@
 ---
 title: ASP.NET Core and Entity Framework 6
 author: tdykstra
-description: Entity Framework 6.3 and later works with ASP.NET Core 3.1 and later.
+description: Entity Framework 6.3 or later works with ASP.NET Core 3.1 or later.
 ms.author: tdykstra
-ms.custom: mvc
 ms.date: 11/06/2023
 uid: data/entity-framework-6
 ---
@@ -96,6 +95,6 @@ This sample can be created from scratch by the following steps in Visual Studio:
 
 * In the Core project, in `appsettings.json`, add the connection string.
 
-* In the Core project, add a controller and view(s) to verify that you can read and write data. (Note that ASP.NET Core MVC scaffolding won't work with the EF6 context referenced from the class library.)
+* In the Core project, add a controller and views to verify that you can read and write data. (Note that ASP.NET Core MVC scaffolding won't work with the EF6 context referenced from the class library.)
 
 :::moniker-end

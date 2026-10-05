@@ -104,7 +104,7 @@ The services are registered in `IHostBuilder.ConfigureServices` (`Program.cs`). 
 
 ## Queued background tasks
 
-A background task queue is based on the .NET 4.x <xref:System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem%2A>:
+A background task queue is based on the .NET Framework 4.x <xref:System.Web.Hosting.HostingEnvironment.QueueBackgroundWorkItem%2A>:
 
 :::code language="csharp" source="~/fundamentals/host/hosted-services/samples/6.0/BackgroundTasksSample/Services/BackgroundTaskQueue.cs" id="snippet1":::
 
@@ -143,7 +143,7 @@ The following code creates an asynchronous timed background task:
 ## Additional resources
 
 * [Background services unit tests on GitHub](https://github.com/dotnet/runtime/blob/main/src/libraries/Microsoft.Extensions.Hosting/tests/UnitTests/BackgroundServiceTests.cs).
-* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/host/hosted-services/samples/) ([how to download](xref:index#how-to-download-a-sample))
+* [View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/host/hosted-services/samples/) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 * [Implement background tasks in microservices with IHostedService and the BackgroundService class](/dotnet/standard/microservices-architecture/multi-container-microservice-net-applications/background-tasks-with-ihostedservice)
 * [Run background tasks with WebJobs in Azure App Service](/azure/app-service/webjobs-create)
 * <xref:System.Threading.Timer>

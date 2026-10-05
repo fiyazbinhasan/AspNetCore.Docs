@@ -1,9 +1,8 @@
 ---
 title: Use ASP.NET Core APIs in a class library
-author: rick-anderson
+author: wadepickett
 description: Learn how to use ASP.NET Core APIs in a class library.
 ms.author: wpickett
-ms.custom: mvc
 ms.date: 12/16/2019
 uid: fundamentals/target-aspnetcore
 ---
@@ -15,7 +14,7 @@ This document provides guidance for using ASP.NET Core APIs in a class library. 
 
 ## Determine which ASP.NET Core versions to support
 
-ASP.NET Core adheres to the [.NET Core support policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core). Consult the support policy when determining which ASP.NET Core versions to support in a library. A library should:
+ASP.NET Core adheres to the [.NET and .NET Core support policy](https://dotnet.microsoft.com/platform/support/policy/dotnet-core). Consult the support policy when determining which ASP.NET Core versions to support in a library. A library should:
 
 * Make an effort to support all ASP.NET Core versions classified as *Long-Term Support* (LTS).
 * Not feel obligated to support ASP.NET Core versions classified as *End of Life* (EOL).
@@ -24,7 +23,7 @@ As preview releases of ASP.NET Core are made available, breaking changes are pos
 
 ## Use the ASP.NET Core shared framework
 
-With the release of .NET Core 3.0, many ASP.NET Core assemblies are no longer published to NuGet as packages. Instead, the assemblies are included in the `Microsoft.AspNetCore.App` shared framework, which is installed with the .NET Core SDK and runtime installers. For a list of packages no longer being published, see [Remove obsolete package references](xref:migration/22-to-30#remove-obsolete-package-references).
+With the release of .NET Core 3.0, many ASP.NET Core assemblies are no longer published to NuGet as packages. Instead, the assemblies are included in the `Microsoft.AspNetCore.App` shared framework, which is installed with the .NET SDK and runtime installers. For a list of packages no longer being published, see [Remove obsolete package references](xref:migration/22-to-30#remove-obsolete-package-references).
 
 As of .NET Core 3.0, projects using the `Microsoft.NET.Sdk.Web` MSBuild SDK implicitly reference the shared framework. Projects using the `Microsoft.NET.Sdk` or `Microsoft.NET.Sdk.Razor` SDK must reference ASP.NET Core to use ASP.NET Core APIs in the shared framework.
 
@@ -187,7 +186,7 @@ Alternatively, .NET Standard 2.0 could be targeted instead of targeting both .NE
 
 With the preceding project file, the following caveats exist:
 
-* Since the library only contains Tag Helpers, it's more straightforward to target the specific platforms on which ASP.NET Core runs: .NET Core and .NET Framework. Tag Helpers can't be used by other .NET Standard 2.0-compliant target frameworks such as Unity, UWP, and Xamarin.
+* Since the library only contains Tag Helpers, it's more straightforward to target the specific platforms on which ASP.NET Core runs: .NET Core and .NET Framework. Tag Helpers can't be used by other .NET Standard 2.0-compliant target frameworks such as Unity and UWP.
 * Using .NET Standard 2.0 from .NET Framework has some issues that were addressed in .NET Framework 4.7.2. You can improve the experience for consumers using .NET Framework 4.6.1 through 4.7.1 by targeting .NET Framework 4.6.1.
 
 If your library needs to call platform-specific APIs, target specific .NET implementations instead of .NET Standard. For more information, see [Multi-targeting](/dotnet/standard/library-guidance/cross-platform-targeting#multi-targeting).

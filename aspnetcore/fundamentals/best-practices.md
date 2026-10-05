@@ -4,7 +4,7 @@ author: mjrousos
 description: Tips for maximizing performance and reliability in ASP.NET Core apps.
 monikerRange: '>= aspnetcore-2.1'
 ms.author: tdykstra
-ms.date: 12/20/2022
+ms.date: 12/29/2025
 uid: fundamentals/best-practices
 ---
 # ASP.NET Core Best Practices
@@ -39,7 +39,7 @@ A common performance problem in ASP.NET Core apps is blocking calls that could b
 * **Do** make controller/Razor Page actions asynchronous. The entire call stack is asynchronous in order to benefit from [async/await](/dotnet/csharp/programming-guide/concepts/async/) patterns.
 * **Consider** using message brokers like [Azure Service Bus](/azure/service-bus-messaging/service-bus-messaging-overview) to offload long-running calls
 
-A profiler, such as [PerfView](https://github.com/Microsoft/perfview), can be used to find threads frequently added to the [Thread Pool](/windows/desktop/procthread/thread-pools). The `Microsoft-Windows-DotNETRuntime/ThreadPoolWorkerThread/Start` event indicates a thread added to the thread pool. <!--  For more information, see [async guidance docs](TBD-Link_To_Davifowl_Doc)  -->
+A profiler, such as [PerfView](https://github.com/Microsoft/perfview), can be used to find threads frequently added to the [Thread Pool](/windows/desktop/procthread/thread-pools). The `Microsoft-Windows-DotNETRuntime/ThreadPoolWorkerThread/Start` event indicates a thread added to the thread pool.
 
 ## Return large collections across multiple smaller pages
 
@@ -54,7 +54,7 @@ A webpage shouldn't load large amounts of data all at once. When returning a col
 
 For more information on paging and limiting the number of returned records, see:
 
-* [Performance considerations](xref:data/ef-rp/intro#performance-considerations) 
+* [Performance considerations](xref:data/ef-rp/intro#performance-considerations)
 * [Add paging to an ASP.NET Core app](xref:data/ef-rp/sort-filter-page#add-paging)
 
 ### Return `IEnumerable<T>` or `IAsyncEnumerable<T>`
@@ -65,7 +65,7 @@ Beginning with ASP.NET Core 3.0, `IAsyncEnumerable<T>` can be used as an alterna
 
 ## Minimize large object allocations
 
-The [.NET Core garbage collector](/dotnet/standard/garbage-collection/) manages allocation and release of memory automatically in ASP.NET Core apps. Automatic garbage collection generally means that developers don't need to worry about how or when memory is freed. However, cleaning up unreferenced objects takes CPU time, so developers should minimize allocating objects in [hot code paths](#understand-hot-code-paths). Garbage collection is especially expensive on large objects (>= 85,000 bytes). Large objects are stored on the [large object heap](/dotnet/standard/garbage-collection/large-object-heap) and require a full (generation 2) garbage collection to clean up. Unlike generation 0 and generation 1 collections, a generation 2 collection requires a temporary suspension of app execution. Frequent allocation and de-allocation of large objects can cause inconsistent performance.
+The [.NET garbage collector](/dotnet/standard/garbage-collection/) manages allocation and release of memory automatically in ASP.NET Core apps. Automatic garbage collection generally means that developers don't need to worry about how or when memory is freed. However, cleaning up unreferenced objects takes CPU time, so developers should minimize allocating objects in [hot code paths](#understand-hot-code-paths). Garbage collection is especially expensive on large objects (>= 85,000 bytes). Large objects are stored on the [large object heap](/dotnet/standard/garbage-collection/large-object-heap) and require a full (generation 2) garbage collection to clean up. Unlike generation 0 and generation 1 collections, a generation 2 collection requires a temporary suspension of app execution. Frequent allocation and de-allocation of large objects can cause inconsistent performance.
 
 Recommendations:
 
@@ -154,7 +154,7 @@ Recommendations:
 
 ## Use the latest ASP.NET Core release
 
-Each new release of ASP.NET Core includes performance improvements. Optimizations in .NET Core and ASP.NET Core mean that newer versions generally outperform older versions. For example, .NET Core 2.1 added support for compiled regular expressions and benefitted from [Span\<T>](/dotnet/standard/memory-and-spans/memory-t-usage-guidelines). ASP.NET Core 2.2 added support for HTTP/2. [ASP.NET Core 3.0 adds many improvements](xref:aspnetcore-3.0) that reduce memory usage and improve throughput. If performance is a priority, consider upgrading to the current version of ASP.NET Core.
+Each new release of ASP.NET Core includes performance improvements. Optimizations in .NET and ASP.NET Core mean that newer versions generally outperform older versions. For example, .NET Core 2.1 added support for compiled regular expressions and benefitted from [Span\<T>](/dotnet/standard/memory-and-spans/memory-t-usage-guidelines). ASP.NET Core 2.2 added support for HTTP/2. [ASP.NET Core 3.0 adds many improvements](xref:aspnetcore-3.0) that reduce memory usage and improve throughput. If performance is a priority, consider upgrading to the current version of ASP.NET Core.
 
 ## Minimize exceptions
 
@@ -186,7 +186,7 @@ In the preceding code, `Get` synchronously reads the entire HTTP request body in
 The preceding code asynchronously reads the entire HTTP request body into memory.
 
 > [!WARNING]
-> If the request is large, reading the entire HTTP request body into memory could lead to an out of memory (OOM) condition. OOM can result in a Denial Of Service.  For more information, see [Avoid reading large request bodies or response bodies into memory](#arlb) in this article.
+> If the request is large, reading the entire HTTP request body into memory could lead to an out of memory (OOM) condition. OOM can result in a Denial Of Service. For more information, see [Avoid reading large request bodies or response bodies into memory](#arlb) in this article.
 
 **Do this:** The following example is fully asynchronous using a non-buffered request body:
 
@@ -202,7 +202,7 @@ Use `HttpContext.Request.ReadFormAsync` instead of `HttpContext.Request.Form`.
 * The form has been read by a call to `ReadFormAsync`, and
 * The cached form value is being read using `HttpContext.Request.Form`
 
-**Do not do this:** The following example uses `HttpContext.Request.Form`.  `HttpContext.Request.Form` uses [sync over async](https://devblogs.microsoft.com/pfxteam/should-i-expose-synchronous-wrappers-for-asynchronous-methods/) and can lead to thread pool starvation.
+**Do not do this:** The following example uses `HttpContext.Request.Form`. `HttpContext.Request.Form` uses [sync over async](https://devblogs.microsoft.com/pfxteam/should-i-expose-synchronous-wrappers-for-asynchronous-methods/) and can lead to thread pool starvation.
 
 [!code-csharp[](~/performance/performance-best-practices/samples/3.0/Controllers/MySecondController.cs?name=snippet1)]
 
@@ -230,12 +230,12 @@ Storing a large request or response body into a single `byte[]` or `string`:
 
 ## Working with a synchronous data processing API
 
-When using a serializer/de-serializer that only supports synchronous reads and writes (for example,  [Json.NET](https://www.newtonsoft.com/json/help/html/Introduction.htm)):
+When using a serializer/de-serializer that only supports synchronous reads and writes (for example, [Json.NET](https://www.newtonsoft.com/json/help/html/Introduction.htm)):
 
 * Buffer the data into memory asynchronously before passing it into the serializer/de-serializer.
 
 > [!WARNING]
-> If the request is large, it could lead to an out of memory (OOM) condition. OOM can result in a Denial Of Service.  For more information, see [Avoid reading large request bodies or response bodies into memory](#arlb) in this article.
+> If the request is large, it could lead to an out of memory (OOM) condition. OOM can result in a Denial Of Service. For more information, see [Avoid reading large request bodies or response bodies into memory](#arlb) in this article.
 
 ASP.NET Core 3.0 uses <xref:System.Text.Json> by default for JSON serialization. <xref:System.Text.Json>:
 
@@ -308,7 +308,7 @@ Background tasks should be implemented as hosted services. For more information,
 
 ## Do not capture services injected into the controllers on background threads
 
-**Do not do this:** The following example shows a closure that is capturing the `DbContext` from the `Controller` action parameter. This is a bad practice.  The work item could run outside of the request scope. The `ContosoDbContext` is scoped to the request, resulting in an `ObjectDisposedException`.
+**Do not do this:** The following example shows a closure that is capturing the `DbContext` from the `Controller` action parameter. This is a bad practice. The work item could run outside of the request scope. The `ContosoDbContext` is scoped to the request, resulting in an `ObjectDisposedException`.
 
 [!code-csharp[](~/performance/performance-best-practices/samples/3.0/Controllers/FireAndForgetSecondController.cs?name=snippet1)]
 
@@ -362,7 +362,7 @@ Components only expect to be called if it's possible for them to handle and mani
 
 Using in-process hosting, an ASP.NET Core app runs in the same process as its IIS worker process. In-process hosting provides improved performance over out-of-process hosting because requests aren't proxied over the loopback adapter. The loopback adapter is a network interface that returns outgoing network traffic back to the same machine. IIS handles process management with the [Windows Process Activation Service (WAS)](/iis/manage/provisioning-and-managing-iis/features-of-the-windows-process-activation-service-was).
 
-Projects default to the in-process hosting model in ASP.NET Core 3.0 and later.
+Projects default to the in-process hosting model in ASP.NET Core 3.0 or later.
 
 For more information, see [Host ASP.NET Core on Windows with IIS](xref:host-and-deploy/iis/index)
 

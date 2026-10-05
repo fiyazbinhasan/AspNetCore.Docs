@@ -3,8 +3,7 @@ title: Session in ASP.NET Core
 author: tdykstra
 description: Discover approaches to preserve session between requests.
 ms.author: tdykstra
-ms.custom: mvc
-ms.date: 05/29/2024
+ms.date: 04/24/2025
 uid: fundamentals/app-state
 ---
 # Session and state management in ASP.NET Core
@@ -15,7 +14,7 @@ By [Rick Anderson](https://twitter.com/RickAndMSFT), [Kirk Larkin](https://twitt
 
 HTTP is a stateless protocol. By default, HTTP requests are independent messages that don't retain user values. This article describes several approaches to preserve user data between requests.
 
-For Blazor state management guidance, which adds to or supersedes the guidance in this article, see <xref:blazor/state-management>.
+For Blazor state management guidance, which adds to or supersedes the guidance in this article, see <xref:blazor/state-management/index>.
 
 ## State management
 
@@ -33,7 +32,7 @@ State can be stored using several approaches. Each approach is described later i
 
 ## SignalR/Blazor Server and HTTP context-based state management
 
-[SignalR](xref:signalr/introduction) apps shouldn't use session state and other state management approaches that rely upon a stable HTTP context to store information. SignalR apps can store per-connection state in [`Context.Items` in the hub](xref:signalr/hubs). For more information and alternative state management approaches for Blazor Server apps, see <xref:blazor/state-management?pivots=server>. <!-- https://github.com/aspnet/SignalR/issues/2139 https://github.com/dotnet/AspNetCore.Docs/issues/27956 https://github.com/dotnet/AspNetCore.Docs/issues/14974 -->
+[SignalR](xref:signalr/introduction) apps shouldn't use session state and other state management approaches that rely upon a stable HTTP context to store information. SignalR apps can store per-connection state in [`Context.Items` in the hub](xref:signalr/hubs). For more information and alternative state management approaches for Blazor Server apps, see <xref:blazor/state-management/index> and <xref:blazor/state-management/server>.
 
 ## Cookies
 
@@ -75,7 +74,7 @@ Session state exhibits the following behaviors:
 
 The in-memory cache provider stores session data in the memory of the server where the app resides. In a server farm scenario:
 
-* Use *sticky sessions* to tie each session to a specific app instance on an individual server. [Azure App Service](https://azure.microsoft.com/services/app-service/) uses [Application Request Routing (ARR)](/iis/extensions/planning-for-arr/using-the-application-request-routing-module) to enforce sticky sessions by default. However, sticky sessions can affect scalability and complicate web app updates. A better approach is to use a Redis or SQL Server distributed cache, which doesn't require sticky sessions. For more information, see <xref:performance/caching/distributed>.
+* Use *sticky sessions* to tie each session to a specific app instance on an individual server. [Azure App Service](https://azure.microsoft.com/services/app-service/) uses [Application Request Routing (ARR)](/iis/extensions/planning-for-arr/using-the-application-request-routing-module) to enforce sticky sessions by default. However, sticky sessions can affect scalability and complicate web app updates. A better approach is to use a Redis, SQL Server, or Azure Postgres distributed cache, which doesn't require sticky sessions. For more information, see <xref:performance/caching/distributed>.
 * The session cookie is encrypted via <xref:Microsoft.AspNetCore.DataProtection.IDataProtector>. Data Protection must be properly configured to read session cookies on each machine. For more information, see <xref:security/data-protection/introduction> and [Key storage providers](xref:security/data-protection/implementation/key-storage-providers).
 
 ### Configure session state
@@ -92,7 +91,7 @@ The following code shows how to set up the in-memory session provider with a def
 
 The preceding code sets a short timeout to simplify testing.
 
-The order of middleware is important.  Call `UseSession` after `UseRouting` and before `MapRazorPages` and `MapDefaultControllerRoute` . See [Middleware Ordering](xref:fundamentals/middleware/index#order).
+The order of middleware is important.  Call `UseSession` after `UseRouting` and before `MapRazorPages` and `MapDefaultControllerRoute`. See [Middleware Ordering](xref:fundamentals/middleware/index#middleware-order).
 
 [HttpContext.Session](xref:Microsoft.AspNetCore.Http.HttpContext.Session) is available after session state is configured.
 
@@ -122,7 +121,7 @@ To override cookie session defaults, use <xref:Microsoft.AspNetCore.Builder.Sess
 
 [!code-csharp[](app-state/6.0samples/RazorPagesContacts/Program.cs?name=snippet_or&highlight=8-13)]
 
-The app uses the <xref:Microsoft.AspNetCore.Builder.SessionOptions.IdleTimeout> property to determine how long a session can be idle before its contents in the server's cache are abandoned. This property is independent of the cookie expiration. Each request that passes through the [Session Middleware](xref:Microsoft.AspNetCore.Session.SessionMiddleware) resets the timeout.
+The app uses the <xref:Microsoft.AspNetCore.Builder.SessionOptions.IdleTimeout> property to determine how long a session can be idle before its contents in the server's cache are abandoned. This property is independent of the cookie expiration. Each request that passes through the [session middleware](xref:Microsoft.AspNetCore.Session.SessionMiddleware) resets the timeout.
 
 Session state is *non-locking*. If two requests simultaneously attempt to modify the contents of a session, the last request overrides the first. `Session` is implemented as a *coherent session*, which means that all the contents are stored together. When two requests seek to modify different session values, the last request may override session changes made by the first.
 
@@ -230,7 +229,7 @@ To enable the session-based TempData provider, use the <xref:Microsoft.Extension
 
 A limited amount of data can be passed from one request to another by adding it to the new request's query string. This is useful for capturing state in a persistent manner that allows links with embedded state to be shared through email or social networks. Because URL query strings are public, never use query strings for sensitive data.
 
-In addition to unintended sharing, including data in query strings can expose the app to [Cross-Site Request Forgery (CSRF)](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) attacks. Any preserved session state must protect against CSRF attacks. For more information, see <xref:security/anti-request-forgery>.
+In addition to unintended sharing, including data in query strings can expose the app to [Cross-Site Request Forgery (CSRF)](https://owasp.org/www-community/attacks/csrf) attacks. Any preserved session state must protect against CSRF attacks. For more information, see <xref:security/anti-request-forgery>.
 
 ## Hidden fields
 
@@ -283,7 +282,7 @@ The recommended approach to check for errors is to call `await feature.Session.C
 
 ## Additional resources
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/app-state/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/app-state/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 <xref:host-and-deploy/web-farm>
 
@@ -295,7 +294,7 @@ By [Rick Anderson](https://twitter.com/RickAndMSFT), [Kirk Larkin](https://twitt
 
 HTTP is a stateless protocol. By default, HTTP requests are independent messages that don't retain user values. This article describes several approaches to preserve user data between requests.
 
-[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/app-state/samples) ([how to download](xref:index#how-to-download-a-sample))
+[View or download sample code](https://github.com/dotnet/AspNetCore.Docs/tree/main/aspnetcore/fundamentals/app-state/samples) ([how to download](xref:fundamentals/index#how-to-download-a-sample))
 
 ## State management
 
@@ -313,7 +312,7 @@ State can be stored using several approaches. Each approach is described later i
 
 ## SignalR/Blazor Server and HTTP context-based state management
 
-[SignalR](xref:signalr/introduction) apps shouldn't use session state and other state management approaches that rely upon a stable HTTP context to store information. SignalR apps can store per-connection state in [`Context.Items` in the hub](xref:signalr/hubs). For more information and alternative state management approaches for Blazor Server apps, see <xref:blazor/state-management?pivots=server>. <!-- https://github.com/aspnet/SignalR/issues/2139 https://github.com/dotnet/AspNetCore.Docs/issues/27956 https://github.com/dotnet/AspNetCore.Docs/issues/14974 -->
+[SignalR](xref:signalr/introduction) apps shouldn't use session state and other state management approaches that rely upon a stable HTTP context to store information. SignalR apps can store per-connection state in [`Context.Items` in the hub](xref:signalr/hubs). For more information and alternative state management approaches for Blazor Server apps, see <xref:blazor/state-management/index> and <xref:blazor/state-management/server>.
 
 ## Cookies
 
@@ -354,7 +353,7 @@ Session state exhibits the following behaviors:
 
 The in-memory cache provider stores session data in the memory of the server where the app resides. In a server farm scenario:
 
-* Use *sticky sessions* to tie each session to a specific app instance on an individual server. [Azure App Service](https://azure.microsoft.com/services/app-service/) uses [Application Request Routing (ARR)](/iis/extensions/planning-for-arr/using-the-application-request-routing-module) to enforce sticky sessions by default. However, sticky sessions can affect scalability and complicate web app updates. A better approach is to use a Redis or SQL Server distributed cache, which doesn't require sticky sessions. For more information, see <xref:performance/caching/distributed>.
+* Use *sticky sessions* to tie each session to a specific app instance on an individual server. [Azure App Service](https://azure.microsoft.com/services/app-service/) uses [Application Request Routing (ARR)](/iis/extensions/planning-for-arr/using-the-application-request-routing-module) to enforce sticky sessions by default. However, sticky sessions can affect scalability and complicate web app updates. A better approach is to use a Redis, SQL Server, or Azure Postgres distributed cache, which doesn't require sticky sessions. For more information, see <xref:performance/caching/distributed>.
 * The session cookie is encrypted via <xref:Microsoft.AspNetCore.DataProtection.IDataProtector>. Data Protection must be properly configured to read session cookies on each machine. For more information, see <xref:security/data-protection/introduction> and [Key storage providers](xref:security/data-protection/implementation/key-storage-providers).
 
 ### Configure session state
@@ -376,7 +375,7 @@ The following code shows how to set up the in-memory session provider with a def
 
 The preceding code sets a short timeout to simplify testing.
 
-The order of middleware is important.  Call `UseSession` after `UseRouting` and before `UseEndpoints`. See [Middleware Ordering](xref:fundamentals/middleware/index#order).
+The order of middleware is important. Call `UseSession` after `UseRouting` and before `UseEndpoints`. For more information, see <xref:fundamentals/middleware/index#middleware-order>.
 
 [HttpContext.Session](xref:Microsoft.AspNetCore.Http.HttpContext.Session) is available after session state is configured.
 
@@ -406,7 +405,7 @@ To override cookie session defaults, use <xref:Microsoft.AspNetCore.Builder.Sess
 
 [!code-csharp[](app-state/samples/3.x/SessionSample/Startup2.cs?name=snippet1&highlight=5-10)]
 
-The app uses the <xref:Microsoft.AspNetCore.Builder.SessionOptions.IdleTimeout> property to determine how long a session can be idle before its contents in the server's cache are abandoned. This property is independent of the cookie expiration. Each request that passes through the [Session Middleware](xref:Microsoft.AspNetCore.Session.SessionMiddleware) resets the timeout.
+The app uses the <xref:Microsoft.AspNetCore.Builder.SessionOptions.IdleTimeout> property to determine how long a session can be idle before its contents in the server's cache are abandoned. This property is independent of the cookie expiration. Each request that passes through the [session middleware](xref:Microsoft.AspNetCore.Session.SessionMiddleware) resets the timeout.
 
 Session state is *non-locking*. If two requests simultaneously attempt to modify the contents of a session, the last request overrides the first. `Session` is implemented as a *coherent session*, which means that all the contents are stored together. When two requests seek to modify different session values, the last request may override session changes made by the first.
 
@@ -507,7 +506,7 @@ To enable the session-based TempData provider, use the <xref:Microsoft.Extension
 
 A limited amount of data can be passed from one request to another by adding it to the new request's query string. This is useful for capturing state in a persistent manner that allows links with embedded state to be shared through email or social networks. Because URL query strings are public, never use query strings for sensitive data.
 
-In addition to unintended sharing, including data in query strings can expose the app to [Cross-Site Request Forgery (CSRF)](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_(CSRF)) attacks. Any preserved session state must protect against CSRF attacks. For more information, see <xref:security/anti-request-forgery>.
+In addition to unintended sharing, including data in query strings can expose the app to [Cross-Site Request Forgery (CSRF)](https://owasp.org/www-community/attacks/csrf) attacks. Any preserved session state must protect against CSRF attacks. For more information, see <xref:security/anti-request-forgery>.
 
 ## Hidden fields
 

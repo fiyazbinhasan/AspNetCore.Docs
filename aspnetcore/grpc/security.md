@@ -4,7 +4,6 @@ author: jamesnk
 description: Learn about security considerations for gRPC for ASP.NET Core.
 monikerRange: '>= aspnetcore-3.0'
 ms.author: wpickett
-ms.custom: mvc
 ms.date: 07/07/2019
 uid: grpc/security
 ---
@@ -14,7 +13,7 @@ uid: grpc/security
 
 By [James Newton-King](https://twitter.com/jamesnk)
 
-This article provides information on securing gRPC with .NET Core.
+This article provides information on securing gRPC with .NET.
 
 ## Transport security
 

@@ -3,9 +3,8 @@ title: ASP.NET Core Razor component rendering
 author: guardrex
 description: Learn about Razor component rendering in ASP.NET Core Blazor apps, including when to manually trigger a component to render.
 monikerRange: '>= aspnetcore-3.1'
-ms.author: riande
-ms.custom: mvc
-ms.date: 02/09/2024
+ms.author: wpickett
+ms.date: 11/11/2025
 uid: blazor/components/rendering
 ---
 # ASP.NET Core Razor component rendering
@@ -39,7 +38,7 @@ Components inherited from <xref:Microsoft.AspNetCore.Components.ComponentBase> s
 
 In most cases, <xref:Microsoft.AspNetCore.Components.ComponentBase> conventions result in the correct subset of component rerenders after an event occurs. Developers aren't usually required to provide manual logic to tell the framework which components to rerender and when to rerender them. The overall effect of the framework's conventions is that the component receiving an event rerenders itself, which recursively triggers rerendering of descendant components whose parameter values may have changed.
 
-For more information on the performance implications of the framework's conventions and how to optimize an app's component hierarchy for rendering, see <xref:blazor/performance#optimize-rendering-speed>.
+For more information on the performance implications of the framework's conventions and how to optimize an app's component hierarchy for rendering, see <xref:blazor/performance/rendering>.
 
 ::: moniker range=">= aspnetcore-8.0"
 
@@ -51,7 +50,33 @@ For example, consider a component that makes a long-running database query or we
 
 Streaming rendering requires the server to avoid buffering the output. The response data must flow to the client as the data is generated. For hosts that enforce buffering, streaming rendering degrades gracefully, and the page loads without streaming rendering.
 
-To stream content updates when using static server-side rendering (static SSR) or prerendering, apply the `[StreamRendering(true)]` attribute to the component. Streaming rendering must be explicitly enabled because streamed updates may cause content on the page to shift. Components without the attribute automatically adopt streaming rendering if the parent component uses the feature. Pass `false` to the attribute in a child component to disable the feature at that point and further down the component subtree. The attribute is functional when applied to components supplied by a [Razor class library](xref:blazor/components/class-libraries).
+To stream content updates when using static server-side rendering (static SSR) or prerendering, apply the [`[StreamRendering]` attribute](xref:Microsoft.AspNetCore.Components.StreamRenderingAttribute) in .NET 9 or later (use `[StreamRendering(true)]` in .NET 8) to the component. Streaming rendering must be explicitly enabled because streamed updates may cause content on the page to shift. Components without the attribute automatically adopt streaming rendering if the parent component uses the feature. Pass `false` to the attribute in a child component to disable the feature at that point and further down the component subtree. The attribute is functional when applied to components supplied by a [Razor class library](xref:blazor/components/class-libraries).
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-10.0"
+
+If [enhanced navigation](xref:blazor/fundamentals/navigation#enhanced-navigation-and-form-handling) is active, streaming rendering renders [Not Found responses](xref:blazor/fundamentals/navigation#not-found-responses) without reloading the page. When enhanced navigation is blocked, the framework redirects to Not Found content with a page refresh. 
+
+Streaming rendering can only render components that have a route, such as a [`NotFoundPage` assignment](xref:blazor/fundamentals/navigation#not-found-responses) (`NotFoundPage="..."`) or a [status code pages re-execution middleware page assignment](xref:fundamentals/error-handling#usestatuscodepageswithreexecute) (<xref:Microsoft.AspNetCore.Builder.StatusCodePagesExtensions.UseStatusCodePagesWithReExecute%2A>). The Not Found render fragment (`<NotFound>...</NotFound>`) and the `DefaultNotFound` 404 content ("`Not found`" plain text) don't have routes, so they can't be used during streaming rendering.
+
+Streaming `NavigationManager.NotFound` content rendering uses (in order):
+
+* A `NotFoundPage` passed to the `Router` component, if present.
+* A status code pages re-execution middleware page, if configured.
+* No action if neither of the preceding approaches is adopted.
+
+Non-streaming `NavigationManager.NotFound` content rendering uses (in order):
+
+* A `NotFoundPage` passed to the `Router` component, if present.
+* Not Found render fragment content, if present. *Not recommended in .NET 10 or later.*
+* `DefaultNotFound` 404 content ("`Not found`" plain text).
+
+[Status code pages re-execution middleware](xref:fundamentals/error-handling#usestatuscodepageswithreexecute) with <xref:Microsoft.AspNetCore.Builder.StatusCodePagesExtensions.UseStatusCodePagesWithReExecute%2A> takes precedence for browser-based address routing problems, such as an incorrect URL typed into the browser's address bar or selecting a link that has no endpoint in the app.
+
+:::moniker-end
+
+:::moniker range=">= aspnetcore-8.0"
 
 The following example is based on the `Weather` component in an app created from the [Blazor Web App project template](xref:blazor/project-structure#blazor-web-app). The call to <xref:System.Threading.Tasks.Task.Delay%2A?displayProperty=nameWithType> simulates retrieving weather data asynchronously. The component initially renders placeholder content ("`Loading...`") without waiting for the asynchronous delay to complete. When the asynchronous delay completes and the weather data content is generated, the content is streamed to the response and patched into the weather forecast table.
 
@@ -59,7 +84,7 @@ The following example is based on the `Weather` component in an app created from
 
 ```razor
 @page "/weather"
-@attribute [StreamRendering(true)]
+@attribute [StreamRendering]
 
 ...
 
@@ -147,7 +172,7 @@ Even if <xref:Microsoft.AspNetCore.Components.ComponentBase.ShouldRender%2A> is 
 
 ::: moniker-end
 
-For more information on performance best practices pertaining to <xref:Microsoft.AspNetCore.Components.ComponentBase.ShouldRender%2A>, see <xref:blazor/performance#avoid-unnecessary-rendering-of-component-subtrees>.
+For more information on performance best practices pertaining to <xref:Microsoft.AspNetCore.Components.ComponentBase.ShouldRender%2A>, see <xref:blazor/performance/rendering#avoid-unnecessary-rendering-of-component-subtrees>.
 
 ## `StateHasChanged`
 
@@ -257,7 +282,7 @@ Consider the following `CounterState1` component, which updates the count four t
 Consider the following `CounterState2` component that uses <xref:System.Timers.Timer?displayProperty=fullName> to update a count at a regular interval and calls <xref:Microsoft.AspNetCore.Components.ComponentBase.StateHasChanged%2A> to update the UI:
 
 * `OnTimerCallback` runs outside of any Blazor-managed rendering flow or event notification. Therefore, `OnTimerCallback` must call <xref:Microsoft.AspNetCore.Components.ComponentBase.StateHasChanged%2A> because Blazor isn't aware of the changes to `currentCount` in the callback.
-* The component implements <xref:System.IDisposable>, where the <xref:System.Timers.Timer> is disposed when the framework calls the `Dispose` method. For more information, see <xref:blazor/components/lifecycle#component-disposal-with-idisposable-and-iasyncdisposable>.
+* The component implements <xref:System.IDisposable>, where the <xref:System.Timers.Timer> is disposed when the framework calls the `Dispose` method. For more information, see <xref:blazor/components/component-disposal>.
 
 Because the callback is invoked outside of Blazor's synchronization context, the component must wrap the logic of `OnTimerCallback` in <xref:Microsoft.AspNetCore.Components.ComponentBase.InvokeAsync%2A?displayProperty=nameWithType> to move it onto the renderer's synchronization context. This is equivalent to marshalling to the UI thread in other UI frameworks. <xref:Microsoft.AspNetCore.Components.ComponentBase.StateHasChanged%2A> can only be called from the renderer's synchronization context and throws an exception otherwise:
 
@@ -315,7 +340,7 @@ For approaches to manage state, see the following resources:
 
 * [Bind across more than two components](xref:blazor/components/data-binding#bind-across-more-than-two-components) using data bindings.
 * [Pass data across a component hierarchy](xref:blazor/components/cascading-values-and-parameters#pass-data-across-a-component-hierarchy) using cascading values and parameters.
-* [Server-side in-memory state container service](xref:blazor/state-management?pivots=server#in-memory-state-container-service-server) ([client-side equivalent](xref:blazor/state-management?pivots=webassembly#in-memory-state-container-service-wasm)) section of the *State management* article.
+* [In-memory state container service](xref:blazor/state-management/index#in-memory-state-container-service) section of the *State management* overview.
 
 For the state manager approach, C# events are outside the Blazor rendering pipeline. Call <xref:Microsoft.AspNetCore.Components.ComponentBase.StateHasChanged%2A> on other components you wish to rerender in response to the state manager's events.
 
@@ -323,7 +348,4 @@ The state manager approach is similar to the earlier case with <xref:System.Time
 
 ## WebAssembly loading progress indicator for Blazor Web Apps
 
-<!-- UPDATE 10.0 Will be removed for a new feature in this area. 
-                 Tracked by: https://github.com/dotnet/aspnetcore/issues/49056 -->
-
-A loading progress indicator isn't present in an app created from the Blazor Web App project template. A new loading progress indicator feature is planned for a future release of .NET. In the meantime, an app can adopt custom code to create a loading progress indicator. For more information, see <xref:blazor/fundamentals/startup#client-side-loading-progress-indicators>.
+An app can adopt custom code to create a loading progress indicator. For more information, see <xref:blazor/fundamentals/startup#client-side-loading-indicators>.
